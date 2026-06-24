@@ -1,1 +1,41 @@
-{"data":"ewogICJuYW1lIjogInBvcnRmb2xpbyIsCiAgInByaXZhdGUiOiB0cnVlLAogICJ2ZXJzaW9uIjogIjAuMC4wIiwKICAidHlwZSI6ICJtb2R1bGUiLAogICJzY3JpcHRzIjogewogICAgImRldiI6ICJ2aXRlIiwKICAgICJidWlsZCI6ICJ2aXRlIGJ1aWxkIiwKICAgICJsaW50IjogImVzbGludCBzcmMgLS1leHQganMsanN4IC0tcmVwb3J0LXVudXNlZC1kaXNhYmxlLWRpcmVjdGl2ZXMgLS1tYXgtd2FybmluZ3MgMCIsCiAgICAicHJldmlldyI6ICJ2aXRlIHByZXZpZXciCiAgfSwKICAiZGVwZW5kZW5jaWVzIjogewogICAgIkBlbWFpbGpzL2Jyb3dzZXIiOiAiXjMuMTEuMCIsCiAgICAiQHJlYWN0LXRocmVlL2RyZWkiOiAiXjkuNzcuMyIsCiAgICAiQHJlYWN0LXRocmVlL2ZpYmVyIjogIl44LjEzLjMiLAogICAgImZyYW1lci1tb3Rpb24iOiAiXjEwLjEyLjE3IiwKICAgICJtYWF0aCI6ICJeMC43LjAiLAogICAgInJlYWN0IjogIl4xOC4yLjAiLAogICAgInJlYWN0LWRvbSI6ICJeMTguMi4wIiwKICAgICJyZWFjdC1wYXJhbGxheC10aWx0IjogIl4xLjcuMTQ5IiwKICAgICJyZWFjdC1yb3V0ZXItZG9tIjogIl42LjE0LjAiLAogICAgInJlYWN0LXRpbHQiOiAiXjEuMC4yIiwKICAgICJyZWFjdC10eXBld3JpdGVyIjogIl4wLjQuMSIsCiAgICAicmVhY3QtdmVydGljYWwtdGltZWxpbmUtY29tcG9uZW50IjogIl4zLjYuMCIsCiAgICAidGhyZWUiOiAiXjAuMTUzLjAiCiAgfSwKICAiZGV2RGVwZW5kZW5jaWVzIjogewogICAgIkB0eXBlcy9yZWFjdCI6ICJeMTguMC4zNyIsCiAgICAiQHR5cGVzL3JlYWN0LWRvbSI6ICJeMTguMC4xMSIsCiAgICAiQHZpdGVqcy9wbHVnaW4tcmVhY3QiOiAiXjQuMC4wIiwKICAgICJhdXRvcHJlZml4ZXIiOiAiXjEwLjQuMTQiLAogICAgImVzbGludCI6ICJeOC4zOC4wIiwKICAgICJlc2xpbnQtcGx1Z2luLXJlYWN0IjogIl43LjMyLjIiLAogICAgImVzbGludC1wbHVnaW4tcmVhY3QtaG9va3MiOiAiXjQuNi4wIiwKICAgICJlc2xpbnQtcGx1Z2luLXJlYWN0LXJlZnJlc2giOiAiXjAuMy40IiwKICAgICJwb3N0Y3NzIjogIl44LjQuMjQiLAogICAgInRhaWx3aW5kY3NzIjogIl4zLjMuMiIsCiAgICAidml0ZSI6ICJeNC4zLjkiCiAgfQp9Cg=="}
+﻿{
+  "name": "portfolio",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^3.11.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "@react-three/drei": "^9.77.3",
+    "@react-three/fiber": "^8.13.3",
+    "framer-motion": "^10.12.17",
+    "maath": "^0.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-parallax-tilt": "^1.7.149",
+    "react-router-dom": "^6.14.0",
+    "react-tilt": "^1.0.2",
+    "react-typewriter": "^0.4.1",
+    "react-vertical-timeline-component": "^3.6.0",
+    "three": "^0.153.0",
+    "vite": "^4.3.9"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.37",
+    "@types/react-dom": "^18.0.11",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.38.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.2",
+    "vite": "^4.3.9"
+  }
+}
