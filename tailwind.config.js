@@ -1,1 +1,27 @@
-{"data":"LyoqIEB0eXBlIHtpbXBvcnQoJ3RhaWx3aW5kY3NzJykuQ29uZmlnfSAqLwptb2R1bGUuZXhwb3J0cyA9IHsKICBjb250ZW50OiBbIi4vc3JjLyoqLyoue2pzLGpzeH0iXSwKICBtb2RlOiAiaml0IiwKICB0aGVtZTogewogICAgZXh0ZW5kOiB7CiAgICAgIGNvbG9yczogewogICAgICAgIHByaW1hcnk6ICIjMDUwODE2IiwKICAgICAgICBzZWNvbmRhcnk6ICIjYWFhNmMzIiwKICAgICAgICB0ZXJ0aWFyeTogIiMxNTEwMzAiLAogICAgICAgICJibGFjay0xMDAiOiAiIzEwMGQyNSIsCiAgICAgICAgImJsYWNrLTIwMCI6ICIjMDkwMzI1IiwKICAgICAgICAid2hpdGUtMTAwIjogIiNmM2YzZjMiLAogICAgICB9LAogICAgICBib3hTaGFkb3c6IHsKICAgICAgICBjYXJkOiAiMHB4IDM1cHggMTIwcHggLTE1cHggIzIxMWUzNSIsCiAgICAgIH0sCiAgICAgIHNjcmVlbnM6IHsKICAgICAgICB4czogIjQ1MHB4IiwKICAgICAgfSwKICAgICAgYmFja2dyb3VuZEltYWdlOiB7CiAgICAgICAgImhlcm8tcGF0dGVybiI6ICJ1cmwoJy9zcmMvYXNzZXRzL2hlcm9iZy5wbmcnKSIsCiAgICAgIH0sCiAgICB9LAogIH0sCiAgcGx1Z2luczogW10sCn07Cg=="}
+﻿/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./src/**/*.{js,jsx}"],
+  mode: "jit",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#050816",
+        secondary: "#aaa6c3",
+        tertiary: "#151030",
+        "black-100": "#100d25",
+        "black-200": "#090325",
+        "white-100": "#f3f3f3",
+      },
+      boxShadow: {
+        card: "0px 35px 120px -15px #211e35",
+      },
+      screens: {
+        xs: "450px",
+      },
+      backgroundImage: {
+        "hero-pattern": "url('/src/assets/herobg.png')",
+      },
+    },
+  },
+  plugins: [],
+};
