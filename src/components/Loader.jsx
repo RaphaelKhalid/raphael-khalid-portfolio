@@ -1,1 +1,22 @@
-{"data":"aW1wb3J0IHsgSHRtbCwgdXNlUHJvZ3Jlc3MgfSBmcm9tICJAcmVhY3QtdGhyZWUvZHJlaSI7Cgpjb25zdCBMb2FkZXIgPSAoKSA9PiB7CiAgY29uc3QgeyBwcm9ncmVzcyB9ID0gdXNlUHJvZ3Jlc3MoKTsKICByZXR1cm4gKAogICAgPEh0bWw+CiAgICAgIDxzcGFuIGNsYXNzTmFtZT0iY2FudmFzLWxvYWQiPjwvc3Bhbj4KICAgICAgPHAKICAgICAgICBzdHlsZT17ewogICAgICAgICAgZm9udFNpemU6ICIxNCIsCiAgICAgICAgICBjb2xvcjogIiNmMWYxZjEiLAogICAgICAgICAgZm9udFdlaWdodDogODAwLAogICAgICAgICAgbWFyZ2luVG9wOiA0MCwKICAgICAgICB9fQogICAgICA+CiAgICAgICAge3Byb2dyZXNzLnRvRml4ZWQoMCl9JQogICAgICA8L3A+CiAgICA8L0h0bWw+CiAgKTsKfTsKCmV4cG9ydCBkZWZhdWx0IExvYWRlcjsK"}
+﻿import { Html, useProgress } from "@react-three/drei";
+
+const Loader = () => {
+  const { progress } = useProgress();
+  return (
+    <Html>
+      <span className="canvas-load"></span>
+      <p
+        style={{
+          fontSize: "14",
+          color: "#f1f1f1",
+          fontWeight: 800,
+          marginTop: 40,
+        }}
+      >
+        {progress.toFixed(0)}%
+      </p>
+    </Html>
+  );
+};
+
+export default Loader;

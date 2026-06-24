@@ -1,1 +1,61 @@
-{"data":"aW1wb3J0IHsgbW90aW9uIH0gZnJvbSAiZnJhbWVyLW1vdGlvbiI7CmltcG9ydCB7IHN0eWxlcyB9IGZyb20gIi4uL3N0eWxlcyI7CmltcG9ydCBoZWFkc2hvdGdyYXkgZnJvbSAiLi4vYXNzZXRzL2hlYWRzaG90Z3JheS5wbmciOwppbXBvcnQgaGVhZHNob3QgZnJvbSAiLi4vYXNzZXRzL2hlYWRzaG90LnBuZyI7Cgpjb25zdCBIZXJvID0gKCkgPT4gewogIHJldHVybiAoCiAgICA8c2VjdGlvbiBjbGFzc05hbWU9InJlbGF0aXZlIHctZnVsbCBoLXNjcmVlbiBteC1hdXRvIG92ZXJmbG93LWhpZGRlbiI+CiAgICAgIDxkaXYKICAgICAgICBjbGFzc05hbWU9e2Ake3N0eWxlcy5wYWRkaW5nWH0gYWJzb2x1dGUgaW5zZXQtMCB0b3AtWzEyMHB4XSBtYXgtdy03eGwgbXgtYXV0byBmbGV4IGZsZXgtcm93IGl0ZW1zLXN0YXJ0IGdhcC01YH0KICAgICAgPgogICAgICAgIDxkaXYgY2xhc3NOYW1lPSJmbGV4IGZsZXgtY29sIGp1c3RpZnktY2VudGVyIGl0ZW1zLWNlbnRlciBtdC01Ij4KICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPSJ3LTUgaC01IHJvdW5kZWQtZnVsbCBiZy1bIzhCRkFGRl0iIC8+CiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT0idy0xIHNtOmgtODAgaC00MCB2aW9sZXQtZ3JhZGllbnQiIC8+CiAgICAgICAgPC9kaXY+CgogICAgICAgIDxpbWcKICAgICAgICAgIHNyYz17aGVhZHNob3R9CiAgICAgICAgICBhbHQ9IlByb2ZpbGUiCiAgICAgICAgICBjbGFzc05hbWU9InJvdW5kZWQtZnVsbCIKICAgICAgICAgIHN0eWxlPXt7CiAgICAgICAgICAgIHBvc2l0aW9uOiAiYWJzb2x1dGUiLAogICAgICAgICAgICB0b3A6ICIxMDAlIiwKICAgICAgICAgICAgbGVmdDogIjc1JSIsCiAgICAgICAgICAgIHRyYW5zZm9ybTogInRyYW5zbGF0ZSgtNTAlLCAtNzUlKSIsCiAgICAgICAgICAgIHpJbmRleDogImF1dG8iLAogICAgICAgICAgfX0KICAgICAgICAvPgogICAgICAgIDxkaXYgc3R5bGU9e3sgekluZGV4OiAwIH19PgogICAgICAgICAgPGgxIGNsYXNzTmFtZT17YCR7c3R5bGVzLmhlcm9IZWFkVGV4dH0gdGV4dC13aGl0ZWB9PgogICAgICAgICAgICBJJ20gPHNwYW4gY2xhc3NOYW1lPSJ0ZXh0LXdoaXRlIj5SYXBoYWVsIEtoYWxpZDwvc3Bhbj4KICAgICAgICAgIDwvaDE+CiAgICAgICAgICA8cCBjbGFzc05hbWU9e2Ake3N0eWxlcy5oZXJvU3ViVGV4dH0gbXQtMiB0ZXh0LXdoaXRlLTEwMGB9PgogICAgICAgICAgICBJIGFtIGEgQ29tcHV0ZXIgYW5kIFBvbGl0aWNhbCBTY2llbnRpc3QueyIgIn0KICAgICAgICAgICAgPGJyIGNsYXNzTmFtZT0ic206YmxvY2sgaGlkZGVuIiAvPgogICAgICAgICAgPC9wPgogICAgICAgIDwvZGl2PgogICAgICA8L2Rpdj4KCiAgICAgIDxkaXYgY2xhc3NOYW1lPSJhYnNvbHV0ZSB4czpib3R0b20tMTAgYm90dG9tLTMyIHctZnVsbCBmbGV4IGp1c3RpZnktY2VudGVyIGl0ZW1zLWNlbnRlciI+CiAgICAgICAgPGEgaHJlZj0iI2Fib3V0Ij4KICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPSJ3LVszNXB4XSBoLVs2NHB4XSByb3VuZGVkLTN4bCBib3JkZXItNCBib3JkZXItc2Vjb25kYXJ5IGZsZXgganVzaXRmeSBjZW50ZXIgaXRlbXMtc3RhcnQgcC0yIj4KICAgICAgICAgICAgPG1vdGlvbi5kaXYKICAgICAgICAgICAgICBhbmltYXRlPXt7CiAgICAgICAgICAgICAgICB5OiBbMCwgMjQsIDBdLAogICAgICAgICAgICAgIH19CiAgICAgICAgICAgICAgdHJhbnNpdGlvbj17ewogICAgICAgICAgICAgICAgZHVyYXRpb246IDEuNSwKICAgICAgICAgICAgICAgIHJlcGVhdDogSW5maW5pdHksCiAgICAgICAgICAgICAgICByZXBlYXRUeXBlOiAibG9vcCIsCiAgICAgICAgICAgICAgfX0KICAgICAgICAgICAgICBjbGFzc05hbWU9InctMyBoLTMgcm91bmRlZC1mdWxsIGJnLXNlY29uZGFyeSBtYi0xIgogICAgICAgICAgICA+PC9tb3Rpb24uZGl2PgogICAgICAgICAgPC9kaXY+CiAgICAgICAgPC9hPgogICAgICA8L2Rpdj4KICAgIDwvc2VjdGlvbj4KICApOwp9OwoKZXhwb3J0IGRlZmF1bHQgSGVybzsK"}
+﻿import { motion } from "framer-motion";
+import { styles } from "../styles";
+import headshotgray from "../assets/headshotgray.png";
+import headshot from "../assets/headshot.png";
+
+const Hero = () => {
+  return (
+    <section className="relative w-full h-screen mx-auto overflow-hidden">
+      <div
+        className={`${styles.paddingX} absolute inset-0 top-[120px] max-w-7xl mx-auto flex flex-row items-start gap-5`}
+      >
+        <div className="flex flex-col justify-center items-center mt-5">
+          <div className="w-5 h-5 rounded-full bg-[#8BFAFF]" />
+          <div className="w-1 sm:h-80 h-40 violet-gradient" />
+        </div>
+
+        <img
+          src={headshot}
+          alt="Profile"
+          className="rounded-full"
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: "75%",
+            transform: "translate(-50%, -75%)",
+            zIndex: "auto",
+          }}
+        />
+        <div style={{ zIndex: 0 }}>
+          <h1 className={`${styles.heroHeadText} text-white`}>
+            I'm <span className="text-white">Raphael Khalid</span>
+          </h1>
+          <p className={`${styles.heroSubText} mt-2 text-white-100`}>
+            I am a Computer and Political Scientist.{" "}
+            <br className="sm:block hidden" />
+          </p>
+        </div>
+      </div>
+
+      <div className="absolute xs:bottom-10 bottom-32 w-full flex justify-center items-center">
+        <a href="#about">
+          <div className="w-[35px] h-[64px] rounded-3xl border-4 border-secondary flex jusitfy center items-start p-2">
+            <motion.div
+              animate={{
+                y: [0, 24, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                repeatType: "loop",
+              }}
+              className="w-3 h-3 rounded-full bg-secondary mb-1"
+            ></motion.div>
+          </div>
+        </a>
+      </div>
+    </section>
+  );
+};
+
+export default Hero;

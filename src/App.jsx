@@ -1,1 +1,35 @@
-{"data":"aW1wb3J0IHsgQnJvd3NlclJvdXRlciB9IGZyb20gInJlYWN0LXJvdXRlci1kb20iOwppbXBvcnQgewogIEFib3V0LAogIENvbnRhY3QsCiAgRXhwZXJpZW5jZSwKICBIZXJvLAogIE5hdmJhciwKICBXb3JrcywKICBTdGFyc0NhbnZhcywKfSBmcm9tICIuL2NvbXBvbmVudHMiOwoKY29uc3QgQXBwID0gKCkgPT4gewogIHJldHVybiAoCiAgICA8QnJvd3NlclJvdXRlcj4KICAgICAgPGRpdiBjbGFzc05hbWU9InJlbGF0aXZlIHotMCBiZy1wcmltYXJ5Ij4KICAgICAgICA8ZGl2CiAgICAgICAgICBjbGFzc05hbWU9ImJnLXByaW1hcnkgYmctY292ZXIgYmctbm8tcmVwZWF0IGJnLWNlbnRlciIKICAgICAgICAgIHN0eWxlPXt7IHpJbmRleDogLTEgfX0KICAgICAgICA+CiAgICAgICAgICA8TmF2YmFyIC8+CiAgICAgICAgICA8SGVybyAvPgogICAgICAgIDwvZGl2PgogICAgICAgIDxBYm91dCAvPgogICAgICAgIDxFeHBlcmllbmNlIC8+CiAgICAgICAgPFdvcmtzIC8+CiAgICAgICAgPGRpdiBjbGFzc05hbWU9InJlbGF0aXZlIHotMCI+CiAgICAgICAgICA8Q29udGFjdCAvPgogICAgICAgICAgPFN0YXJzQ2FudmFzIC8+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgogICAgPC9Ccm93c2VyUm91dGVyPgogICk7Cn07CgpleHBvcnQgZGVmYXVsdCBBcHA7Cg=="}
+﻿import { BrowserRouter } from "react-router-dom";
+import {
+  About,
+  Contact,
+  Experience,
+  Hero,
+  Navbar,
+  Works,
+  StarsCanvas,
+} from "./components";
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <div className="relative z-0 bg-primary">
+        <div
+          className="bg-primary bg-cover bg-no-repeat bg-center"
+          style={{ zIndex: -1 }}
+        >
+          <Navbar />
+          <Hero />
+        </div>
+        <About />
+        <Experience />
+        <Works />
+        <div className="relative z-0">
+          <Contact />
+          <StarsCanvas />
+        </div>
+      </div>
+    </BrowserRouter>
+  );
+};
+
+export default App;

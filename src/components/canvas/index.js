@@ -1,1 +1,6 @@
-{"data":"aW1wb3J0IEVhcnRoIGZyb20gIi4vRWFydGgiOw0KaW1wb3J0IEJhbGxDYW52YXMgZnJvbSAiLi9CYWxsIjsNCmltcG9ydCBDb21wdXRlcnNDYW52YXMgZnJvbSAiLi9Db21wdXRlcnMiOw0KaW1wb3J0IFN0YXJzQ2FudmFzIGZyb20gIi4vU3RhcnMiOw0KDQpleHBvcnQgeyBFYXJ0aCwgQmFsbENhbnZhcywgQ29tcHV0ZXJzQ2FudmFzLCBTdGFyc0NhbnZhcyB9Ow0K"}
+﻿import Earth from "./Earth";
+import BallCanvas from "./Ball";
+import ComputersCanvas from "./Computers";
+import StarsCanvas from "./Stars";
+
+export { Earth, BallCanvas, ComputersCanvas, StarsCanvas };

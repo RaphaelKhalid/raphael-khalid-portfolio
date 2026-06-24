@@ -1,1 +1,20 @@
-{"data":"aW1wb3J0IHsgRWFydGgsIEJhbGxDYW52YXMsIENvbXB1dGVyc0NhbnZhcywgU3RhcnNDYW52YXMgfSBmcm9tICIuL2NhbnZhcyI7CmltcG9ydCBIZXJvIGZyb20gIi4vSGVybyI7CmltcG9ydCBOYXZiYXIgZnJvbSAiLi9OYXZiYXIiOwppbXBvcnQgQWJvdXQgZnJvbSAiLi9BYm91dCI7CmltcG9ydCBFeHBlcmllbmNlIGZyb20gIi4vRXhwZXJpZW5jZSI7CmltcG9ydCBXb3JrcyBmcm9tICIuL1dvcmtzIjsKaW1wb3J0IENvbnRhY3QgZnJvbSAiLi9Db250YWN0IjsKCmV4cG9ydCB7CiAgSGVybywKICBOYXZiYXIsCiAgQWJvdXQsCiAgRXhwZXJpZW5jZSwKICBXb3JrcywKICBDb250YWN0LAogIEVhcnRoLAogIEJhbGxDYW52YXMsCiAgQ29tcHV0ZXJzQ2FudmFzLAogIFN0YXJzQ2FudmFzLAp9Owo="}
+﻿import { Earth, BallCanvas, ComputersCanvas, StarsCanvas } from "./canvas";
+import Hero from "./Hero";
+import Navbar from "./Navbar";
+import About from "./About";
+import Experience from "./Experience";
+import Works from "./Works";
+import Contact from "./Contact";
+
+export {
+  Hero,
+  Navbar,
+  About,
+  Experience,
+  Works,
+  Contact,
+  Earth,
+  BallCanvas,
+  ComputersCanvas,
+  StarsCanvas,
+};

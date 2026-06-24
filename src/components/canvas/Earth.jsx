@@ -1,1 +1,44 @@
-{"data":"aW1wb3J0IFJlYWN0LCB7IFN1c3BlbnNlIH0gZnJvbSAicmVhY3QiOw0KaW1wb3J0IHsgQ2FudmFzIH0gZnJvbSAiQHJlYWN0LXRocmVlL2ZpYmVyIjsNCmltcG9ydCB7IE9yYml0Q29udHJvbHMsIFByZWxvYWQsIHVzZUdMVEYgfSBmcm9tICJAcmVhY3QtdGhyZWUvZHJlaSI7DQoNCmltcG9ydCBMb2FkZXIgZnJvbSAiLi4vTG9hZGVyIjsNCg0KY29uc3QgRWFydGggPSAoKSA9PiB7DQogIGNvbnN0IGVhcnRoID0gdXNlR0xURigiLi9wbGFuZXQvc2NlbmUuZ2x0ZiIpOw0KDQogIHJldHVybiAoDQogICAgPHByaW1pdGl2ZSBvYmplY3Q9e2VhcnRoLnNjZW5lfSBzY2FsZT17Mi41fSBwb3NpdGlvbi15PXswfSByb3RhdGlvbi15PXswfSAvPg0KICApOw0KfTsNCg0KY29uc3QgRWFydGhDYW52YXMgPSAoKSA9PiB7DQogIHJldHVybiAoDQogICAgPENhbnZhcw0KICAgICAgc2hhZG93cw0KICAgICAgZnJhbWVsb29wPSJkZW1hbmQiDQogICAgICBkcHI9e1sxLCAyXX0NCiAgICAgIGdsPXt7IHByZXNlcnZlRHJhd2luZ0J1ZmZlcjogdHJ1ZSB9fQ0KICAgICAgY2FtZXJhPXt7DQogICAgICAgIGZvdjogNDUsDQogICAgICAgIG5lYXI6IDAuMSwNCiAgICAgICAgZmFyOiAyMDAsDQogICAgICAgIHBvc2l0aW9uOiBbLTQsIDMsIDZdLA0KICAgICAgfX0NCiAgICA+DQogICAgICA8U3VzcGVuc2UgZmFsbGJhY2s9ezxMb2FkZXIgLz59Pg0KICAgICAgICA8T3JiaXRDb250cm9scw0KICAgICAgICAgIGF1dG9Sb3RhdGUNCiAgICAgICAgICBlbmFibGVab29tPXtmYWxzZX0NCiAgICAgICAgICBtYXhQb2xhckFuZ2xlPXtNYXRoLlBJIC8gMn0NCiAgICAgICAgICBtaW5Qb2xhckFuZ2xlPXtNYXRoLlBJIC8gMn0NCiAgICAgICAgLz4NCiAgICAgICAgPEVhcnRoIC8+DQoNCiAgICAgICAgPFByZWxvYWQgYWxsIC8+DQogICAgICA8L1N1c3BlbnNlPg0KICAgIDwvQ2FudmFzPg0KICApOw0KfTsNCg0KZXhwb3J0IGRlZmF1bHQgRWFydGhDYW52YXM7DQo="}
+﻿import React, { Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Preload, useGLTF } from "@react-three/drei";
+
+import Loader from "../Loader";
+
+const Earth = () => {
+  const earth = useGLTF("./planet/scene.gltf");
+
+  return (
+    <primitive object={earth.scene} scale={2.5} position-y={0} rotation-y={0} />
+  );
+};
+
+const EarthCanvas = () => {
+  return (
+    <Canvas
+      shadows
+      frameloop="demand"
+      dpr={[1, 2]}
+      gl={{ preserveDrawingBuffer: true }}
+      camera={{
+        fov: 45,
+        near: 0.1,
+        far: 200,
+        position: [-4, 3, 6],
+      }}
+    >
+      <Suspense fallback={<Loader />}>
+        <OrbitControls
+          autoRotate
+          enableZoom={false}
+          maxPolarAngle={Math.PI / 2}
+          minPolarAngle={Math.PI / 2}
+        />
+        <Earth />
+
+        <Preload all />
+      </Suspense>
+    </Canvas>
+  );
+};
+
+export default EarthCanvas;

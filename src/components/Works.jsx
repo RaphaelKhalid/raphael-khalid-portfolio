@@ -1,1 +1,99 @@
-{"data":"aW1wb3J0IFBhcmFsbGF4VGlsdCBmcm9tICJyZWFjdC1wYXJhbGxheC10aWx0IjsKaW1wb3J0IHsgbW90aW9uIH0gZnJvbSAiZnJhbWVyLW1vdGlvbiI7CmltcG9ydCB7IHN0eWxlcyB9IGZyb20gIi4uL3N0eWxlcyI7CmltcG9ydCB7IGxpbmsgfSBmcm9tICIuLi9hc3NldHMiOwppbXBvcnQgU2VjdGlvbldyYXBwZXIgZnJvbSAiLi4vaG9jIjsKaW1wb3J0IHsgcHJvamVjdHMgfSBmcm9tICIuLi9jb25zdGFudHMvaW5kZXgiOwppbXBvcnQgeyBmYWRlSW4sIHRleHRWYXJpYW50IH0gZnJvbSAiLi4vdXRpbHMvbW90aW9ucyI7Cgpjb25zdCBQcm9qZWN0Q2FyZCA9ICh7CiAgaW5kZXgsCiAgbmFtZSwKICBkZXNjcmlwdGlvbiwKICB0YWdzLAogIGltYWdlLAogIHNvdXJjZV9jb2RlX2xpbmssCn0pID0+IHsKICByZXR1cm4gKAogICAgPG1vdGlvbi5kaXYKICAgICAgdmFyaWFudHM9e2ZhZGVJbigidXAiLCAic3ByaW5nIiwgaW5kZXggKiAwLjUsIDAuNzUpfQogICAgICBpbml0aWFsPSJoaWRkZW4iCiAgICAgIGFuaW1hdGU9InNob3ciCiAgICA+CiAgICAgIDxQYXJhbGxheFRpbHQKICAgICAgICBvcHRpb25zPXt7CiAgICAgICAgICBtYXg6IDQ1LAogICAgICAgICAgc2NhbGU6IDEsCiAgICAgICAgICBzcGVlZDogNDUwLAogICAgICAgIH19CiAgICAgICAgY2xhc3NOYW1lPSJiZy10ZXJ0aWFyeSBwLTUgcm91bmRlZC0yeGwgc206dy1bMzYwcHhdIHctZnVsbCIKICAgICAgPgogICAgICAgIDxkaXYgY2xhc3NOYW1lPSJyZWxhdGl2ZSB3LWZ1bGwgaC1bMjMwcHhdIj4KICAgICAgICAgIDxpbWcKICAgICAgICAgICAgc3JjPXtpbWFnZX0KICAgICAgICAgICAgYWx0PSJwcm9qZWN0X2ltYWdlIgogICAgICAgICAgICBjbGFzc05hbWU9InctZnVsbCBoLWZ1bGwgb2JqZWN0LWNvdmVyIHJvdW5kZWQtMnhsIgogICAgICAgICAgLz4KCiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT0iYWJzb2x1dGUgaW5zZXQtMCBmbGV4IGp1c3RpZnktZW5kIG0tMyBjYXJkLWltZ19ob3ZlciI+CiAgICAgICAgICAgIDxkaXYKICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiB3aW5kb3cub3Blbihzb3VyY2VfY29kZV9saW5rLCAiX2JsYW5rIil9CiAgICAgICAgICAgICAgY2xhc3NOYW1lPSJ3LTEwIGgtMTAgcm91bmRlZC1mdWxsIGZsZXgganVzdGlmeS1jZW50ZXIgaXRlbXMtY2VudGVyIGN1cnNvci1wb2ludGVyIgogICAgICAgICAgICA+CiAgICAgICAgICAgICAgPGEKICAgICAgICAgICAgICAgIGNsYXNzTmFtZT0id2hpdGUgdy0xMCBoLTEwIHJvdW5kZWQtZnVsbCBmbGV4IGp1c3RpZnktY2VudGVyIGl0ZW1zLWNlbnRlciBjdXJzb3ItcG9pbnRlciIKICAgICAgICAgICAgICAgIGhyZWY9e3NvdXJjZV9jb2RlX2xpbmt9CiAgICAgICAgICAgICAgICB0YXJnZXQ9Il9ibGFuayIKICAgICAgICAgICAgICAgIHJlbD0ibm9vcGVuZXIgbm9yZWZlcnJlciIKICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICA8aW1nCiAgICAgICAgICAgICAgICAgIHNyYz17bGlua30KICAgICAgICAgICAgICAgICAgYWx0PSJzb3VyY2UgY29kZSIKICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPSJ3LTEvMiBoLTEvMiBvYmplY3QtY29udGFpbiIKICAgICAgICAgICAgICAgIC8+CiAgICAgICAgICAgICAgPC9hPgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgIDwvZGl2PgogICAgICAgIDwvZGl2PgoKICAgICAgICA8ZGl2IGNsYXNzTmFtZT0ibXQtNSI+CiAgICAgICAgICA8aDMgY2xhc3NOYW1lPSJ0ZXh0LXdoaXRlIGZvbnQtYm9sZCB0ZXh0LVsyNHB4XSI+e25hbWV9PC9oMz4KICAgICAgICAgIDxwIGNsYXNzTmFtZT0ibXQtMiB0ZXh0LXNlY29uZGFyeSB0ZXh0LVsxNHB4XSI+e2Rlc2NyaXB0aW9ufTwvcD4KICAgICAgICA8L2Rpdj4KCiAgICAgICAgPGRpdiBjbGFzc05hbWU9Im10LTQgZmxleCBmbGV4LXdyYXAgZ2FwLTIiPgogICAgICAgICAge3RhZ3MubWFwKCh0YWcpID0+ICgKICAgICAgICAgICAgPHAKICAgICAgICAgICAgICBrZXk9e2Ake25hbWV9LSR7dGFnLm5hbWV9YH0KICAgICAgICAgICAgICBjbGFzc05hbWU9e2B0ZXh0LVsxNHB4XSAke3RhZy5jb2xvcn1gfQogICAgICAgICAgICA+CiAgICAgICAgICAgICAgI3t0YWcubmFtZX0KICAgICAgICAgICAgPC9wPgogICAgICAgICAgKSl9CiAgICAgICAgPC9kaXY+CiAgICAgIDwvUGFyYWxsYXhUaWx0PgogICAgPC9tb3Rpb24uZGl2PgogICk7Cn07Cgpjb25zdCBXb3JrcyA9ICgpID0+IHsKICByZXR1cm4gKAogICAgPD4KICAgICAgPHAgY2xhc3NOYW1lPXtzdHlsZXMuc2VjdGlvblN1YlRleHR9Pk15IFdvcms8L3A+CiAgICAgIDxoMiBjbGFzc05hbWU9e3N0eWxlcy5zZWN0aW9uSGVhZFRleHR9PlByb2plY3RzLjwvaDI+CgogICAgICA8ZGl2IGNsYXNzTmFtZT0idy1mdWxsIGZsZXgiPgogICAgICAgIEEgZGl2ZXJzZSBzaG93Y2FzZSBvZiBwcm9qZWN0cywgZnJvbSBtYWNoaW5lIGxlYXJuaW5nLCB0byBwb2xpdGljYWwKICAgICAgICBzY2llbmNlLCBhbmQgaW50ZXJlc3RpbmcgaW50ZXJzZWN0aW9ucyBpbiBiZXR3ZWVuLgogICAgICA8L2Rpdj4KCiAgICAgIDxkaXYgY2xhc3NOYW1lPSJtdC0yMCBmbGV4IGZsZXgtd3JhcCBnYXAtNyI+CiAgICAgICAge3Byb2plY3RzLm1hcCgocHJvamVjdCwgaW5kZXgpID0+ICgKICAgICAgICAgIDxQcm9qZWN0Q2FyZCBrZXk9e2Bwcm9qZWN0LSR7aW5kZXh9YH0gaW5kZXg9e2luZGV4fSB7Li4ucHJvamVjdH0gLz4KICAgICAgICApKX0KICAgICAgPC9kaXY+CiAgICA8Lz4KICApOwp9OwoKZXhwb3J0IGRlZmF1bHQgU2VjdGlvbldyYXBwZXIoV29ya3MsICJ3b3JrIik7Cg=="}
+﻿import ParallaxTilt from "react-parallax-tilt";
+import { motion } from "framer-motion";
+import { styles } from "../styles";
+import { link } from "../assets";
+import SectionWrapper from "../hoc";
+import { projects } from "../constants/index";
+import { fadeIn, textVariant } from "../utils/motions";
+
+const ProjectCard = ({
+  index,
+  name,
+  description,
+  tags,
+  image,
+  source_code_link,
+}) => {
+  return (
+    <motion.div
+      variants={fadeIn("up", "spring", index * 0.5, 0.75)}
+      initial="hidden"
+      animate="show"
+    >
+      <ParallaxTilt
+        options={{
+          max: 45,
+          scale: 1,
+          speed: 450,
+        }}
+        className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full"
+      >
+        <div className="relative w-full h-[230px]">
+          <img
+            src={image}
+            alt="project_image"
+            className="w-full h-full object-cover rounded-2xl"
+          />
+
+          <div className="absolute inset-0 flex justify-end m-3 card-img_hover">
+            <div
+              onClick={() => window.open(source_code_link, "_blank")}
+              className="w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
+            >
+              <a
+                className="white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
+                href={source_code_link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={link}
+                  alt="source code"
+                  className="w-1/2 h-1/2 object-contain"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <h3 className="text-white font-bold text-[24px]">{name}</h3>
+          <p className="mt-2 text-secondary text-[14px]">{description}</p>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <p
+              key={`${name}-${tag.name}`}
+              className={`text-[14px] ${tag.color}`}
+            >
+              #{tag.name}
+            </p>
+          ))}
+        </div>
+      </ParallaxTilt>
+    </motion.div>
+  );
+};
+
+const Works = () => {
+  return (
+    <>
+      <p className={styles.sectionSubText}>My Work</p>
+      <h2 className={styles.sectionHeadText}>Projects.</h2>
+
+      <div className="w-full flex">
+        A diverse showcase of projects, from machine learning, to political
+        science, and interesting intersections in between.
+      </div>
+
+      <div className="mt-20 flex flex-wrap gap-7">
+        {projects.map((project, index) => (
+          <ProjectCard key={`project-${index}`} index={index} {...project} />
+        ))}
+      </div>
+    </>
+  );
+};
+
+export default SectionWrapper(Works, "work");

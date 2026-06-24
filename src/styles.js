@@ -1,1 +1,17 @@
-{"data":"Y29uc3Qgc3R5bGVzID0gew0KICBwYWRkaW5nWDogInNtOnB4LTE2IHB4LTYiLA0KICBwYWRkaW5nWTogInNtOnB5LTE2IHB5LTYiLA0KICBwYWRkaW5nOiAic206cHgtMTYgcHgtNiBzbTpweS0xNiBweS0xMCIsDQoNCiAgaGVyb0hlYWRUZXh0Og0KICAgICJmb250LWJsYWNrIHRleHQtd2hpdGUgbGc6dGV4dC1bODBweF0gc206dGV4dC1bNjBweF0geHM6dGV4dC1bNTBweF0gdGV4dC1bNDBweF0gbGc6bGVhZGluZy1bOThweF0gbXQtMiIsDQogIGhlcm9TdWJUZXh0Og0KICAgICJ0ZXh0LVsjZGZkOWZmXSBmb250LW1lZGl1bSBsZzp0ZXh0LVszMHB4XSBzbTp0ZXh0LVsyNnB4XSB4czp0ZXh0LVsyMHB4XSB0ZXh0LVsxNnB4XSBsZzpsZWFkaW5nLVs0MHB4XSIsDQoNCiAgc2VjdGlvbkhlYWRUZXh0Og0KICAgICJ0ZXh0LXdoaXRlIGZvbnQtYmxhY2sgbWQ6dGV4dC1bNjBweF0gc206dGV4dC1bNTBweF0geHM6dGV4dC1bNDBweF0gdGV4dC1bMzBweF0iLA0KICBzZWN0aW9uU3ViVGV4dDoNCiAgICAic206dGV4dC1bMThweF0gdGV4dC1bMTRweF0gdGV4dC1zZWNvbmRhcnkgdXBwZXJjYXNlIHRyYWNraW5nLXdpZGVyIiwNCn07DQoNCmV4cG9ydCB7IHN0eWxlcyB9Ow0K"}
+﻿const styles = {
+  paddingX: "sm:px-16 px-6",
+  paddingY: "sm:py-16 py-6",
+  padding: "sm:px-16 px-6 sm:py-16 py-10",
+
+  heroHeadText:
+    "font-black text-white lg:text-[80px] sm:text-[60px] xs:text-[50px] text-[40px] lg:leading-[98px] mt-2",
+  heroSubText:
+    "text-[#dfd9ff] font-medium lg:text-[30px] sm:text-[26px] xs:text-[20px] text-[16px] lg:leading-[40px]",
+
+  sectionHeadText:
+    "text-white font-black md:text-[60px] sm:text-[50px] xs:text-[40px] text-[30px]",
+  sectionSubText:
+    "sm:text-[18px] text-[14px] text-secondary uppercase tracking-wider",
+};
+
+export { styles };

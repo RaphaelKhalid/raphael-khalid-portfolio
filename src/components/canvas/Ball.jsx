@@ -1,1 +1,54 @@
-{"data":"aW1wb3J0IFJlYWN0LCB7IFN1c3BlbnNlIH0gZnJvbSAicmVhY3QiOw0KaW1wb3J0IHsgQ2FudmFzIH0gZnJvbSAiQHJlYWN0LXRocmVlL2ZpYmVyIjsNCmltcG9ydCB7DQogIE9yYml0Q29udHJvbHMsDQogIERlY2FsLA0KICBGbG9hdCwNCiAgUHJlbG9hZCwNCiAgdXNlVGV4dHVyZSwNCn0gZnJvbSAiQHJlYWN0LXRocmVlL2RyZWkiOw0KaW1wb3J0IExvYWRlciBmcm9tICIuLi9Mb2FkZXIiOw0KDQpjb25zdCBCYWxsID0gKHByb3BzKSA9PiB7DQogIGNvbnN0IFtkZWNhbF0gPSB1c2VUZXh0dXJlKFtwcm9wcy5pbWdVcmxdKTsNCg0KICByZXR1cm4gKA0KICAgIDxGbG9hdCBzcGVlZD17MS43NX0gcm90YXRpb25JbnRlbnNpdHk9ezF9IGZsb2F0SW50ZW5zaXR5PXsyfT4NCiAgICAgIDxhbWJpZW50TGlnaHQgaW50ZW5zaXR5PXswLjI1fSAvPg0KICAgICAgPGRpcmVjdGlvbmFsTGlnaHQgcG9zaXRpb249e1swLCAwLCAwLjA1XX0gLz4NCiAgICAgIDxtZXNoIGNhc3RTaGFkb3cgcmVjZWl2ZVNoYWRvdyBzY2FsZT17Mi43NX0+DQogICAgICAgIDxpY29zYWhlZHJvbkdlb21ldHJ5IGFyZ3M9e1sxLCAxXX0gLz4NCiAgICAgICAgPG1lc2hTdGFuZGFyZE1hdGVyaWFsDQogICAgICAgICAgY29sb3I9IiNmZmY4ZWIiDQogICAgICAgICAgcG9seWdvbk9mZnNldA0KICAgICAgICAgIHBvbHlnb25PZmZzZXRGYWN0b3I9ey01fQ0KICAgICAgICAgIGZsYXRTaGFkaW5nDQogICAgICAgIC8+DQogICAgICAgIDxEZWNhbA0KICAgICAgICAgIHBvc2l0aW9uPXtbMCwgMCwgMV19DQogICAgICAgICAgbWFwPXtkZWNhbH0NCiAgICAgICAgICByb3RhdGlvbj17WzIgKiBNYXRoLlBJLCAwLCA2LjI1XX0NCiAgICAgICAgICBmbGF0U2hhZGluZw0KICAgICAgICAvPg0KICAgICAgPC9tZXNoPg0KICAgIDwvRmxvYXQ+DQogICk7DQp9Ow0KDQpjb25zdCBCYWxsQ2FudmFzID0gKHsgaWNvbiB9KSA9PiB7DQogIHJldHVybiAoDQogICAgPENhbnZhcw0KICAgICAgZnJhbWVsb29wPSJkZW1hbmQiDQogICAgICBkcHI9e1sxLCAyXX0NCiAgICAgIGdsPXt7IHByZXNlcnZlRHJhd2luZ0J1ZmZlcjogdHJ1ZSB9fQ0KICAgID4NCiAgICAgIDxTdXNwZW5zZSBmYWxsYmFjaz17PExvYWRlciAvPn0+DQogICAgICAgIDxPcmJpdENvbnRyb2xzIGVuYWJsZVpvb209e2ZhbHNlfSAvPg0KICAgICAgICA8QmFsbCBpbWdVcmw9e2ljb259IC8+DQogICAgICA8L1N1c3BlbnNlPg0KDQogICAgICA8UHJlbG9hZCBhbGwgLz4NCiAgICA8L0NhbnZhcz4NCiAgKTsNCn07DQpleHBvcnQgZGVmYXVsdCBCYWxsQ2FudmFzOw0K"}
+﻿import React, { Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import {
+  OrbitControls,
+  Decal,
+  Float,
+  Preload,
+  useTexture,
+} from "@react-three/drei";
+import Loader from "../Loader";
+
+const Ball = (props) => {
+  const [decal] = useTexture([props.imgUrl]);
+
+  return (
+    <Float speed={1.75} rotationIntensity={1} floatIntensity={2}>
+      <ambientLight intensity={0.25} />
+      <directionalLight position={[0, 0, 0.05]} />
+      <mesh castShadow receiveShadow scale={2.75}>
+        <icosahedronGeometry args={[1, 1]} />
+        <meshStandardMaterial
+          color="#fff8eb"
+          polygonOffset
+          polygonOffsetFactor={-5}
+          flatShading
+        />
+        <Decal
+          position={[0, 0, 1]}
+          map={decal}
+          rotation={[2 * Math.PI, 0, 6.25]}
+          flatShading
+        />
+      </mesh>
+    </Float>
+  );
+};
+
+const BallCanvas = ({ icon }) => {
+  return (
+    <Canvas
+      frameloop="demand"
+      dpr={[1, 2]}
+      gl={{ preserveDrawingBuffer: true }}
+    >
+      <Suspense fallback={<Loader />}>
+        <OrbitControls enableZoom={false} />
+        <Ball imgUrl={icon} />
+      </Suspense>
+
+      <Preload all />
+    </Canvas>
+  );
+};
+export default BallCanvas;
