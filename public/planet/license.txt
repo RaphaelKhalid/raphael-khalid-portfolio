@@ -1,1 +1,11 @@
-{"data":"TW9kZWwgSW5mb3JtYXRpb246DQoqIHRpdGxlOglTdHlsaXplZCBwbGFuZXQNCiogc291cmNlOglodHRwczovL3NrZXRjaGZhYi5jb20vM2QtbW9kZWxzL3N0eWxpemVkLXBsYW5ldC03ODk3MjVkYjg2ZjU0N2ZjOTE2M2IwMGYzMDJjM2U3MA0KKiBhdXRob3I6CWNtencgKGh0dHBzOi8vc2tldGNoZmFiLmNvbS9jbXp3KQ0KDQpNb2RlbCBMaWNlbnNlOg0KKiBsaWNlbnNlIHR5cGU6CUNDLUJZLTQuMCAoaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbGljZW5zZXMvYnkvNC4wLykNCiogcmVxdWlyZW1lbnRzOglBdXRob3IgbXVzdCBiZSBjcmVkaXRlZC4gQ29tbWVyY2lhbCB1c2UgaXMgYWxsb3dlZC4NCg0KSWYgeW91IHVzZSB0aGlzIDNEIG1vZGVsIGluIHlvdXIgcHJvamVjdCBiZSBzdXJlIHRvIGNvcHkgcGFzdGUgdGhpcyBjcmVkaXQgd2hlcmV2ZXIgeW91IHNoYXJlIGl0Og0KVGhpcyB3b3JrIGlzIGJhc2VkIG9uICJTdHlsaXplZCBwbGFuZXQiIChodHRwczovL3NrZXRjaGZhYi5jb20vM2QtbW9kZWxzL3N0eWxpemVkLXBsYW5ldC03ODk3MjVkYjg2ZjU0N2ZjOTE2M2IwMGYzMDJjM2U3MCkgYnkgY216dyAoaHR0cHM6Ly9za2V0Y2hmYWIuY29tL2NtencpIGxpY2Vuc2VkIHVuZGVyIENDLUJZLTQuMCAoaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbGljZW5zZXMvYnkvNC4wLyk="}
+Model Information:
+* title:	Stylized planet
+* source:	https://sketchfab.com/3d-models/stylized-planet-789725db86f547fc9163b00f302c3e70
+* author:	cmzw (https://sketchfab.com/cmzw)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Stylized planet" (https://sketchfab.com/3d-models/stylized-planet-789725db86f547fc9163b00f302c3e70) by cmzw (https://sketchfab.com/cmzw) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

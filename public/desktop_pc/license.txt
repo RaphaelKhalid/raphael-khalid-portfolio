@@ -1,1 +1,11 @@
-{"data":"TW9kZWwgSW5mb3JtYXRpb246DQoqIHRpdGxlOglHYW1pbmcgRGVza3RvcCBQQw0KKiBzb3VyY2U6CWh0dHBzOi8vc2tldGNoZmFiLmNvbS8zZC1tb2RlbHMvZ2FtaW5nLWRlc2t0b3AtcGMtZDFkODI4MmM5OTE2NDM4MDkxZjExYWViMjg3ODdiNjYNCiogYXV0aG9yOglZb2xhbGExMjMyIChodHRwczovL3NrZXRjaGZhYi5jb20vWW9sYWxhMTIzMikNCg0KTW9kZWwgTGljZW5zZToNCiogbGljZW5zZSB0eXBlOglDQy1CWS00LjAgKGh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LzQuMC8pDQoqIHJlcXVpcmVtZW50czoJQXV0aG9yIG11c3QgYmUgY3JlZGl0ZWQuIENvbW1lcmNpYWwgdXNlIGlzIGFsbG93ZWQuDQoNCklmIHlvdSB1c2UgdGhpcyAzRCBtb2RlbCBpbiB5b3VyIHByb2plY3QgYmUgc3VyZSB0byBjb3B5IHBhc3RlIHRoaXMgY3JlZGl0IHdoZXJldmVyIHlvdSBzaGFyZSBpdDoNClRoaXMgd29yayBpcyBiYXNlZCBvbiAiR2FtaW5nIERlc2t0b3AgUEMiIChodHRwczovL3NrZXRjaGZhYi5jb20vM2QtbW9kZWxzL2dhbWluZy1kZXNrdG9wLXBjLWQxZDgyODJjOTkxNjQzODA5MWYxMWFlYjI4Nzg3YjY2KSBieSBZb2xhbGExMjMyIChodHRwczovL3NrZXRjaGZhYi5jb20vWW9sYWxhMTIzMikgbGljZW5zZWQgdW5kZXIgQ0MtQlktNC4wIChodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9saWNlbnNlcy9ieS80LjAvKQ=="}
+Model Information:
+* title:	Gaming Desktop PC
+* source:	https://sketchfab.com/3d-models/gaming-desktop-pc-d1d8282c9916438091f11aeb28787b66
+* author:	Yolala1232 (https://sketchfab.com/Yolala1232)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Gaming Desktop PC" (https://sketchfab.com/3d-models/gaming-desktop-pc-d1d8282c9916438091f11aeb28787b66) by Yolala1232 (https://sketchfab.com/Yolala1232) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
