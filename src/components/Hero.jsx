@@ -1,7 +1,5 @@
 ﻿import { motion } from "framer-motion";
 import { styles } from "../styles";
-import headshotgray from "../assets/headshotgray.png";
-import headshot from "../assets/headshot.png";
 
 const Hero = () => {
   return (
@@ -14,18 +12,6 @@ const Hero = () => {
           <div className="w-1 sm:h-80 h-40 violet-gradient" />
         </div>
 
-        <img
-          src={headshot}
-          alt="Profile"
-          className="rounded-full"
-          style={{
-            position: "absolute",
-            top: "100%",
-            left: "75%",
-            transform: "translate(-50%, -75%)",
-            zIndex: "auto",
-          }}
-        />
         <div style={{ zIndex: 0 }}>
           <h1 className={`${styles.heroHeadText} text-white`}>
             I'm <span className="text-white">Raphael Khalid</span>
@@ -38,7 +24,7 @@ const Hero = () => {
       </div>
 
       <div className="absolute xs:bottom-10 bottom-32 w-full flex justify-center items-center">
-        <a href="#about">
+        <a href="#work">
           <div className="w-[35px] h-[64px] rounded-3xl border-4 border-secondary flex jusitfy center items-start p-2">
             <motion.div
               animate={{
