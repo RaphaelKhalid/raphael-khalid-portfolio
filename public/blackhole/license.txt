@@ -1,1 +1,11 @@
-{"data":"TW9kZWwgSW5mb3JtYXRpb246CiogdGl0bGU6CUJsYWNraG9sZQoqIHNvdXJjZToJaHR0cHM6Ly9za2V0Y2hmYWIuY29tLzNkLW1vZGVscy9ibGFja2hvbGUtNzRjYmVhZWFlMjE3NGEyMThmZTk0NTVkNzc5MDJiNWMKKiBhdXRob3I6CXJ1YnlrYW1lbiAoaHR0cHM6Ly9za2V0Y2hmYWIuY29tL3J1YnlrYW1lbikKCk1vZGVsIExpY2Vuc2U6CiogbGljZW5zZSB0eXBlOglDQy1CWS00LjAgKGh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LzQuMC8pCiogcmVxdWlyZW1lbnRzOglBdXRob3IgbXVzdCBiZSBjcmVkaXRlZC4gQ29tbWVyY2lhbCB1c2UgaXMgYWxsb3dlZC4KCklmIHlvdSB1c2UgdGhpcyAzRCBtb2RlbCBpbiB5b3VyIHByb2plY3QgYmUgc3VyZSB0byBjb3B5IHBhc3RlIHRoaXMgY3JlZGl0IHdoZXJldmVyIHlvdSBzaGFyZSBpdDoKVGhpcyB3b3JrIGlzIGJhc2VkIG9uICJCbGFja2hvbGUiIChodHRwczovL3NrZXRjaGZhYi5jb20vM2QtbW9kZWxzL2JsYWNraG9sZS03NGNiZWFlYWUyMTc0YTIxOGZlOTQ1NWQ3NzkwMmI1YykgYnkgcnVieWthbWVuIChodHRwczovL3NrZXRjaGZhYi5jb20vcnVieWthbWVuKSBsaWNlbnNlZCB1bmRlciBDQy1CWS00LjAgKGh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LzQuMC8p"}
+Model Information:
+* title:	Blackhole
+* source:	https://sketchfab.com/3d-models/blackhole-74cbeaeae2174a218fe9455d77902b5c
+* author:	rubykamen (https://sketchfab.com/rubykamen)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Blackhole" (https://sketchfab.com/3d-models/blackhole-74cbeaeae2174a218fe9455d77902b5c) by rubykamen (https://sketchfab.com/rubykamen) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
