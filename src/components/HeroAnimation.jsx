@@ -1,1 +1,26 @@
-{"data":"aW1wb3J0IFJlYWN0LCB7IHVzZVN0YXRlIH0gZnJvbSAicmVhY3QiOw0KaW1wb3J0IHsgVHlwZXdyaXRlciB9IGZyb20gInJlYWN0LXR5cGV3cml0ZXIiOw0KaW1wb3J0IHsgc3R5bGVzIH0gZnJvbSAiLi4vc3R5bGVzIjsNCg0KY29uc3QgQ29vbEFuaW1hdGVkVGV4dCA9ICgpID0+IHsNCiAgY29uc3QgW3Nob3dDb21wdXRlciwgc2V0U2hvd0NvbXB1dGVyXSA9IHVzZVN0YXRlKHRydWUpOw0KDQogIGNvbnN0IHRvZ2dsZVRleHQgPSAoKSA9PiB7DQogICAgc2V0U2hvd0NvbXB1dGVyKChwcmV2KSA9PiAhcHJldik7DQogIH07DQoNCiAgcmV0dXJuICgNCiAgICA8cCBjbGFzc05hbWU9e2Ake3N0eWxlcy5oZXJvU3ViVGV4dH0gbXQtMiB0ZXh0LXdoaXRlLTEwMGB9Pg0KICAgICAgSSBhbXsiICJ9DQogICAgICA8VHlwZXdyaXRlcg0KICAgICAgICBvblR5cGluZ0VuZD17dG9nZ2xlVGV4dH0NCiAgICAgICAgY3Vyc29yPXtudWxsfQ0KICAgICAgICBkZWxheT17NzV9DQogICAgICAgIHN0cmluZz17c2hvd0NvbXB1dGVyID8gImEgY29tcHV0ZXIiIDogImEgcG9saXRpY2FsIHNjaWVudGlzdCJ9DQogICAgICAvPg0KICAgICAgPGJyIGNsYXNzTmFtZT0ic206YmxvY2sgaGlkZGVuIiAvPg0KICAgIDwvcD4NCiAgKTsNCn07DQoNCmV4cG9ydCBkZWZhdWx0IENvb2xBbmltYXRlZFRleHQ7DQo="}
+﻿import React, { useState } from "react";
+import { Typewriter } from "react-typewriter";
+import { styles } from "../styles";
+
+const CoolAnimatedText = () => {
+  const [showComputer, setShowComputer] = useState(true);
+
+  const toggleText = () => {
+    setShowComputer((prev) => !prev);
+  };
+
+  return (
+    <p className={`${styles.heroSubText} mt-2 text-white-100`}>
+      I am{" "}
+      <Typewriter
+        onTypingEnd={toggleText}
+        cursor={null}
+        delay={75}
+        string={showComputer ? "a computer" : "a political scientist"}
+      />
+      <br className="sm:block hidden" />
+    </p>
+  );
+};
+
+export default CoolAnimatedText;

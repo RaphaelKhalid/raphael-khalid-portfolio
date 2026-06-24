@@ -1,1 +1,295 @@
-{"data":"aW1wb3J0IHsNCiAgbW9iaWxlLA0KICBiYWNrZW5kLA0KICBjcmVhdG9yLA0KICB3ZWIsDQogIGphdmFzY3JpcHQsDQogIHR5cGVzY3JpcHQsDQogIGh0bWwsDQogIGNzcywNCiAgcmVhY3RqcywNCiAgcmVkdXgsDQogIHRhaWx3aW5kLA0KICBub2RlanMsDQogIG1vbmdvZGIsDQogIGdpdCwNCiAgZmlnbWEsDQogIGRvY2tlciwNCiAgbWV0YSwNCiAgdGVzbGEsDQogIHNob3BpZnksDQogIGNhcnJlbnQsDQogIHdhdmVuZXQsDQogIGtoYXdhamEsDQogIHdhc3RlLA0KICBoZWdlbW9ueSwNCiAgYnViYmxlLA0KICBtb25vcG9seSwNCiAgY2hlc3MsDQogIGNvbmZsaWN0LA0KICBqb2JpdCwNCiAgdHJpcGd1aWRlLA0KICB0aHJlZWpzLA0KICBiZWF0Ym94LA0KICBtaW5lcnZhLA0KICBkYXVtLA0KICBidXJhcSwNCiAgZ2Vuc2xlciwNCiAgZGViYXRlc3BhY2VzLA0KICBzbHVtbWwsDQogIG1tbCwNCiAgcmVkZGl0cGFwZXIsDQogIHBzeWNoLA0KfSBmcm9tICIuLi9hc3NldHMiOw0KDQpleHBvcnQgY29uc3QgbmF2TGlua3MgPSBbDQogIHsNCiAgICBpZDogImFib3V0IiwNCiAgICB0aXRsZTogIkFib3V0IiwNCiAgfSwNCiAgew0KICAgIGlkOiAid29yayIsDQogICAgdGl0bGU6ICJXb3JrIiwNCiAgfSwNCiAgew0KICAgIGlkOiAiY29udGFjdCIsDQogICAgdGl0bGU6ICJDb250YWN0IiwNCiAgfSwNCl07DQoNCmNvbnN0IHNlcnZpY2VzID0gWw0KICB7DQogICAgdGl0bGU6ICJTb2Z0d2FyZSBEZXZlbG9wZXIiLA0KICAgIGljb246IHdlYiwNCiAgfSwNCiAgew0KICAgIHRpdGxlOiAiTWFjaGluZSBMZWFybmluZyBFbmdpbmVlciIsDQogICAgaWNvbjogbW9iaWxlLA0KICB9LA0KICB7DQogICAgdGl0bGU6ICJQb2xpdGljYWwgU2NpZW50aXN0IiwNCiAgICBpY29uOiBiYWNrZW5kLA0KICB9LA0KICB7DQogICAgdGl0bGU6ICJDb21wbGV4aXR5IFNjaWVudGlzdCIsDQogICAgaWNvbjogY3JlYXRvciwNCiAgfSwNCl07DQoNCmNvbnN0IGV4cGVyaWVuY2VzID0gWw0KICB7DQogICAgdGl0bGU6ICJUZWFjaGluZyBBc3Npc3RhbnQiLA0KICAgIGNvbXBhbnlfbmFtZTogIk1pbmVydmEgVW5pdmVyc2l0eSIsDQogICAgaWNvbjogbWluZXJ2YSwNCiAgICBpY29uQmc6ICIjRkZGRkZGIiwNCiAgICBkYXRlOiAiU2VwdGVtYmVyIDIwMjEgLSBQcmVzZW50IiwNCiAgICBwb2ludHM6IFsNCiAgICAgICJBc3Nlc3NlZCBzdHVkZW50IHJlc3BvbnNlcyAoODQgc3R1ZGVudHMgYWNyb3NzIDUgY2xhc3NlcykgYmFzZWQgb24gc2V0IHJ1YnJpY3MsIGdpdmluZyBjb25zdHJ1Y3RpdmUgZmVlZGJhY2sgYW5kIHRyYWNraW5nIHRoZWlyIHByb2dyZXNzIG92ZXIgdGltZSB0byBkZXZlbG9wIHBlcnNvbmFsaXplZCByZWNvbW1lbmRhdGlvbnMgdG8gaW1wcm92ZSBjb2Rpbmcgc2tpbGxzLiIsDQogICAgICAiSGVsZCB3ZWVrbHkgb2ZmaWNlIGhvdXJzIGVtcGxveWluZyBhIHNvY3JhdGljIGZvcm1hdCB0byBhc3Npc3Qgc3R1ZGVudHMgZGVidWcgY29kZSwgZGV2ZWxvcCBhbGdvcml0aG1pYyBzdHJhdGVnaWVzLCBjb25zdHJ1Y3QgZXhwZXJpbWVudHMgZm9yIHRpbWUgY29tcGxleGl0eSwgYW5kIHRyb3VibGVzaG9vdCBjb25jZXB0dWFsIGRpZmZpY3VsdGllcy4iLA0KICAgICAgIkRldmVsb3BlZCBhIGJhbmsgb2YgUHl0aG9uIHByb2JsZW1zIHRlc3RpbmcgcnVicmljcyByZWxhdGVkIHRvIGNvbXBsZXhpdHkgYW5hbHlzaXMgJiBjb21wdXRhdGlvbmFsIGNyaXRpcXVlLiIsDQogICAgICAiQ29tbXVuaWNhdGVkIHdpdGggc3R1ZGVudHMgb24gU2xhY2sgdG8gcHJvdmlkZSBhY3RpdmUgc3VwcG9ydCBhbmQgZmVlZGJhY2sgZm9yIHByb2dyYW1taW5nIHF1ZXN0aW9ucy4iLA0KICAgIF0sDQogIH0sDQogIHsNCiAgICB0aXRsZTogIlRlY2huaWNhbCBTdXBwb3J0IiwNCiAgICBjb21wYW55X25hbWU6ICJNaW5lcnZhIFByb2plY3QiLA0KICAgIGljb246IG1pbmVydmEsDQogICAgaWNvbkJnOiAiI0ZGRkZGRiIsDQogICAgZGF0ZTogIkphbnVhcnkgMjAyMSAtIFNlcHRlbWJlciAyMDIxIiwNCiAgICBwb2ludHM6IFsNCiAgICAgICJEZWxpdmVyZWQgY3VzdG9tZXIgZmFjaW5nIHN1cHBvcnQgb24gSW50ZXJjb20gZm9yIGxpdmUgY2hhdHMgYW5kIFNsYWNrIGZvciBNaW5lcnZhIEZvcnVtIHVzZXJzLiIsDQogICAgICAiQ29tbXVuaWNhdGVkIHNwZWNpZmljIHRyb3VibGVzaG9vdGluZyBpbnN0cnVjdGlvbnMgdG8gMjUwKyB1c2VycyBmYWNpbmcgdGVjaG5pY2FsIGRpZmZpY3VsdGllcyBpbiBhIHByb2Zlc3Npb25hbCwgYWNjZXNzaWJsZSwgYW5kIHVzZXItZnJpZW5kbHkgbWFubmVyLCBjYXRlZ29yaXppbmcgY2hhdHMgdG8gZm9sbG93IHVwIHdoZW4gbmVjZXNzYXJ5LiIsDQogICAgICAiVHJpYWdlZC9jb2xsYWJvcmF0ZWQgb24gb3ZlciAyODAgYnVncyBpbiBBc2FuYSBieSBjYXRlZ29yaXppbmcsIHJlcHJvZHVjaW5nLCBhbmQgZm9sbG93aW5nIHVwIHdpdGggdXNlcnMuIiwNCiAgICBdLA0KICB9LA0KICB7DQogICAgdGl0bGU6ICJDaXZpYyBQYXJ0bmVyc2hpcCIsDQogICAgY29tcGFueV9uYW1lOiAiRGF1bSBTY2hvb2wiLA0KICAgIGljb246IGRhdW0sDQogICAgaWNvbkJnOiAiI0ZGRkZGRiIsDQogICAgZGF0ZTogIlNlcHRlbWJlciAyMDIxIC0gRGVjZW1iZXIgMjAyMSIsDQogICAgcG9pbnRzOiBbDQogICAgICAiSSBwYXJ0bmVyZWQgdXAgd2l0aCB0aGUgRW5nbGlzaCB0ZWFjaGluZyBmYWN1bHR5IGF0IERhdW0gU2Nob29sIHRvIHVuZGVydGFrZSBhIGNyZWF0aXZlIHByb2plY3Qgd2hpY2ggaGVscGVkIHRlbGwgdGhlIHN0b3JpZXMgb2YgdGhlIE5vcnRoIEtvcmVhbiBzdHVkZW50cy4gIiwNCiAgICAgICJJIGZhY2lsaXRhdGVkIGNvbGxhYm9yYXRpdmUgd3JpdGluZyBkYXlzIHdpdGggdGhlIHN0dWRlbnRzIHRvIG92ZXJzZWUgdGhlIGNyZWF0aW9uIG9mIGEgc3RvcnkgYm9vay4gVGhlaXIgc3RvcnkgYm9vayB3YXMgdGl0bGVkIOKAnFNhbWUsIGJ1dCBEaWZmZXJlbnTigJ0sIHdpdGggNCBkaXN0aW5jdCBjaGFwdGVycyByZXByZXNlbnRpbmcgNCBleHBlcmllbmNlcyBvZiBhIGNoYXJhY3RlciBpbiBOb3J0aCBLb3JlYSwgaW5mb3JtZWQgYnkgdGhlIHN0dWRlbnRz4oCZIG93biBqb3VybmV5cy4iLA0KICAgIF0sDQogIH0sDQogIHsNCiAgICB0aXRsZTogIkNpdmljIFBhcnRuZXJzaGlwIiwNCiAgICBjb21wYW55X25hbWU6ICJHZW5zbGVyIiwNCiAgICBpY29uOiBnZW5zbGVyLA0KICAgIGljb25CZzogIiNGRkZGRkYiLA0KICAgIGRhdGU6ICJTZXB0ZW1iZXIgMjAyMCAtIEFwcmlsIDIwMjEiLA0KICAgIHBvaW50czogWw0KICAgICAgIldvcmtlZCB3aXRoIEdlbnNsZXIgaW4gYSB0ZWFtIG9mIDUgdG8gZGV2ZWxvcCBhIGpvdXJuZXkgbWFwIG9uIHByb3ZpZGluZyB0ZWNobm9sb2dpY2FsIHNvbHV0aW9ucyBmb3IgY3VzdG9tZXItb3JpZW50ZWQgaXNzdWVzIGZhY2VkIGJ5IHRoZSBTYW4gRnJhbmNpc2NvIEludGVybmF0aW9uYWwgQWlycG9ydCwgZm9jdXNpbmcgb24gdGhlIHZpc3VhbGx5IGltcGFpcmVkLiIsDQogICAgXSwNCiAgfSwNCiAgew0KICAgIHRpdGxlOiAiRmVsbG93c2hpcCIsDQogICAgY29tcGFueV9uYW1lOiAiRGViYXRlIFNwYWNlcyIsDQogICAgaWNvbjogZGViYXRlc3BhY2VzLA0KICAgIGljb25CZzogIiNGRkZGRkYiLA0KICAgIGRhdGU6ICJPY3RvYmVyIDIwMjAgLSBEZWNlbWJlciAyMDIwIiwNCiAgICBwb2ludHM6IFsNCiAgICAgICJGYWNpbGl0YXRlZCBkZWJhdGUgc2tpbGxzIHRyYWluaW5nIGFuZCBhZGp1ZGljYXRlZCBkZWJhdGVzIGZvciBhbiBpbnRlcm5hdGlvbmFsIGF1ZGllbmNlIG9mIDEwMCsgYWRvbGVzY2VudHMuIiwNCiAgICAgICJEZXZlbG9wZWQgZGViYXRlIGN1cnJpY3VsdW0sIGZvY3VzaW5nIG9uIGNvbW11bmljYXRpb24sIHBlcnN1YXNpdmVuZXNzLCBhbmQgcHVibGljIHNwZWFraW5nIHNraWxscywgd2hpbGUgY29sbGFib3JhdGluZyBpbiBhIHRlYW0gb2YgNSBpbnRlcm5hdGlvbmFsbHkgYWNjbGFpbWVkIGRlYmF0ZXJzIGxlZCBieSBIYXJ2YXJkIExhdyBzdHVkZW50cy4iLA0KICAgIF0sDQogIH0sDQogIHsNCiAgICB0aXRsZTogIkNvbW1hbmQiLA0KICAgIGNvbXBhbnlfbmFtZTogIkJ1cmFxIFBsYW5ldGFyeSBTb2NpZXR5IiwNCiAgICBpY29uOiBidXJhcSwNCiAgICBpY29uQmc6ICIjRkZGRkZGIiwNCiAgICBkYXRlOiAiRGVjZW1iZXIgMjAxNiAtIEphbnVhcnkgMjAyMyIsDQogICAgcG9pbnRzOiBbDQogICAgICAiTGVkIGFuZCB3b3JrZWQgaW4gYSB0ZWFtIG9mIDcgdG8gb3JnYW5pemUgYSBsZWFkZXJzaGlwIGNhbXAgZm9yIHRoZSB0b3AgNDAgc2VsZWN0ZWQgY2FuZGlkYXRlcyBpbiBQYWtpc3Rhbi4iLA0KICAgICAgIk9yZ2FuaXplZCBtYXJrZXRpbmcgdGVhbXMgaW4gdGhyZWUgY2l0aWVzIChJc2xhbWFiYWQsIExhaG9yZSwgS2FyYWNoaSksIHJlYWNoaW5nIDIwMDArIHJlZ2lzdHJhdGlvbnMgZm9yIEJ1cmFxIGluIDIwMTksIGFuIGluY3JlYXNlIG9mIDMzJSBmcm9tIHByZXZpb3VzIHllYXJzLiIsDQogICAgICAiSW52aXRlZCBleHBlcnRzIGxpa2UgRHIuIFBlcnZleiBIb29kYmhveSBhbmQgUHVsaXR6ZXItcHJpemUgd2lubmluZyBqb3VybmFsaXN0IFBhdWwgU2Fsb3BlayBmb3Igd29ya3Nob3BzLiIsDQogICAgXSwNCiAgfSwNCl07DQoNCmNvbnN0IHRlc3RpbW9uaWFscyA9IFsNCiAgew0KICAgIHRlc3RpbW9uaWFsOg0KICAgICAgIkkgdGhvdWdodCBpdCB3YXMgaW1wb3NzaWJsZSB0byBtYWtlIGEgd2Vic2l0ZSBhcyBiZWF1dGlmdWwgYXMgb3VyIHByb2R1Y3QsIGJ1dCBSaWNrIHByb3ZlZCBtZSB3cm9uZy4iLA0KICAgIG5hbWU6ICJTYXJhIExlZSIsDQogICAgZGVzaWduYXRpb246ICJDRk8iLA0KICAgIGNvbXBhbnk6ICJBY21lIENvIiwNCiAgICBpbWFnZTogImh0dHBzOi8vcmFuZG9tdXNlci5tZS9hcGkvcG9ydHJhaXRzL3dvbWVuLzQuanBnIiwNCiAgfSwNCiAgew0KICAgIHRlc3RpbW9uaWFsOg0KICAgICAgIkkndmUgbmV2ZXIgbWV0IGEgd2ViIGRldmVsb3BlciB3aG8gdHJ1bHkgY2FyZXMgYWJvdXQgdGhlaXIgY2xpZW50cycgc3VjY2VzcyBsaWtlIFJpY2sgZG9lcy4iLA0KICAgIG5hbWU6ICJDaHJpcyBCcm93biIsDQogICAgZGVzaWduYXRpb246ICJDT08iLA0KICAgIGNvbXBhbnk6ICJERUYgQ29ycCIsDQogICAgaW1hZ2U6ICJodHRwczovL3JhbmRvbXVzZXIubWUvYXBpL3BvcnRyYWl0cy9tZW4vNS5qcGciLA0KICB9LA0KICB7DQogICAgdGVzdGltb25pYWw6DQogICAgICAiQWZ0ZXIgUmljayBvcHRpbWl6ZWQgb3VyIHdlYnNpdGUsIG91ciB0cmFmZmljIGluY3JlYXNlZCBieSA1MCUuIFdlIGNhbid0IHRoYW5rIHRoZW0gZW5vdWdoISIsDQogICAgbmFtZTogIkxpc2EgV2FuZyIsDQogICAgZGVzaWduYXRpb246ICJDVE8iLA0KICAgIGNvbXBhbnk6ICI0NTYgRW50ZXJwcmlzZXMiLA0KICAgIGltYWdlOiAiaHR0cHM6Ly9yYW5kb211c2VyLm1lL2FwaS9wb3J0cmFpdHMvd29tZW4vNi5qcGciLA0KICB9LA0KXTsNCg0KY29uc3QgcHJvamVjdHMgPSBbDQogIHsNCiAgICBuYW1lOiAiSW5zdGFuY2UgU2VnbWVudGF0aW9uIG9uIEFlcmlhbCBTbHVtIEltYWdlcyIsDQogICAgZGVzY3JpcHRpb246DQogICAgICAiQ29tcGFyaW5nIHR3byBtYWNoaW5lIGxlYXJuaW5nIG1vZGVscyBvbiB0aGUgdGFzayBvZiBpbnN0YW5jZSBzZWdtZW50YXRpb24gZm9yIGFlcmlhbCBpbWFnZXMgb2Ygc2x1bXMuIiwNCiAgICB0YWdzOiBbDQogICAgICB7DQogICAgICAgIG5hbWU6ICJzbHVtcyIsDQogICAgICAgIGNvbG9yOiAiYmx1ZS10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgICB7DQogICAgICAgIG5hbWU6ICJ0b3JjaCIsDQogICAgICAgIGNvbG9yOiAiZ3JlZW4tdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAibWFjaGluZWxlYXJuaW5nIiwNCiAgICAgICAgY29sb3I6ICJwaW5rLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICBdLA0KICAgIGltYWdlOiBzbHVtbWwsDQogICAgc291cmNlX2NvZGVfbGluazoNCiAgICAgICJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vZmlsZS9kLzFuM01iblJ2ZTV6WE0teVJpN1BKT1h6NGJWYkxGRm9ySC92aWV3P3VzcD1kcml2ZV9saW5rIiwNCiAgfSwNCiAgew0KICAgIG5hbWU6ICJSZXBsaWNhdGlvbiBQYXBlcjogTWVkaWNhbCBNYXJpanVhbmEgTGVnYWxpemF0aW9uIGFuZCBNb3RvciBWZWhpY2xlIEZhdGFsaXRpZXMiLA0KICAgIGRlc2NyaXB0aW9uOg0KICAgICAgIlJlcGxpY2F0aW9uIG9mIHRoZSBwYXBlciAnQSBSZXBsaWNhdGlvbiBvZiDigJxNYXJpanVhbmEgbWVkaWNhbGl6YXRpb24gYW5kIG1vdG9yIHZlaGljbGUgZmF0YWxpdGllczogYSBzeW50aGV0aWMgY29udHJvbCBncm91cCBhcHByb2FjaCcuIiwNCiAgICB0YWdzOiBbDQogICAgICB7DQogICAgICAgIG5hbWU6ICJSIiwNCiAgICAgICAgY29sb3I6ICJibHVlLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICAgIHsNCiAgICAgICAgbmFtZTogImNhdXNhbGluZmVyZW5jZSIsDQogICAgICAgIGNvbG9yOiAiZ3JlZW4tdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAic3ludGhldGljY29udHJvbCIsDQogICAgICAgIGNvbG9yOiAicGluay10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgXSwNCiAgICBpbWFnZTogbW1sLA0KICAgIHNvdXJjZV9jb2RlX2xpbms6DQogICAgICAiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xTXdsLWRWVVdCUWJTS3B6MnV3V1Y1aER1YXktcmc1dzgvdmlldz91c3A9ZHJpdmVfbGluayIsDQogIH0sDQogIHsNCiAgICBuYW1lOiAiVGhlIGVmZmVjdCBvZiBwYXJlbnRpbmcgc3R5bGVzIGFuZCBleHBvc3VyZSB0byBkZWNlcHRpb24gdW5kZXIgYSByZXdhcmQtcHVuaXNobWVudCBwYXJhZGlnbSBvbiB0aGUgcmF0ZSBvZiBseWluZyIsDQogICAgZGVzY3JpcHRpb246DQogICAgICAiVGhlIHByZXNlbnQgc3R1ZHkgaW52ZXN0aWdhdGVzIGhvdyB0aGUgYWJpbGl0eSB0byBkZWNlaXZlIGlzIGluZmx1ZW5jZWQgYnkgcGFyZW50aW5nIHN0eWxlIHVuZGVyIGEgcmV3YXJkLWFuZC1wdW5pc2htZW50IHBhcmFkaWdtIGZvciBjaGlsZHJlbiBhZ2VkIGJldHdlZW4gMiBhbmQgNCB5ZWFycy4iLA0KICAgIHRhZ3M6IFsNCiAgICAgIHsNCiAgICAgICAgbmFtZTogInBzY3lob2xvZ3kiLA0KICAgICAgICBjb2xvcjogImJsdWUtdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAibW9ja3N0dWR5IiwNCiAgICAgICAgY29sb3I6ICJncmVlbi10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgICB7DQogICAgICAgIG5hbWU6ICJyZXNlYXJjaCIsDQogICAgICAgIGNvbG9yOiAicGluay10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgXSwNCiAgICBpbWFnZTogcHN5Y2gsDQogICAgc291cmNlX2NvZGVfbGluazoNCiAgICAgICJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vZmlsZS9kLzEtQVpoLUgteFFpbm4teEpDT29FaDh4d2lPTXNmbmlweS92aWV3P3VzcD1zaGFyaW5nIiwNCiAgfSwNCiAgew0KICAgIG5hbWU6ICJTZW50aW1lbnQgQW5hbHlzaXMgb2YgTmV3cyBTdWJyZWRkaXQgQ29tbWVudHMiLA0KICAgIGRlc2NyaXB0aW9uOg0KICAgICAgIkEgYnJpZWYgbG9vayBpbnRvIHRoZSB2YXJ5aW5nIHNlbnRpbWVudHMgYWNyb3NzIHIvbmV3cyBhbmQgci93b3JsZG5ld3MsIHNwZWNpZmljYWxseSBmb2xsb3dpbmcgT2N0b2JlciA3dGgsIHVzaW5nIFZBREVSIGFuZCB0ZXh0YmxvYi4iLA0KICAgIHRhZ3M6IFsNCiAgICAgIHsNCiAgICAgICAgbmFtZTogInBvbGl0aWNhbHNjaWVuY2UiLA0KICAgICAgICBjb2xvcjogImJsdWUtdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAidG9yY2giLA0KICAgICAgICBjb2xvcjogImdyZWVuLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICAgIHsNCiAgICAgICAgbmFtZTogIm1hY2hpbmVsZWFybmluZyIsDQogICAgICAgIGNvbG9yOiAicGluay10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgXSwNCiAgICBpbWFnZTogcmVkZGl0cGFwZXIsDQogICAgc291cmNlX2NvZGVfbGluazoNCiAgICAgICJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vZmlsZS9kLzFTTWNMRVoxN0k3cnc5Y19tajI0RUFmcExqcmxIMzY3bS92aWV3P3VzcD1kcml2ZV9saW5rIiwNCiAgfSwNCiAgew0KICAgIG5hbWU6ICJMaXZlIEJlYXRib3ggQ2xhc3NpZmllciIsDQogICAgZGVzY3JpcHRpb246DQogICAgICAiQSByZWFsIHRpbWUgYmVhdGJveCBjbGFzc2lmaWVyIHRoYXQgdXNlcyBhIGNvbnZvbHV0aW9uYWwgbmV1cmFsIG5ldHdvcmsgdG8gY2xhc3NpZnkgYmVhdGJveCBzb3VuZHMuIFRoZSBtb2RlbCB3YXMgdHJhaW5lZCBvbiA1IGNsYXNzZXMgb2YgYmVhdGJveCBzb3VuZHMsIGJ1aWx0IHVzaW5nIHRlbnNvcmZsb3cuIiwNCiAgICB0YWdzOiBbDQogICAgICB7DQogICAgICAgIG5hbWU6ICJweXRob24iLA0KICAgICAgICBjb2xvcjogImJsdWUtdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAidGVuc29yZmxvdyIsDQogICAgICAgIGNvbG9yOiAiZ3JlZW4tdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAibWFjaGluZWxlYXJuaW5nIiwNCiAgICAgICAgY29sb3I6ICJwaW5rLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICBdLA0KICAgIGltYWdlOiBiZWF0Ym94LA0KICAgIHNvdXJjZV9jb2RlX2xpbms6DQogICAgICAiaHR0cHM6Ly9naXRodWIuY29tL1JhcGhhZWxLaGFsaWQvUHl0aG9uL3RyZWUvbWFpbi9MaXZlJTIwQXVkaW8lMjBDbGFzc2lmaWVyJTIwd2l0aCUyMENOTnMlMjBmb3IlMjBCZWF0Ym94IiwNCiAgfSwNCiAgew0KICAgIG5hbWU6ICJSZXBsaWNhdGluZyBHb29nbGUgV2F2ZW5ldHMiLA0KICAgIGRlc2NyaXB0aW9uOg0KICAgICAgIkFuIGV4dGVuc2lvbiBvZiB0aGUgYmVhdGJveCBjbGFzc2lmaWVyLCB0aGlzIHByb2plY3QgdXNlcyBhIHdhdmVuZXQgYXJjaGl0ZWN0dXJlIHRvIGdlbmVyYXRlIG5vdmVsIHNvdW5kcywgdHJhaW5lZCBvbiBteSBvd24gYmVhdGJveCBzYW1wbGVzLiIsDQogICAgdGFnczogWw0KICAgICAgew0KICAgICAgICBuYW1lOiAicHl0aG9uIiwNCiAgICAgICAgY29sb3I6ICJibHVlLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICAgIHsNCiAgICAgICAgbmFtZTogInRlbnNvcmZsb3ciLA0KICAgICAgICBjb2xvcjogImdyZWVuLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICAgIHsNCiAgICAgICAgbmFtZTogImdlbmVyYXRpdmVhdWRpbyIsDQogICAgICAgIGNvbG9yOiAicGluay10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgXSwNCiAgICBpbWFnZTogd2F2ZW5ldCwNCiAgICBzb3VyY2VfY29kZV9saW5rOg0KICAgICAgImh0dHBzOi8vZHJpdmUuZ29vZ2xlLmNvbS9maWxlL2QvMXBDcXdwdUM4eE00TXhjX3VmdW56eFdMRzhiVTRuX2JFL3ZpZXc/dXNwPXNoYXJpbmciLA0KICB9LA0KICB7DQogICAgbmFtZTogIktoYXdhamEgU2lyYSAtIEEgQ29tcGxleGl0eSBBcHByb2FjaCIsDQogICAgZGVzY3JpcHRpb246DQogICAgICAiQSByZXNlYXJjaCBwYXBlciBvbiB0aGUgS2hhd2FqYSBTaXJhIGNvbW11bml0eSBpbiBQYWtpc3Rhbi4gVGhpcyBwYXBlciBkZW1vbnN0cmF0ZXMgdGhlIGFnZ3JlZ2F0aW9uIG9mIG1lbnRhbCBtb2RlbHMgaW50byBpZGVvbG9naWVzLCB1c2VzIE9zdHJvbSdzIEFESUNPIHN5bnRheCBmb3IgcnVsZSBjYXRlZ29yaXphdGlvbiwgYW5kIHZpc3VhbGl6ZXMgdGhlIGNhdXNhbCByZWxhdGlvbnMgYmV0d2VlbiBib3RoLiIsDQogICAgdGFnczogWw0KICAgICAgew0KICAgICAgICBuYW1lOiAiY29tcGxleGl0eSIsDQogICAgICAgIGNvbG9yOiAiYmx1ZS10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgICB7DQogICAgICAgIG5hbWU6ICJjYXVzYWxpdHkiLA0KICAgICAgICBjb2xvcjogImdyZWVuLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICAgIHsNCiAgICAgICAgbmFtZTogInBvbGl0aWNhbHNjaWVuY2UiLA0KICAgICAgICBjb2xvcjogInBpbmstdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgIF0sDQogICAgaW1hZ2U6IGtoYXdhamEsDQogICAgc291cmNlX2NvZGVfbGluazoNCiAgICAgICJodHRwczovL2RyaXZlLmdvb2dsZS5jb20vZmlsZS9kLzFtVUZiRzJPYlNpb2s0WkhqdFV1dXRRNUt4NDdnUGROYy92aWV3P3VzcD1zaGFyaW5nIiwNCiAgfSwNCiAgew0KICAgIG5hbWU6ICJNb2RlbGluZyBDb21wbGV4IFN5c3RlbXMgLSBXYXN0ZSBDb2xsZWN0aW9uIiwNCiAgICBkZXNjcmlwdGlvbjoNCiAgICAgICJBbiBpbXBsZW1lbnRhdGlvbiBvZiBhIHdhc3RlLWNvbGxlY3Rpb24gc3lzdGVtIGluIFB5dGhvbiB1c2luZyBOZXR3b3JrWC4gQSBNb250ZSBDYXJsbyBzZWFyY2ggaXMgY29tcGFyZWQgd2l0aCBvdGhlciBzdHJhdGVnaWVzIG9uIHRoZSBtZXRyaWNzIG9mIGZ1ZWwgZWZmaWNpZW5jeS4iLA0KICAgIHRhZ3M6IFsNCiAgICAgIHsNCiAgICAgICAgbmFtZTogInB5dGhvbiIsDQogICAgICAgIGNvbG9yOiAiYmx1ZS10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgICB7DQogICAgICAgIG5hbWU6ICJzaW11bGF0aW9ucyIsDQogICAgICAgIGNvbG9yOiAiZ3JlZW4tdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAibmV0d29ya3giLA0KICAgICAgICBjb2xvcjogInBpbmstdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgIF0sDQogICAgaW1hZ2U6IHdhc3RlLA0KICAgIHNvdXJjZV9jb2RlX2xpbms6DQogICAgICAiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xYUhSeXV4b2JIVDNHVDM5LU1Od0ZMNWZUTHMyNkZuSHMvdmlldz91c3A9c2hhcmluZyIsDQogIH0sDQogIHsNCiAgICBuYW1lOiAiQSBTeXN0ZW0gRHluYW1pY3MgQXBwcm9hY2ggdG8gSGVnZW1vbmljIFRoZW9yeSIsDQogICAgZGVzY3JpcHRpb246DQogICAgICAiQSByZXNlYXJjaCBwYXBlciB3aGljaCBkZXZlbG9wcyBhIHF1YW50aXRhdGl2ZSBiYXNpcyBzdXBwb3J0aW5nIHRoZSB0aGVzaXMgdGhhdCB0aGUgYmFsYW5jZSBvZiBwb3dlciBpcyBzaGlmdGluZyB0b3dhcmRzIG11bHRpcG9sYXJpdHkuIEEgcXVhbGl0aWF0aXZlIGFuYWx5c2lzIHVzaW5nIDMtZGltZW5zaW9uYWwgcGhhc2Ugc3BhY2VzIHByZWRpY3RzIHRoZSBncm93dGggdHJhamVjdG9yaWVzIG9mIHRoZSBVbml0ZWQgU3RhdGVzIGFuZCBDaGluYSBhcyBhIGNhc2Ugc3R1ZHkuIiwNCiAgICB0YWdzOiBbDQogICAgICB7DQogICAgICAgIG5hbWU6ICJjb21wbGV4aXR5IiwNCiAgICAgICAgY29sb3I6ICJibHVlLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICAgIHsNCiAgICAgICAgbmFtZTogInN5c3RlbWR5bmFtaWNzIiwNCiAgICAgICAgY29sb3I6ICJncmVlbi10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgICB7DQogICAgICAgIG5hbWU6ICJwb2xpdGljYWxzY2llbmNlIiwNCiAgICAgICAgY29sb3I6ICJwaW5rLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICBdLA0KICAgIGltYWdlOiBoZWdlbW9ueSwNCiAgICBzb3VyY2VfY29kZV9saW5rOg0KICAgICAgImh0dHBzOi8vZHJpdmUuZ29vZ2xlLmNvbS9maWxlL2QvMVZWc1J3QmJZQ2o4QnVaOG9lWEIxWHhwUEtRYnMyM21WL3ZpZXc/dXNwPXNoYXJpbmciLA0KICB9LA0KICB7DQogICAgbmFtZTogIkhvdXNpbmcgQnViYmxlIGluIFR1cmtleSIsDQogICAgZGVzY3JpcHRpb246DQogICAgICAiVGhpcyBwYXBlciBwcmVzZW50cyBldmlkZW5jZSBmb3IgYSBob3VzaW5nIGJ1YmJsZSBpbiBUdXJrZXksIHN1cHBvcnRlZCBieSBub3ZlbCBhcmd1bWVudHMgYWJvdXQgdGhlIGNvbnRhZ2lvbiBvZiBjb25mb3JtaXR5IChzaW11bGF0ZWQgd2l0aCBOZXRMb2dvKSwgcGFpcmVkIHdpdGggZWNvbm9taWMgYW5hbHlzaXMgb2Ygc3lzdGVtaWMgcmlzaywgYnVzaW5lc3MgY3ljbGVzLCBhbmQgbW9uZXRhcnkgcG9saWN5LiBUaGUgcGFwZXIgZW5kcyB3aXRoIHBvbGljeSByZWNvbW1lbmRhdGlvbnMgaW5jbHVkaW5nIGNyZWRpdCBjb250cm9scyBhbmQgZ292ZXJubWVudCBzZWN1cml0eSBzd2Fwcy4iLA0KICAgIHRhZ3M6IFsNCiAgICAgIHsNCiAgICAgICAgbmFtZTogImVjb25vbWljcyIsDQogICAgICAgIGNvbG9yOiAiYmx1ZS10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgICB7DQogICAgICAgIG5hbWU6ICJuZXR3b3JrcyIsDQogICAgICAgIGNvbG9yOiAiZ3JlZW4tdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAibmV0bG9nbyIsDQogICAgICAgIGNvbG9yOiAicGluay10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgXSwNCiAgICBpbWFnZTogYnViYmxlLA0KICAgIHNvdXJjZV9jb2RlX2xpbms6DQogICAgICAiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xUjlYRl8zWWFrNWFqY212RXRoanIybUF6aHpSSGRsYlkvdmlldz91c3A9c2hhcmluZyIsDQogIH0sDQogIHsNCiAgICBuYW1lOiAiTXVsdGlsYXllciBOZXR3b3JrcyB0byBBbmFseXplIE1vbm9wb2x5IFBvd2VyIiwNCiAgICBkZXNjcmlwdGlvbjoNCiAgICAgICJUaGlzIHJlc2VhcmNoIHBhcGVyIHVzZXMgYSBuaWNoZSB0ZWNobmlxdWUgd2hpY2ggSSd2ZSBzdHVkaWVkIGFuZCBpbXByb3ZlZCBvdmVyIHRoZSBwYXN0IHRocmVlIHllYXJzOiBtdWx0aWxheWVyIG5ldHdvcmtzLiBUaGUgcGFwZXIgY29uc2lkZXJzIE1ldGEncyBzb2NpYWwgbWVkaWEgbW9ub3BvbHkgZnJvbSBub3ZlbCBwZXJzcGVjdGl2ZXMgaW50cm9kdWNlZCBieSBuZXR3b3JrIHRoZW9yeS4iLA0KICAgIHRhZ3M6IFsNCiAgICAgIHsNCiAgICAgICAgbmFtZTogImVjb25vbWljcyIsDQogICAgICAgIGNvbG9yOiAiYmx1ZS10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgICB7DQogICAgICAgIG5hbWU6ICJuZXR3b3JrcyIsDQogICAgICAgIGNvbG9yOiAiZ3JlZW4tdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAicmVzZWFyY2giLA0KICAgICAgICBjb2xvcjogInBpbmstdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgIF0sDQogICAgaW1hZ2U6IG1vbm9wb2x5LA0KICAgIHNvdXJjZV9jb2RlX2xpbms6DQogICAgICAiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xQm5RM1BxV0RhbmgyMTNOTFA1N1Y5M0RiNklqSDhvbDAvdmlldz91c3A9c2hhcmluZyIsDQogIH0sDQogIHsNCiAgICBuYW1lOiAiQ2xhc3NpY2FsIENoZXNzIEVuZ2luZSIsDQogICAgZGVzY3JpcHRpb246DQogICAgICAiSW5zcGlyZWQgYnkgbXkgcGFzc2lvbiBmb3IgQ2hlc3MsIHRoaXMgcHJvamVjdCBpbXBsZW1lbnRzIHRoZSBjbGFzc2ljYWwgY2hlc3MgZW5naW5lIGFsZ29yaXRobTogbWluaW1heCwgd2l0aCBzdWJzZXF1ZW50IG9wdGltaXphdGlvbnMgaW5jbHVkaW5nIGFscGhhLWJldGEgcHJ1bmluZyBhbmQgdGhlIE5lZ2FtYXggYWxnb3JpdGhtLiIsDQogICAgdGFnczogWw0KICAgICAgew0KICAgICAgICBuYW1lOiAicHl0aG9uIiwNCiAgICAgICAgY29sb3I6ICJibHVlLXRleHQtZ3JhZGllbnQiLA0KICAgICAgfSwNCiAgICAgIHsNCiAgICAgICAgbmFtZTogInB5Z2FtZSIsDQogICAgICAgIGNvbG9yOiAiZ3JlZW4tdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAiY2hlc3MiLA0KICAgICAgICBjb2xvcjogInBpbmstdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgIF0sDQogICAgaW1hZ2U6IGNoZXNzLA0KICAgIHNvdXJjZV9jb2RlX2xpbms6DQogICAgICAiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xMXo4VllZMDVPYXBUV19VWWtUdkRMUzFuY3plLUpUcm0vdmlldz91c3A9c2hhcmluZyIsDQogIH0sDQogIHsNCiAgICBuYW1lOiAiUmVjb25jaWxpbmcgRGlzcGFyYXRlIENvbmZsaWN0cyAtIEthc2htaXIgYW5kIElzcmFlbC1QYWxlc3RpbmUiLA0KICAgIGRlc2NyaXB0aW9uOg0KICAgICAgIlRoaXMgcmVzZWFyY2ggcGFwZXIgY29tcGFyZXMgdGhlIEthc2htaXIgYW5kIElzcmFlbC1QYWxlc3RpbmUgY29uZmxpY3QgdG8gZ2FybmVyIHRoZW9yZXRpY2FsIHNpbWlsYXJpdGllcyBhbmQgZGlmZmVyZW5jZXMuIFRoZSBtYWluIGNvbXBhcmlzb25zIGFyZSBvbiB0aGUgdGhlb3JldGljYWwgaXRlbXMgb2YgZm9ybWFsIGFuZCBpbmZvcm1hbCBydWxlcywgdGhlIHJvbGUgb2YgZ292ZXJubWVudGFsIGFuZCBub24tZ292ZXJubWVudGFsIGFnZW50cywgYW5kIHRoZSBpbXBhY3Qgb2YgYnVyZWF1Y3JhdGljIGFuZCBnb3Zlcm5hbmNlIGZhY3RvcnMgaW4gY29uZmxpY3QgcGVyc2lzdGVuY2UuIiwNCiAgICB0YWdzOiBbDQogICAgICB7DQogICAgICAgIG5hbWU6ICJjb25mbGljdCIsDQogICAgICAgIGNvbG9yOiAiYmx1ZS10ZXh0LWdyYWRpZW50IiwNCiAgICAgIH0sDQogICAgICB7DQogICAgICAgIG5hbWU6ICJuZXR3b3JrcyIsDQogICAgICAgIGNvbG9yOiAiZ3JlZW4tdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgICAgew0KICAgICAgICBuYW1lOiAicmVzZWFyY2giLA0KICAgICAgICBjb2xvcjogInBpbmstdGV4dC1ncmFkaWVudCIsDQogICAgICB9LA0KICAgIF0sDQogICAgaW1hZ2U6IGNvbmZsaWN0LA0KICAgIHNvdXJjZV9jb2RlX2xpbms6DQogICAgICAiaHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xTkFBeG9kcDBkZDZ2THUtLVdNdy1UOHc3X3dFSEc1UnovdmlldyIsDQogIH0sDQpdOw0KDQpleHBvcnQgeyBzZXJ2aWNlcywgZXhwZXJpZW5jZXMsIHRlc3RpbW9uaWFscywgcHJvamVjdHMgfTsNCg=="}
+﻿import {
+  mobile,
+  backend,
+  creator,
+  web,
+  javascript,
+  typescript,
+  html,
+  css,
+  reactjs,
+  redux,
+  tailwind,
+  nodejs,
+  mongodb,
+  git,
+  figma,
+  docker,
+  meta,
+  tesla,
+  shopify,
+  carrent,
+  wavenet,
+  khawaja,
+  waste,
+  hegemony,
+  bubble,
+  monopoly,
+  chess,
+  conflict,
+  jobit,
+  tripguide,
+  threejs,
+  beatbox,
+  minerva,
+  daum,
+  buraq,
+  gensler,
+  debatespaces,
+  slumml,
+  mml,
+  redditpaper,
+  psych,
+} from "../assets";
+
+export const navLinks = [
+  { id: "about", title: "About" },
+  { id: "work", title: "Work" },
+  { id: "contact", title: "Contact" },
+];
+
+const services = [
+  { title: "Software Developer", icon: web },
+  { title: "Machine Learning Engineer", icon: mobile },
+  { title: "Political Scientist", icon: backend },
+  { title: "Complexity Scientist", icon: creator },
+];
+
+const experiences = [
+  {
+    title: "Course Instructor",
+    company_name: "Center for Future Global Leaders",
+    icon: meta,
+    iconBg: "#FFFFFF",
+    date: "January 2025 - Present",
+    points: [
+      "Red-teamed educational chatbots over a 6-month project using intention obfuscation resulting in additional preventative measures being shipped, including an incident response policy and stricter model guardrails for security & age-appropriate designs intended for a 4-week online bootcamp with 500+ middle-schoolers.",
+      "Independently designed an undergraduate robotics course for Hanyang for 2 cohorts of ~50 students covering hardware fundamentals, C code and simulations, ethics of AI and robotics, kinematics, and search algorithms.",
+    ],
+  },
+  {
+    title: "L2 Technical Support",
+    company_name: "Minerva Project",
+    icon: minerva,
+    iconBg: "#FFFFFF",
+    date: "May 2024 - May 2026",
+    points: [
+      "Triaged technical support issues for 3,000+ users on Minerva Project's proprietary videotelephony platform with median response times of ~43 seconds, whilst proactively monitoring Datadog's Pubsub and Licode server health and user connection metrics such as RTT, ping, IP, browser, OS details for critical live chat support.",
+    ],
+  },
+  {
+    title: "Residential Counselor",
+    company_name: "Wharton Global Youth at UPenn",
+    icon: shopify,
+    iconBg: "#FFFFFF",
+    date: "Summer 2024",
+    points: [
+      "Responded to unique circumstances like conflict mediations with urgency while maintaining compliance with protocol to maintain the well-being of a cohort of 30 students, as well as being on-call 24/7 for emergencies.",
+    ],
+  },
+  {
+    title: "Undergraduate Teaching Assistant",
+    company_name: "Minerva University",
+    icon: minerva,
+    iconBg: "#FFFFFF",
+    date: "September 2021 - May 2024",
+    points: [
+      "Assessed 84 students across 5 courses for daily written and video responses, graded Python projects and problem sets, and established trust with faculty, evidenced by promotions from SS51 - introductory Complex Systems, to CS110 - intermediate Data Structures & Algorithms, and CS152 - advanced Artificial Intelligence.",
+      "Held weekly office hours employing a socratic format averaging 2 - 3 students per session providing personalized feedback and debugging Python code; participating students scored 10-20% higher overall.",
+    ],
+  },
+];
+
+const testimonials = [
+  {
+    testimonial: "I thought it was impossible to make a website as beautiful as our product, but Rick proved me wrong.",
+    name: "Sara Lee",
+    designation: "CFO",
+    company: "Acme Co",
+    image: "https://randomuser.me/api/portraits/women/4.jpg",
+  },
+  {
+    testimonial: "I've never met a web developer who truly cares about their clients' success like Rick does.",
+    name: "Chris Brown",
+    designation: "COO",
+    company: "DEF Corp",
+    image: "https://randomuser.me/api/portraits/men/5.jpg",
+  },
+  {
+    testimonial: "After Rick optimized our website, our traffic increased by 50%. We can't thank them enough!",
+    name: "Lisa Wang",
+    designation: "CTO",
+    company: "456 Enterprises",
+    image: "https://randomuser.me/api/portraits/women/6.jpg",
+  },
+];
+
+const projects = [
+  {
+    name: "Robotics 101",
+    description: "A 13-unit full-stack web application built independently to deepen robotics expertise, featuring interactive physics simulations, canvas-based rendering for robot control, and a puzzle-validation engine. Built with Python, TypeScript, Next.js, React, and Tailwind CSS; deployed to production.",
+    tags: [
+      { name: "nextjs", color: "blue-text-gradient" },
+      { name: "react", color: "green-text-gradient" },
+      { name: "robotics", color: "pink-text-gradient" },
+    ],
+    image: jobit,
+    source_code_link: "https://github.com/RaphaelKhalid",
+  },
+  {
+    name: "Instance Segmentation on Aerial Slum Images",
+    description: "Used QGIS to get satellite images of slums, creating an annotated dataset of 1,022 instances merged with iSAID. Fine-tuned a Faster R-CNN with ResNet-101 backbone and a Cascade R-CNN with ResNeXt-152 backbone using Detectron 2.",
+    tags: [
+      { name: "slums", color: "blue-text-gradient" },
+      { name: "torch", color: "green-text-gradient" },
+      { name: "machinelearning", color: "pink-text-gradient" },
+    ],
+    image: slumml,
+    source_code_link: "https://drive.google.com/file/d/1n3MbnRve5zXM-yRi7PJOXz4bVbLFForH/view?usp=drive_link",
+  },
+  {
+    name: "A Non-Proliferation Treaty for AI",
+    description: "Blog post deep-diving into the Munich and Framework Conventions on AI, performing a literature review of AI governance frameworks, critiquing safety approaches, and proposing solutions towards a unifying framework for AI governance and regulation.",
+    tags: [
+      { name: "aigovernance", color: "blue-text-gradient" },
+      { name: "policy", color: "green-text-gradient" },
+      { name: "research", color: "pink-text-gradient" },
+    ],
+    image: conflict,
+    source_code_link: "https://github.com/RaphaelKhalid",
+  },
+  {
+    name: "Replication Paper: Medical Marijuana Legalization and Motor Vehicle Fatalities",
+    description: "Replication of the paper 'A Replication of \"Marijuana medicalization and motor vehicle fatalities: a synthetic control group approach'.",
+    tags: [
+      { name: "R", color: "blue-text-gradient" },
+      { name: "causalinference", color: "green-text-gradient" },
+      { name: "syntheticcontrol", color: "pink-text-gradient" },
+    ],
+    image: mml,
+    source_code_link: "https://drive.google.com/file/d/1Mwl-dVUWBQbSKpz2uwWV5hDuay-rg5w8/view?usp=drive_link",
+  },
+  {
+    name: "The effect of parenting styles and exposure to deception under a reward-punishment paradigm on the rate of lying",
+    description: "The present study investigates how the ability to deceive is influenced by parenting style under a reward-and-punishment paradigm for children aged between 2 and 4 years.",
+    tags: [
+      { name: "psychology", color: "blue-text-gradient" },
+      { name: "mockstudy", color: "green-text-gradient" },
+      { name: "research", color: "pink-text-gradient" },
+    ],
+    image: psych,
+    source_code_link: "https://drive.google.com/file/d/1-AZh-H-xQinn-xJCOoEh8xwiOMsfnipy/view?usp=sharing",
+  },
+  {
+    name: "Sentiment Analysis of News Subreddit Comments",
+    description: "A brief look into the varying sentiments across r/news and r/worldnews, specifically following October 7th, using VADER and textblob.",
+    tags: [
+      { name: "politicalscience", color: "blue-text-gradient" },
+      { name: "nlp", color: "green-text-gradient" },
+      { name: "machinelearning", color: "pink-text-gradient" },
+    ],
+    image: redditpaper,
+    source_code_link: "https://drive.google.com/file/d/1SMcLEZ17I7rw9c_mj24EAfpLjrlH367m/view?usp=drive_link",
+  },
+  {
+    name: "Live Beatbox Classifier",
+    description: "A real time beatbox classifier that uses a convolutional neural network to classify beatbox sounds. The model was trained on 5 classes of beatbox sounds, built using tensorflow.",
+    tags: [
+      { name: "python", color: "blue-text-gradient" },
+      { name: "tensorflow", color: "green-text-gradient" },
+      { name: "machinelearning", color: "pink-text-gradient" },
+    ],
+    image: beatbox,
+    source_code_link: "https://github.com/RaphaelKhalid/Python/tree/main/Live%20Audio%20Classifier%20with%20CNNs%20for%20Beatbox",
+  },
+  {
+    name: "Replicating Google Wavenets",
+    description: "An extension of the beatbox classifier, this project uses a wavenet architecture to generate novel sounds, trained on my own beatbox samples.",
+    tags: [
+      { name: "python", color: "blue-text-gradient" },
+      { name: "tensorflow", color: "green-text-gradient" },
+      { name: "generativeaudio", color: "pink-text-gradient" },
+    ],
+    image: wavenet,
+    source_code_link: "https://drive.google.com/file/d/1pCqwpuC8xM4Mxc_ufunzxWLG8bU4n_bE/view?usp=sharing",
+  },
+  {
+    name: "Khawaja Sira - A Complexity Approach",
+    description: "A research paper on the Khawaja Sira community in Pakistan demonstrating the aggregation of mental models into ideologies, using Ostrom's ADICO syntax for rule categorization, and visualizing causal relations between both.",
+    tags: [
+      { name: "complexity", color: "blue-text-gradient" },
+      { name: "causality", color: "green-text-gradient" },
+      { name: "politicalscience", color: "pink-text-gradient" },
+    ],
+    image: khawaja,
+    source_code_link: "https://drive.google.com/file/d/1mUFbG2ObSiok4ZHjtUuutQ5Kx47gPdNc/view?usp=sharing",
+  },
+  {
+    name: "Modeling Complex Systems - Waste Collection",
+    description: "An implementation of a waste-collection system in Python using NetworkX. A Monte Carlo search is compared with other strategies on the metrics of fuel efficiency.",
+    tags: [
+      { name: "python", color: "blue-text-gradient" },
+      { name: "simulations", color: "green-text-gradient" },
+      { name: "networkx", color: "pink-text-gradient" },
+    ],
+    image: waste,
+    source_code_link: "https://drive.google.com/file/d/1aHRyuxobHT3GT39-MNwFL5fTLs26FnHs/view?usp=sharing",
+  },
+  {
+    name: "A System Dynamics Approach to Hegemonic Theory",
+    description: "A research paper developing a quantitative basis supporting the thesis that the balance of power is shifting towards multipolarity, using 3-dimensional phase spaces to predict US and China growth trajectories.",
+    tags: [
+      { name: "complexity", color: "blue-text-gradient" },
+      { name: "systemdynamics", color: "green-text-gradient" },
+      { name: "politicalscience", color: "pink-text-gradient" },
+    ],
+    image: hegemony,
+    source_code_link: "https://drive.google.com/file/d/1VVsRwBbYCj8BuZ8oeXB1XxpPKQbs23mV/view?usp=sharing",
+  },
+  {
+    name: "Housing Bubble in Turkey",
+    description: "This paper presents evidence for a housing bubble in Turkey, supported by novel arguments about the contagion of conformity (simulated with NetLogo), economic analysis of systemic risk, business cycles, and monetary policy.",
+    tags: [
+      { name: "economics", color: "blue-text-gradient" },
+      { name: "networks", color: "green-text-gradient" },
+      { name: "netlogo", color: "pink-text-gradient" },
+    ],
+    image: bubble,
+    source_code_link: "https://drive.google.com/file/d/1R9XF_3Yak5ajcmvEthjr2mAzhzRHdlbY/view?usp=sharing",
+  },
+  {
+    name: "Multilayer Networks to Analyze Monopoly Power",
+    description: "This research paper uses multilayer networks to consider Meta's social media monopoly from novel perspectives introduced by network theory.",
+    tags: [
+      { name: "economics", color: "blue-text-gradient" },
+      { name: "networks", color: "green-text-gradient" },
+      { name: "research", color: "pink-text-gradient" },
+    ],
+    image: monopoly,
+    source_code_link: "https://drive.google.com/file/d/1BnQ3PqWDanh213NLP57V93Db6IjH8ol0/view?usp=sharing",
+  },
+  {
+    name: "Classical Chess Engine",
+    description: "Inspired by my passion for Chess, this project implements the classical chess engine algorithm: minimax, with subsequent optimizations including alpha-beta pruning and the Negamax algorithm.",
+    tags: [
+      { name: "python", color: "blue-text-gradient" },
+      { name: "pygame", color: "green-text-gradient" },
+      { name: "chess", color: "pink-text-gradient" },
+    ],
+    image: chess,
+    source_code_link: "https://drive.google.com/file/d/11z8VYY05OapTW_UYkTvDLS1ncze-JTrm/view?usp=sharing",
+  },
+  {
+    name: "Reconciling Disparate Conflicts - Kashmir and Israel-Palestine",
+    description: "This research paper compares the Kashmir and Israel-Palestine conflict to garner theoretical similarities and differences across formal and informal rules, governmental agents, and bureaucratic governance factors.",
+    tags: [
+      { name: "conflict", color: "blue-text-gradient" },
+      { name: "networks", color: "green-text-gradient" },
+      { name: "research", color: "pink-text-gradient" },
+    ],
+    image: conflict,
+    source_code_link: "https://drive.google.com/file/d/1NAAxodp0dd6vLu--WMw-T8w7_wEHG5Rz/view",
+  },
+];
+
+export { services, experiences, testimonials, projects };

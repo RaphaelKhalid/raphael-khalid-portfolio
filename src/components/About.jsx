@@ -1,1 +1,60 @@
-{"data":"aW1wb3J0IFJlYWN0IGZyb20gInJlYWN0IjsKaW1wb3J0IFBhcmFsbGF4VGlsdCBmcm9tICJyZWFjdC1wYXJhbGxheC10aWx0IjsKaW1wb3J0IHsgbW90aW9uIH0gZnJvbSAiZnJhbWVyLW1vdGlvbiI7CmltcG9ydCB7IHN0eWxlcyB9IGZyb20gIi4uL3N0eWxlcyI7CmltcG9ydCB7IHNlcnZpY2VzIH0gZnJvbSAiLi4vY29uc3RhbnRzL2luZGV4IjsKaW1wb3J0IHsgZmFkZUluLCB0ZXh0VmFyaWFudCB9IGZyb20gIi4uL3V0aWxzL21vdGlvbnMiOwppbXBvcnQgU2VjdGlvbldyYXBwZXIgZnJvbSAiLi4vaG9jIjsKCmNvbnN0IFNlcnZpY2VDYXJkID0gKHsgaW5kZXgsIHRpdGxlLCBpY29uIH0pID0+ICgKICA8UGFyYWxsYXhUaWx0IGNsYXNzTmFtZT0ieHM6dy1bMjUwcHhdIHctZnVsbCI+CiAgICA8bW90aW9uLmRpdgogICAgICB2YXJpYW50cz17ZmFkZUluKCJyaWdodCIsICJzcHJpbmciLCAwLjUgKiBpbmRleCwgMC43NSl9CiAgICAgIGNsYXNzTmFtZT0idy1mdWxsIGdyZWVuLXBpbmstZ3JhZGllbnQgcC1bMXB4XSByb3VuZGVkLVsyMHB4XSBzaGFkb3ctY2FyZCIKICAgID4KICAgICAgPGRpdgogICAgICAgIG9wdGlvbnM9e3sKICAgICAgICAgIG1heDogNDUsCiAgICAgICAgICBzY2FsZTogMSwKICAgICAgICAgIHNwZWVkOiA0NTAsCiAgICAgICAgfX0KICAgICAgICBjbGFzc05hbWU9ImJnLXRlcnRpYXJ5IHJvdW5kZWQtWzIwcHhdIHB5LTUgcHgtMTIgbWluLWgtWzI4MHB4XSBmbGV4IGp1c3RpZnktZXZlbmx5IGl0ZW1zLWNlbnRlciBmbGV4LWNvbCIKICAgICAgPgogICAgICAgIDxpbWcgc3JjPXtpY29ufSBhbHQ9e3RpdGxlfSBjbGFzc05hbWU9InctMTYgaC0xNiBvYmplY3QtY29udGFpbiIgLz4KICAgICAgICA8aDMgY2xhc3NOYW1lPSJ0ZXh0LXdoaXRlIHRleHQtWzIwcHhdIGZvbnQtYm9sZCB0ZXh0LWNlbnRlciI+CiAgICAgICAgICB7dGl0bGV9CiAgICAgICAgPC9oMz4KICAgICAgPC9kaXY+CiAgICA8L21vdGlvbi5kaXY+CiAgPC9QYXJhbGxheFRpbHQ+Cik7Cgpjb25zdCBBYm91dCA9ICgpID0+IHsKICByZXR1cm4gKAogICAgPD4KICAgICAgPG1vdGlvbi5kaXYgdmFyaWFudHM9e3RleHRWYXJpYW50KCl9PgogICAgICAgIDxwIGNsYXNzTmFtZT17c3R5bGVzLnNlY3Rpb25TdWJUZXh0fT5JbnRyb2R1Y3Rpb248L3A+CiAgICAgICAgPGgyIGNsYXNzTmFtZT17c3R5bGVzLnNlY3Rpb25IZWFkVGV4dH0+T3ZlcnZpZXcuPC9oMj4KICAgICAgPC9tb3Rpb24uZGl2PgoKICAgICAgPG1vdGlvbi5wCiAgICAgICAgdmFyaWFudHM9e2ZhZGVJbigiIiwgIiIsIDAuMSwgMSl9CiAgICAgICAgY2xhc3NOYW1lPSJtdC00IHRleHQtc2Vjb25kYXJ5IHRleHQtWzE3cHhdIG1heC13LTN4bCBsZWFkaW5nLVszMHB4XSIKICAgICAgPgogICAgICAgIEkgYW0gYSBoaWdobHkgZHJpdmVuIFNlbmlvciBhdCBNaW5lcnZhIFVuaXZlcnNpdHkgbWFqb3JpbmcgaW4gQ29tcHV0ZXIKICAgICAgICBTY2llbmNlIGFuZCBQb2xpdGljYWwgU2NpZW5jZS4gTXkgYmFjaGVsb3IgdGhlc2lzIGlzIGV4cGxvcmluZyB0aGUgdXNlCiAgICAgICAgb2YgbWFjaGluZSBsZWFybmluZyBtb2RlbHMgdG8gaWRlbnRpZnkgYXJlYXMgYXQgaGlnaCByaXNrIG9mIHNsdW0KICAgICAgICBmb3JtYXRpb24gaW4gUGFraXN0YW4gdXNpbmcgc2F0ZWxsaXRlIGltYWdlcnksIHRvd2FyZHMgdGhlIGFpbSBvZgogICAgICAgIHRhcmdldGVkIHBvbGljeSBpbnRlcnZlbnRpb25zLgogICAgICA8L21vdGlvbi5wPgoKICAgICAgPGRpdiBjbGFzc05hbWU9Im10LTIwIGZsZXggZmxleC13cmFwIGdhcC0xMCI+CiAgICAgICAge3NlcnZpY2VzLm1hcCgoc2VydmljZSwgaW5kZXgpID0+ICgKICAgICAgICAgIDxTZXJ2aWNlQ2FyZCBrZXk9e3NlcnZpY2UudGl0bGV9IGluZGV4PXtpbmRleH0gey4uLnNlcnZpY2V9IC8+CiAgICAgICAgKSl9CiAgICAgIDwvZGl2PgogICAgPC8+CiAgKTsKfTsKCmV4cG9ydCBkZWZhdWx0IFNlY3Rpb25XcmFwcGVyKEFib3V0LCAiYWJvdXQiKTsK"}
+﻿import React from "react";
+import ParallaxTilt from "react-parallax-tilt";
+import { motion } from "framer-motion";
+import { styles } from "../styles";
+import { services } from "../constants/index";
+import { fadeIn, textVariant } from "../utils/motions";
+import SectionWrapper from "../hoc";
+
+const ServiceCard = ({ index, title, icon }) => (
+  <ParallaxTilt className="xs:w-[250px] w-full">
+    <motion.div
+      variants={fadeIn("right", "spring", 0.5 * index, 0.75)}
+      className="w-full green-pink-gradient p-[1px] rounded-[20px] shadow-card"
+    >
+      <div
+        options={{
+          max: 45,
+          scale: 1,
+          speed: 450,
+        }}
+        className="bg-tertiary rounded-[20px] py-5 px-12 min-h-[280px] flex justify-evenly items-center flex-col"
+      >
+        <img src={icon} alt={title} className="w-16 h-16 object-contain" />
+        <h3 className="text-white text-[20px] font-bold text-center">
+          {title}
+        </h3>
+      </div>
+    </motion.div>
+  </ParallaxTilt>
+);
+
+const About = () => {
+  return (
+    <>
+      <motion.div variants={textVariant()}>
+        <p className={styles.sectionSubText}>Introduction</p>
+        <h2 className={styles.sectionHeadText}>Overview.</h2>
+      </motion.div>
+
+      <motion.p
+        variants={fadeIn("", "", 0.1, 1)}
+        className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
+      >
+        I am a highly driven Senior at Minerva University majoring in Computer
+        Science and Political Science. My bachelor thesis is exploring the use
+        of machine learning models to identify areas at high risk of slum
+        formation in Pakistan using satellite imagery, towards the aim of
+        targeted policy interventions.
+      </motion.p>
+
+      <div className="mt-20 flex flex-wrap gap-10">
+        {services.map((service, index) => (
+          <ServiceCard key={service.title} index={index} {...service} />
+        ))}
+      </div>
+    </>
+  );
+};
+
+export default SectionWrapper(About, "about");

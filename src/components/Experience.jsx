@@ -1,1 +1,67 @@
-{"data":"aW1wb3J0IHsKICBWZXJ0aWNhbFRpbWVsaW5lLAogIFZlcnRpY2FsVGltZWxpbmVFbGVtZW50LAp9IGZyb20gInJlYWN0LXZlcnRpY2FsLXRpbWVsaW5lLWNvbXBvbmVudCI7CmltcG9ydCB7IG1vdGlvbiB9IGZyb20gImZyYW1lci1tb3Rpb24iOwppbXBvcnQgInJlYWN0LXZlcnRpY2FsLXRpbWVsaW5lLWNvbXBvbmVudC9zdHlsZS5taW4uY3NzIjsKaW1wb3J0IHsgc3R5bGVzIH0gZnJvbSAiLi4vc3R5bGVzIjsKaW1wb3J0IHsgZXhwZXJpZW5jZXMgfSBmcm9tICIuLi9jb25zdGFudHMvaW5kZXgiOwppbXBvcnQgU2VjdGlvbldyYXBwZXIgZnJvbSAiLi4vaG9jIjsKaW1wb3J0IHsgdGV4dFZhcmlhbnQgfSBmcm9tICIuLi91dGlscy9tb3Rpb25zIjsKCmNvbnN0IEV4cGVyaWVuY2VDYXJkID0gKHsgZXhwZXJpZW5jZSB9KSA9PiAoCiAgPFZlcnRpY2FsVGltZWxpbmVFbGVtZW50CiAgICBjb250ZW50U3R5bGU9e3sgYmFja2dyb3VuZDogIiMxZDE4MzYiLCBjb2xvcjogIiNmZmYiIH19CiAgICBjb250ZW50QXJyb3dTdHlsZT17eyBib3JkZXJSaWdodDogIjdweCBzb2xpZCAjMjMyNjMxIiB9fQogICAgZGF0ZT17ZXhwZXJpZW5jZS5kYXRlfQogICAgaWNvblN0eWxlPXt7IGJhY2tncm91bmQ6IGV4cGVyaWVuY2UuaWNvbkJnIH19CiAgICBpY29uPXsKICAgICAgPGRpdiBjbGFzc05hbWU9ImZsZXgganVzdGlmeS1jZW50ZXIgaXRlbXMtY2VudGVyIHctZnVsbCBoLWZ1bGwiPgogICAgICAgIDxpbWcKICAgICAgICAgIHNyYz17ZXhwZXJpZW5jZS5pY29ufQogICAgICAgICAgYWx0PXtleHBlcmllbmNlLmNvbXBhbnlfbmFtZX0KICAgICAgICAgIGNsYXNzTmFtZT0idy1bNjAlXSBoLVs2MCVdIG9iamVjdC1jb250YWluIgogICAgICAgIC8+CiAgICAgIDwvZGl2PgogICAgfQogID4KICAgIDxkaXY+CiAgICAgIDxoMyBjbGFzc05hbWU9InRleHQtd2hpdGUgdGV4dC1bMjRweF0gZm9udC1ib2xkIj57ZXhwZXJpZW5jZS50aXRsZX08L2gzPgogICAgICA8cAogICAgICAgIGNsYXNzTmFtZT0idGV4dC1zZWNvbmRhcnkgdGV4dC1bMTZweF0gZm9udC1zZW1pYm9sZCIKICAgICAgICBzdHlsZT17eyBtYXJnaW46IDAgfX0KICAgICAgPgogICAgICAgIHtleHBlcmllbmNlLmNvbXBhbnlfbmFtZX0KICAgICAgPC9wPgogICAgPC9kaXY+CiAgICA8dWwgY2xhc3NOYW1lPSJtdC01IGxpc3QtZGlzYyBtbC01IHNwYWNlLXktMiI+CiAgICAgIHtleHBlcmllbmNlLnBvaW50cy5tYXAoKHBvaW50LCBpbmRleCkgPT4gKAogICAgICAgIDxsaQogICAgICAgICAga2V5PXtgZXhwZXJpZW5jZS1wb2ludC0ke2luZGV4fWB9CiAgICAgICAgICBjbGFzc05hbWU9InRleHQtd2hpdGUtMTAwIHRleHQtWzE0cHhdIHBsLTEgdHJhY2tpbmctd2lkZXIiCiAgICAgICAgPgogICAgICAgICAge3BvaW50fQogICAgICAgIDwvbGk+CiAgICAgICkpfQogICAgPC91bD4KICA8L1ZlcnRpY2FsVGltZWxpbmVFbGVtZW50PgopOwoKY29uc3QgRXhwZXJpZW5jZSA9ICgpID0+IHsKICByZXR1cm4gKAogICAgPD4KICAgICAgPHAgY2xhc3NOYW1lPXtzdHlsZXMuc2VjdGlvblN1YlRleHR9PldoYXQgSSBoYXZlIGRvbmUgc28gZmFyPC9wPgogICAgICA8aDIgY2xhc3NOYW1lPXtzdHlsZXMuc2VjdGlvbkhlYWRUZXh0fT5Xb3JrIEV4cGVyaWVuY2UuPC9oMj4KCiAgICAgIDxkaXYgY2xhc3NOYW1lPSJtdC0yMCBmbGV4IGZsZXgtY29sIj4KICAgICAgICA8VmVydGljYWxUaW1lbGluZT4KICAgICAgICAgIHtleHBlcmllbmNlcy5tYXAoKGV4cGVyaWVuY2UsIGluZGV4KSA9PiAoCiAgICAgICAgICAgIDxFeHBlcmllbmNlQ2FyZCBrZXk9e2luZGV4fSBleHBlcmllbmNlPXtleHBlcmllbmNlfSAvPgogICAgICAgICAgKSl9CiAgICAgICAgPC9WZXJ0aWNhbFRpbWVsaW5lPgogICAgICA8L2Rpdj4KICAgIDwvPgogICk7Cn07CgpleHBvcnQgZGVmYXVsdCBTZWN0aW9uV3JhcHBlcihFeHBlcmllbmNlLCAiZXhwZXJpZW5jZSIpOwo="}
+﻿import {
+  VerticalTimeline,
+  VerticalTimelineElement,
+} from "react-vertical-timeline-component";
+import { motion } from "framer-motion";
+import "react-vertical-timeline-component/style.min.css";
+import { styles } from "../styles";
+import { experiences } from "../constants/index";
+import SectionWrapper from "../hoc";
+import { textVariant } from "../utils/motions";
+
+const ExperienceCard = ({ experience }) => (
+  <VerticalTimelineElement
+    contentStyle={{ background: "#1d1836", color: "#fff" }}
+    contentArrowStyle={{ borderRight: "7px solid #232631" }}
+    date={experience.date}
+    iconStyle={{ background: experience.iconBg }}
+    icon={
+      <div className="flex justify-center items-center w-full h-full">
+        <img
+          src={experience.icon}
+          alt={experience.company_name}
+          className="w-[60%] h-[60%] object-contain"
+        />
+      </div>
+    }
+  >
+    <div>
+      <h3 className="text-white text-[24px] font-bold">{experience.title}</h3>
+      <p
+        className="text-secondary text-[16px] font-semibold"
+        style={{ margin: 0 }}
+      >
+        {experience.company_name}
+      </p>
+    </div>
+    <ul className="mt-5 list-disc ml-5 space-y-2">
+      {experience.points.map((point, index) => (
+        <li
+          key={`experience-point-${index}`}
+          className="text-white-100 text-[14px] pl-1 tracking-wider"
+        >
+          {point}
+        </li>
+      ))}
+    </ul>
+  </VerticalTimelineElement>
+);
+
+const Experience = () => {
+  return (
+    <>
+      <p className={styles.sectionSubText}>What I have done so far</p>
+      <h2 className={styles.sectionHeadText}>Work Experience.</h2>
+
+      <div className="mt-20 flex flex-col">
+        <VerticalTimeline>
+          {experiences.map((experience, index) => (
+            <ExperienceCard key={index} experience={experience} />
+          ))}
+        </VerticalTimeline>
+      </div>
+    </>
+  );
+};
+
+export default SectionWrapper(Experience, "experience");

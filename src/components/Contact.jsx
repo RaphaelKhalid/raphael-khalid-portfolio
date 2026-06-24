@@ -1,1 +1,141 @@
-{"data":"aW1wb3J0IHsgdXNlUmVmLCB1c2VTdGF0ZSB9IGZyb20gInJlYWN0IjsKaW1wb3J0IHsgbW90aW9uIH0gZnJvbSAiZnJhbWVyLW1vdGlvbiI7CmltcG9ydCBlbWFpbGpzIGZyb20gIkBlbWFpbGpzL2Jyb3dzZXIiOwoKaW1wb3J0IHsgc3R5bGVzIH0gZnJvbSAiLi4vc3R5bGVzIjsKaW1wb3J0IHsgRWFydGggfSBmcm9tICIuL2NhbnZhcyI7CmltcG9ydCBTZWN0aW9uV3JhcHBlciBmcm9tICIuLi9ob2MiOwppbXBvcnQgeyBzbGlkZUluIH0gZnJvbSAiLi4vdXRpbHMvbW90aW9ucyI7CgovLwovLwovLwoKY29uc3QgQ29udGFjdCA9ICgpID0+IHsKICBjb25zdCBmb3JtUmVmID0gdXNlUmVmKCk7CiAgY29uc3QgW2Zvcm0sIHNldEZvcm1dID0gdXNlU3RhdGUoewogICAgbmFtZTogIiIsCiAgICBlbWFpbDogIiIsCiAgICBtZXNzYWdlOiAiIiwKICB9KTsKCiAgY29uc3QgW2xvYWRpbmcsIHNldExvYWRpbmddID0gdXNlU3RhdGUoZmFsc2UpOwoKICBjb25zdCBoYW5kbGVDaGFuZ2UgPSAoZSkgPT4gewogICAgY29uc3QgeyB0YXJnZXQgfSA9IGU7CiAgICBjb25zdCB7IG5hbWUsIHZhbHVlIH0gPSB0YXJnZXQ7CgogICAgc2V0Rm9ybSh7CiAgICAgIC4uLmZvcm0sCiAgICAgIFtuYW1lXTogdmFsdWUsCiAgICB9KTsKICB9OwoKICBjb25zdCBoYW5kbGVTdWJtaXQgPSAoZSkgPT4gewogICAgZS5wcmV2ZW50RGVmYXVsdCgpOwogICAgc2V0TG9hZGluZyh0cnVlKTsKCiAgICBlbWFpbGpzCiAgICAgIC5zZW5kKAogICAgICAgICJzZXJ2aWNlX3E2NmgwY2ciLAogICAgICAgICJ0ZW1wbGF0ZV9wcWI3eHd6IiwKCiAgICAgICAgewogICAgICAgICAgZnJvbV9uYW1lOiBmb3JtLm5hbWUsCiAgICAgICAgICB0b19uYW1lOiAiUmFwaGFlbCBLaGFsaWQiLAogICAgICAgICAgZnJvbV9lbWFpbDogZm9ybS5lbWFpbCwKICAgICAgICAgIHRvX2VtYWlsOiAicmFwaGFlbEB1bmkubWluZXJ2YS5lZHUiLAogICAgICAgICAgbWVzc2FnZTogZm9ybS5tZXNzYWdlLAogICAgICAgIH0sCiAgICAgICAgIlNnMGd2VG5YUDhpVU1JS3Z2IgogICAgICApCiAgICAgIC50aGVuKAogICAgICAgICgpID0+IHsKICAgICAgICAgIHNldExvYWRpbmcoZmFsc2UpOwogICAgICAgICAgYWxlcnQoIlRoYW5rIHlvdS4gSSB3aWxsIGdldCBiYWNrIHRvIHlvdSBhcyBzb29uIGFzIHBvc3NpYmxlLiIpOwoKICAgICAgICAgIHNldEZvcm0oewogICAgICAgICAgICBuYW1lOiAiIiwKICAgICAgICAgICAgZW1haWw6ICIiLAogICAgICAgICAgICBtZXNzYWdlOiAiIiwKICAgICAgICAgIH0pOwogICAgICAgIH0sCiAgICAgICAgKGVycm9yKSA9PiB7CiAgICAgICAgICBzZXRMb2FkaW5nKGZhbHNlKTsKICAgICAgICAgIGNvbnNvbGUuZXJyb3IoZXJyb3IpOwoKICAgICAgICAgIGFsZXJ0KCJBaGgsIHNvbWV0aGluZyB3ZW50IHdyb25nLiBQbGVhc2UgdHJ5IGFnYWluLiIpOwogICAgICAgIH0KICAgICAgKTsKICB9OwoKICByZXR1cm4gKAogICAgPGRpdgogICAgICBjbGFzc05hbWU9e2B4bDptdC0xMiBmbGV4IHhsOmZsZXgtcm93IGZsZXgtY29sLXJldmVyc2UgZ2FwLTEwIG92ZXJmbG93LWhpZGRlbmB9CiAgICA+CiAgICAgIDxtb3Rpb24uZGl2CiAgICAgICAgdmFyaWFudHM9e3NsaWRlSW4oImxlZnQiLCAidHdlZW4iLCAwLjIsIDEpfQogICAgICAgIGNsYXNzTmFtZT0iZmxleC1bMC43NV0gYmctYmxhY2stMTAwIHAtOCByb3VuZGVkLTJ4bCIKICAgICAgPgogICAgICAgIDxwIGNsYXNzTmFtZT17c3R5bGVzLnNlY3Rpb25TdWJUZXh0fT5HZXQgaW4gdG91Y2g8L3A+CiAgICAgICAgPGgzIGNsYXNzTmFtZT17c3R5bGVzLnNlY3Rpb25IZWFkVGV4dH0+Q29udGFjdC48L2gzPgoKICAgICAgICA8Zm9ybQogICAgICAgICAgcmVmPXtmb3JtUmVmfQogICAgICAgICAgb25TdWJtaXQ9e2hhbmRsZVN1Ym1pdH0KICAgICAgICAgIGNsYXNzTmFtZT0ibXQtMTIgZmxleCBmbGV4LWNvbCBnYXAtOCIKICAgICAgICA+CiAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPSJmbGV4IGZsZXgtY29sIj4KICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPSJ0ZXh0LXdoaXRlIGZvbnQtbWVkaXVtIG1iLTQiPllvdXIgTmFtZTwvc3Bhbj4KICAgICAgICAgICAgPGlucHV0CiAgICAgICAgICAgICAgdHlwZT0idGV4dCIKICAgICAgICAgICAgICBuYW1lPSJuYW1lIgogICAgICAgICAgICAgIHZhbHVlPXtmb3JtLm5hbWV9CiAgICAgICAgICAgICAgb25DaGFuZ2U9e2hhbmRsZUNoYW5nZX0KICAgICAgICAgICAgICBwbGFjZWhvbGRlcj0iV2hhdCdzIHlvdXIgbmFtZT8iCiAgICAgICAgICAgICAgY2xhc3NOYW1lPSJiZy10ZXJ0aWFyeSBweS00IHB4LTYgcGxhY2Vob2xkZXI6dGV4dC1zZWNvbmRhcnkgdGV4dC13aGl0ZSByb3VuZGVkLWxnIG91dGxpbmUtbm9uZSBib3JkZXItbm9uZSBmb250LW1lZGl1bSIKICAgICAgICAgICAgLz4KICAgICAgICAgIDwvbGFiZWw+CiAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPSJmbGV4IGZsZXgtY29sIj4KICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPSJ0ZXh0LXdoaXRlIGZvbnQtbWVkaXVtIG1iLTQiPllvdXIgZW1haWw8L3NwYW4+CiAgICAgICAgICAgIDxpbnB1dAogICAgICAgICAgICAgIHR5cGU9ImVtYWlsIgogICAgICAgICAgICAgIG5hbWU9ImVtYWlsIgogICAgICAgICAgICAgIHZhbHVlPXtmb3JtLmVtYWlsfQogICAgICAgICAgICAgIG9uQ2hhbmdlPXtoYW5kbGVDaGFuZ2V9CiAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9IldoYXQncyB5b3VyIGVtYWlsIGFkZHJlc3M/IgogICAgICAgICAgICAgIGNsYXNzTmFtZT0iYmctdGVydGlhcnkgcHktNCBweC02IHBsYWNlaG9sZGVyOnRleHQtc2Vjb25kYXJ5IHRleHQtd2hpdGUgcm91bmRlZC1sZyBvdXRsaW5lLW5vbmUgYm9yZGVyLW5vbmUgZm9udC1tZWRpdW0iCiAgICAgICAgICAgIC8+CiAgICAgICAgICA8L2xhYmVsPgogICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT0iZmxleCBmbGV4LWNvbCI+CiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT0idGV4dC13aGl0ZSBmb250LW1lZGl1bSBtYi00Ij5Zb3VyIE1lc3NhZ2U8L3NwYW4+CiAgICAgICAgICAgIDx0ZXh0YXJlYQogICAgICAgICAgICAgIHJvd3M9ezd9CiAgICAgICAgICAgICAgbmFtZT0ibWVzc2FnZSIKICAgICAgICAgICAgICB2YWx1ZT17Zm9ybS5tZXNzYWdlfQogICAgICAgICAgICAgIG9uQ2hhbmdlPXtoYW5kbGVDaGFuZ2V9CiAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9IldoYXQgZG8geW91IHdhbnQgdG8gc2F5PyIKICAgICAgICAgICAgICBjbGFzc05hbWU9ImJnLXRlcnRpYXJ5IHB5LTQgcHgtNiBwbGFjZWhvbGRlcjp0ZXh0LXNlY29uZGFyeSB0ZXh0LXdoaXRlIHJvdW5kZWQtbGcgb3V0bGluZS1ub25lIGJvcmRlci1ub25lIGZvbnQtbWVkaXVtIgogICAgICAgICAgICAvPgogICAgICAgICAgPC9sYWJlbD4KCiAgICAgICAgICA8YnV0dG9uCiAgICAgICAgICAgIHR5cGU9InN1Ym1pdCIKICAgICAgICAgICAgY2xhc3NOYW1lPSJiZy10ZXJ0aWFyeSBweS0zIHB4LTggcm91bmRlZC14bCBvdXRsaW5lLW5vbmUgdy1maXQgdGV4dC13aGl0ZSBmb250LWJvbGQgc2hhZG93LW1kIHNoYWRvdy1wcmltYXJ5IgogICAgICAgICAgPgogICAgICAgICAgICB7bG9hZGluZyA/ICJTZW5kaW5nLi4uIiA6ICJTZW5kIn0KICAgICAgICAgIDwvYnV0dG9uPgogICAgICAgIDwvZm9ybT4KICAgICAgPC9tb3Rpb24uZGl2PgoKICAgICAgPG1vdGlvbi5kaXYKICAgICAgICB2YXJpYW50cz17c2xpZGVJbigicmlnaHQiLCAidHdlZW4iLCAwLjIsIDEpfQogICAgICAgIGNsYXNzTmFtZT0ieGw6ZmxleC0xIHhsOmgtYXV0byBtZDpoLVs1NTBweF0gaC1bMzUwcHhdIgogICAgICA+CiAgICAgICAgPEVhcnRoIC8+CiAgICAgIDwvbW90aW9uLmRpdj4KICAgIDwvZGl2PgogICk7Cn07CgpleHBvcnQgZGVmYXVsdCBTZWN0aW9uV3JhcHBlcihDb250YWN0LCAiY29udGFjdCIpOwo="}
+﻿import { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import emailjs from "@emailjs/browser";
+
+import { styles } from "../styles";
+import { Earth } from "./canvas";
+import SectionWrapper from "../hoc";
+import { slideIn } from "../utils/motions";
+
+//
+//
+//
+
+const Contact = () => {
+  const formRef = useRef();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { target } = e;
+    const { name, value } = target;
+
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    emailjs
+      .send(
+        "service_q66h0cg",
+        "template_pqb7xwz",
+
+        {
+          from_name: form.name,
+          to_name: "Raphael Khalid",
+          from_email: form.email,
+          to_email: "raphael@uni.minerva.edu",
+          message: form.message,
+        },
+        "Sg0gvTnXP8iUMIKvv"
+      )
+      .then(
+        () => {
+          setLoading(false);
+          alert("Thank you. I will get back to you as soon as possible.");
+
+          setForm({
+            name: "",
+            email: "",
+            message: "",
+          });
+        },
+        (error) => {
+          setLoading(false);
+          console.error(error);
+
+          alert("Ahh, something went wrong. Please try again.");
+        }
+      );
+  };
+
+  return (
+    <div
+      className={`xl:mt-12 flex xl:flex-row flex-col-reverse gap-10 overflow-hidden`}
+    >
+      <motion.div
+        variants={slideIn("left", "tween", 0.2, 1)}
+        className="flex-[0.75] bg-black-100 p-8 rounded-2xl"
+      >
+        <p className={styles.sectionSubText}>Get in touch</p>
+        <h3 className={styles.sectionHeadText}>Contact.</h3>
+
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="mt-12 flex flex-col gap-8"
+        >
+          <label className="flex flex-col">
+            <span className="text-white font-medium mb-4">Your Name</span>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="What's your name?"
+              className="bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium"
+            />
+          </label>
+          <label className="flex flex-col">
+            <span className="text-white font-medium mb-4">Your email</span>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="What's your email address?"
+              className="bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium"
+            />
+          </label>
+          <label className="flex flex-col">
+            <span className="text-white font-medium mb-4">Your Message</span>
+            <textarea
+              rows={7}
+              name="message"
+              value={form.message}
+              onChange={handleChange}
+              placeholder="What do you want to say?"
+              className="bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium"
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="bg-tertiary py-3 px-8 rounded-xl outline-none w-fit text-white font-bold shadow-md shadow-primary"
+          >
+            {loading ? "Sending..." : "Send"}
+          </button>
+        </form>
+      </motion.div>
+
+      <motion.div
+        variants={slideIn("right", "tween", 0.2, 1)}
+        className="xl:flex-1 xl:h-auto md:h-[550px] h-[350px]"
+      >
+        <Earth />
+      </motion.div>
+    </div>
+  );
+};
+
+export default SectionWrapper(Contact, "contact");

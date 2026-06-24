@@ -1,1 +1,46 @@
-{"data":"aW1wb3J0IHsgdXNlU3RhdGUsIHVzZVJlZiwgU3VzcGVuc2UgfSBmcm9tICJyZWFjdCI7DQppbXBvcnQgeyBDYW52YXMsIHVzZUZyYW1lIH0gZnJvbSAiQHJlYWN0LXRocmVlL2ZpYmVyIjsNCmltcG9ydCB7IFBvaW50cywgUG9pbnRNYXRlcmlhbCwgUHJlbG9hZCB9IGZyb20gIkByZWFjdC10aHJlZS9kcmVpIjsNCmltcG9ydCAqIGFzIHJhbmRvbSBmcm9tICJtYWF0aC9yYW5kb20vZGlzdC9tYWF0aC1yYW5kb20uZXNtIjsNCg0KY29uc3QgU3RhcnMgPSAocHJvcHMpID0+IHsNCiAgY29uc3QgcmVmID0gdXNlUmVmKCk7DQogIGNvbnN0IFtzcGhlcmVdID0gdXNlU3RhdGUoKCkgPT4NCiAgICByYW5kb20uaW5TcGhlcmUobmV3IEZsb2F0MzJBcnJheSg1MDAwKSwgeyByYWRpdXM6IDEuMiB9KQ0KICApOw0KDQogIHVzZUZyYW1lKChzdGF0ZSwgZGVsdGEpID0+IHsNCiAgICByZWYuY3VycmVudC5yb3RhdGlvbi54IC09IGRlbHRhIC8gMTA7DQogICAgcmVmLmN1cnJlbnQucm90YXRpb24ueSAtPSBkZWx0YSAvIDE1Ow0KICB9KTsNCg0KICByZXR1cm4gKA0KICAgIDxncm91cCByb3RhdGlvbj17WzAsIDAsIE1hdGguUEkgLyA0XX0+DQogICAgICA8UG9pbnRzIHJlZj17cmVmfSBwb3NpdGlvbnM9e3NwaGVyZX0gc3RyaWRlPXszfSBmcnVzdHVtQ3VsbGVkIHsuLi5wcm9wc30+DQogICAgICAgIDxQb2ludE1hdGVyaWFsDQogICAgICAgICAgdHJhbnNwYXJlbnQNCiAgICAgICAgICBjb2xvcj0iI2YyNzJjOCINCiAgICAgICAgICBzaXplPXswLjAwMn0NCiAgICAgICAgICBzaXplQXR0ZW51YXRpb249e3RydWV9DQogICAgICAgICAgZGVwdGhXcml0ZT17ZmFsc2V9DQogICAgICAgIC8+DQogICAgICA8L1BvaW50cz4NCiAgICA8L2dyb3VwPg0KICApOw0KfTsNCg0KY29uc3QgU3RhcnNDYW52YXMgPSAoKSA9PiB7DQogIHJldHVybiAoDQogICAgPGRpdiBjbGFzc05hbWU9InctZnVsbCBoLWF1dG8gYWJzb2x1dGUgaW5zZXQtMCB6LVstMV0iPg0KICAgICAgPENhbnZhcyBjYW1lcmE9e3sgcG9zaXRpb246IFswLCAwLCAxXSB9fT4NCiAgICAgICAgPFN1c3BlbnNlIGZhbGxiYWNrPXtudWxsfT4NCiAgICAgICAgICA8U3RhcnMgLz4NCiAgICAgICAgPC9TdXNwZW5zZT4NCg0KICAgICAgICA8UHJlbG9hZCBhbGwgLz4NCiAgICAgIDwvQ2FudmFzPg0KICAgIDwvZGl2Pg0KICApOw0KfTsNCg0KZXhwb3J0IGRlZmF1bHQgU3RhcnNDYW52YXM7DQo="}
+﻿import { useState, useRef, Suspense } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Points, PointMaterial, Preload } from "@react-three/drei";
+import * as random from "maath/random/dist/maath-random.esm";
+
+const Stars = (props) => {
+  const ref = useRef();
+  const [sphere] = useState(() =>
+    random.inSphere(new Float32Array(5000), { radius: 1.2 })
+  );
+
+  useFrame((state, delta) => {
+    ref.current.rotation.x -= delta / 10;
+    ref.current.rotation.y -= delta / 15;
+  });
+
+  return (
+    <group rotation={[0, 0, Math.PI / 4]}>
+      <Points ref={ref} positions={sphere} stride={3} frustumCulled {...props}>
+        <PointMaterial
+          transparent
+          color="#f272c8"
+          size={0.002}
+          sizeAttenuation={true}
+          depthWrite={false}
+        />
+      </Points>
+    </group>
+  );
+};
+
+const StarsCanvas = () => {
+  return (
+    <div className="w-full h-auto absolute inset-0 z-[-1]">
+      <Canvas camera={{ position: [0, 0, 1] }}>
+        <Suspense fallback={null}>
+          <Stars />
+        </Suspense>
+
+        <Preload all />
+      </Canvas>
+    </div>
+  );
+};
+
+export default StarsCanvas;

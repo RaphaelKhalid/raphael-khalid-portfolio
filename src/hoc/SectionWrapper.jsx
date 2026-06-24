@@ -1,1 +1,23 @@
-{"data":"aW1wb3J0IHsgbW90aW9uIH0gZnJvbSAiZnJhbWVyLW1vdGlvbiI7DQppbXBvcnQgeyBzdHlsZXMgfSBmcm9tICIuLi9zdHlsZXMiOw0KaW1wb3J0IHsgc3RhZ2dlckNvbnRhaW5lciB9IGZyb20gIi4uL3V0aWxzL21vdGlvbnMiOw0KDQpjb25zdCBTZWN0aW9uV3JhcHBlciA9IChDb21wb25lbnQsIGlkTmFtZSkgPT4NCiAgZnVuY3Rpb24gSE9DKCkgew0KICAgIHJldHVybiAoDQogICAgICA8bW90aW9uLnNlY3Rpb24NCiAgICAgICAgdmFyaWFudHM9e3N0YWdnZXJDb250YWluZXIoKX0NCiAgICAgICAgaW5pdGlhbD0iaGlkZGVuIg0KICAgICAgICB3aGlsZUluVmlldz0ic2hvdyINCiAgICAgICAgdmlld3BvcnQ9e3sgb25jZTogdHJ1ZSwgYW1vdW50OiAwLjI1IH19DQogICAgICAgIGNsYXNzTmFtZT17YCR7c3R5bGVzLnBhZGRpbmd9IG1heC13LTd4bCBteC1hdXRvIHJlbGF0aXZlIHotMGB9DQogICAgICA+DQogICAgICAgIDxzcGFuIGNsYXNzTmFtZT0iaGFzaC1zcGFuIiBpZD17aWROYW1lfT4NCiAgICAgICAgICAmbmJzcDsNCiAgICAgICAgPC9zcGFuPg0KICAgICAgICA8Q29tcG9uZW50IC8+DQogICAgICA8L21vdGlvbi5zZWN0aW9uPg0KICAgICk7DQogIH07DQoNCmV4cG9ydCBkZWZhdWx0IFNlY3Rpb25XcmFwcGVyOw0K"}
+﻿import { motion } from "framer-motion";
+import { styles } from "../styles";
+import { staggerContainer } from "../utils/motions";
+
+const SectionWrapper = (Component, idName) =>
+  function HOC() {
+    return (
+      <motion.section
+        variants={staggerContainer()}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.25 }}
+        className={`${styles.padding} max-w-7xl mx-auto relative z-0`}
+      >
+        <span className="hash-span" id={idName}>
+          &nbsp;
+        </span>
+        <Component />
+      </motion.section>
+    );
+  };
+
+export default SectionWrapper;
