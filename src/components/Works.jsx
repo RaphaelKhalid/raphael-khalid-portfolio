@@ -5,6 +5,7 @@ import { link } from "../assets";
 import SectionWrapper from "../hoc";
 import { projects } from "../constants/index";
 import { fadeIn, textVariant } from "../utils/motions";
+import ProjectAnim from "./ProjectAnim";
 
 const ProjectCard = ({
   index,
@@ -29,7 +30,7 @@ const ProjectCard = ({
         className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full"
       >
         <div className="relative w-full h-[230px]">
-          <div className={`project-card-anim anim-proj-${index} w-full h-full`} />
+          <ProjectAnim index={index} />
 
           <div className="absolute inset-0 flex justify-end m-3 card-img_hover">
             <div
