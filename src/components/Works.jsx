@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef } from "react";
 import ParallaxTilt from "react-parallax-tilt";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { styles } from "../styles";
@@ -6,15 +6,32 @@ import { link } from "../assets";
 import { projects } from "../constants/index";
 import ProjectAnim from "./ProjectAnim";
 
+const CARD_WIDTH = 340;
+const GAP = 28;
+
+/* Per-card scroll-driven entrance — shoots in from the right like a meteor */
+const ScrollCard = ({ index, total, scrollYProgress, children }) => {
+  const enterStart = (index / total) * 0.72;
+  const enterEnd = Math.min(enterStart + 0.14, 0.98);
+  const opacityEnd = Math.min(enterStart + 0.07, 0.98);
+
+  const extraX = useTransform(scrollYProgress, [enterStart, enterEnd], [520, 0]);
+  const opacity = useTransform(scrollYProgress, [enterStart, opacityEnd], [0, 1]);
+  const scale = useTransform(scrollYProgress, [enterStart, enterEnd], [0.82, 1]);
+  const rotate = useTransform(scrollYProgress, [enterStart, enterEnd], [6, 0]);
+
+  return (
+    <motion.div style={{ x: extraX, opacity, scale, rotateZ: rotate }}>
+      {children}
+    </motion.div>
+  );
+};
+
 const ProjectCard = ({ index, name, description, tags, source_code_link }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 16 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: (index % 3) * 0.1 }}
-  >
   <ParallaxTilt
-    options={{ max: 25, scale: 1, speed: 450 }}
-    className="bg-tertiary p-5 rounded-2xl w-[340px] flex-shrink-0 border border-[rgba(139,250,255,0.07)] hover:border-[rgba(139,250,255,0.22)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(139,250,255,0.06)]"
+    options={{ max: 18, scale: 1, speed: 450 }}
+    className="bg-tertiary p-5 rounded-2xl flex-shrink-0 border border-[rgba(139,250,255,0.07)] hover:border-[rgba(139,250,255,0.22)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(139,250,255,0.06)]"
+    style={{ width: CARD_WIDTH }}
   >
     <div className="relative w-full h-[200px]">
       <ProjectAnim index={index} />
@@ -43,43 +60,33 @@ const ProjectCard = ({ index, name, description, tags, source_code_link }) => (
       ))}
     </div>
   </ParallaxTilt>
-  </motion.div>
 );
-
-const CARD_WIDTH = 340;
-const GAP = 28;
 
 const Works = () => {
   const containerRef = useRef(null);
-  const [endX, setEndX] = useState(-3000);
+  const total = projects.length;
 
-  useEffect(() => {
-    const totalStripWidth = projects.length * (CARD_WIDTH + GAP) + 160;
-    setEndX(-(totalStripWidth - window.innerWidth + 80));
-  }, []);
+  const totalStripWidth = total * (CARD_WIDTH + GAP) + 240;
+  const endX = -(totalStripWidth - (typeof window !== "undefined" ? window.innerWidth : 1440) + 80);
+
+  const sectionHeight = total * (CARD_WIDTH + GAP) * 0.82 + 500;
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  const x = useTransform(scrollYProgress, [0, 1], [80, endX]);
-
-  const sectionHeight = projects.length * (CARD_WIDTH + GAP) + 400;
+  /* Base strip translation — pans the whole row left as you scroll */
+  const stripX = useTransform(scrollYProgress, [0, 1], [100, endX]);
 
   return (
-    <section className="relative w-full bg-[#0d0b22]">
-      {/* Top fade from Hero (#050816) into this section */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[140px] pointer-events-none z-10"
-        style={{ background: 'linear-gradient(to bottom, #050816, transparent)' }}
-      />
+    <section className="relative w-full" style={{ background: "transparent" }}>
       <span className="hash-span" id="work">&nbsp;</span>
       <div ref={containerRef} className="relative" style={{ height: sectionHeight }}>
-        <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
+        <div className="sticky top-0 h-screen flex flex-col" style={{ overflow: "visible" }}>
 
           {/* Header */}
-          <div className={`${styles.paddingX} pt-20 pb-6 max-w-7xl mx-auto w-full`}>
+          <div className={`${styles.paddingX} pt-20 pb-6 max-w-7xl mx-auto w-full flex-shrink-0`}>
             <p className={styles.sectionSubText}>My Work</p>
             <h2 className={styles.sectionHeadText}>Projects.</h2>
             <p className="mt-1 text-secondary text-[14px] max-w-xl">
@@ -87,32 +94,34 @@ const Works = () => {
             </p>
           </div>
 
-          {/* Horizontally panning cards */}
-          <div className="flex-1 flex items-center overflow-hidden">
+          {/* Card strip */}
+          <div className="flex-1 flex items-center" style={{ overflow: "hidden" }}>
             <motion.div
-              style={{ x }}
-              className="flex gap-7 will-change-transform"
+              className="flex will-change-transform"
+              style={{ gap: GAP, x: stripX }}
             >
               {projects.map((project, index) => (
-                <ProjectCard key={`project-${index}`} index={index} {...project} />
+                <ScrollCard
+                  key={`project-${index}`}
+                  index={index}
+                  total={total}
+                  scrollYProgress={scrollYProgress}
+                >
+                  <ProjectCard index={index} {...project} />
+                </ScrollCard>
               ))}
             </motion.div>
           </div>
 
           {/* Scroll hint */}
-          <div className="pb-4 flex justify-center">
-            <p className="text-secondary text-[11px] tracking-widest uppercase opacity-40">
+          <div className="pb-5 flex-shrink-0 flex justify-center">
+            <p className="text-secondary text-[11px] tracking-widest uppercase opacity-30">
               scroll to explore →
             </p>
           </div>
 
         </div>
       </div>
-      {/* Bottom fade into Experience (#050816) */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-[140px] pointer-events-none z-10"
-        style={{ background: 'linear-gradient(to bottom, transparent, #050816)' }}
-      />
     </section>
   );
 };
