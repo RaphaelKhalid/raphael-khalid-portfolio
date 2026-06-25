@@ -7,9 +7,14 @@ import { projects } from "../constants/index";
 import ProjectAnim from "./ProjectAnim";
 
 const ProjectCard = ({ index, name, description, tags, source_code_link }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 16 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: (index % 3) * 0.1 }}
+  >
   <ParallaxTilt
     options={{ max: 25, scale: 1, speed: 450 }}
-    className="bg-tertiary p-5 rounded-2xl w-[340px] flex-shrink-0"
+    className="bg-tertiary p-5 rounded-2xl w-[340px] flex-shrink-0 border border-[rgba(139,250,255,0.07)] hover:border-[rgba(139,250,255,0.22)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(139,250,255,0.06)]"
   >
     <div className="relative w-full h-[200px]">
       <ProjectAnim index={index} />
@@ -38,6 +43,7 @@ const ProjectCard = ({ index, name, description, tags, source_code_link }) => (
       ))}
     </div>
   </ParallaxTilt>
+  </motion.div>
 );
 
 const CARD_WIDTH = 340;
@@ -62,7 +68,12 @@ const Works = () => {
   const sectionHeight = projects.length * (CARD_WIDTH + GAP) + 400;
 
   return (
-    <section className="relative w-full">
+    <section className="relative w-full bg-[#0d0b22]">
+      {/* Top fade from Hero (#050816) into this section */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[140px] pointer-events-none z-10"
+        style={{ background: 'linear-gradient(to bottom, #050816, transparent)' }}
+      />
       <span className="hash-span" id="work">&nbsp;</span>
       <div ref={containerRef} className="relative" style={{ height: sectionHeight }}>
         <div className="sticky top-0 h-screen flex flex-col overflow-hidden">
@@ -97,6 +108,11 @@ const Works = () => {
 
         </div>
       </div>
+      {/* Bottom fade into Experience (#050816) */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-[140px] pointer-events-none z-10"
+        style={{ background: 'linear-gradient(to bottom, transparent, #050816)' }}
+      />
     </section>
   );
 };
