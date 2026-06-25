@@ -94,8 +94,8 @@ const Works = () => {
             </p>
           </div>
 
-          {/* Card strip */}
-          <div className="flex-1 flex items-center" style={{ overflow: "hidden" }}>
+          {/* Card strip — clip x only so card tops/bottoms aren't cut */}
+          <div className="flex-1 flex items-center" style={{ overflowX: "clip", overflowY: "visible" }}>
             <motion.div
               className="flex will-change-transform"
               style={{ gap: GAP, x: stripX }}
