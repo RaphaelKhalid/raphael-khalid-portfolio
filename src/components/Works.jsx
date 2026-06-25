@@ -10,12 +10,6 @@ const CARD_W = 340;
 const GAP = 28;
 const STEP = CARD_W + GAP;
 
-/*
-  Each card derives its opacity/scale from its screen-space x position,
-  computed from the spring-driven strip offset. Cards fade + shrink
-  slightly as they approach the viewport edges — spotlight effect.
-  No extra x offset is added so positioning is always correct.
-*/
 const CardWrapper = ({ index, springX, children }) => {
   const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
   const cardCenter = index * STEP + CARD_W / 2;
@@ -24,7 +18,7 @@ const CardWrapper = ({ index, springX, children }) => {
   const scale = useTransform(
     screenCenter,
     [vw * 0.05, vw * 0.45, vw * 0.55, vw * 0.95],
-    [0.84,       1,          1,           0.84]
+    [0.86, 1, 1, 0.86]
   );
   const opacity = useTransform(
     screenCenter,
@@ -41,8 +35,12 @@ const CardWrapper = ({ index, springX, children }) => {
 
 const ProjectCard = ({ index, name, description, tags, source_code_link }) => (
   <ParallaxTilt
-    options={{ max: 15, scale: 1, speed: 450 }}
-    className="bg-tertiary p-5 rounded-2xl border border-[rgba(139,250,255,0.07)] hover:border-[rgba(139,250,255,0.22)] transition-all duration-300 hover:shadow-[0_20px_60px_rgba(139,250,255,0.06)]"
+    tiltEnable={true}
+    tiltMaxAngleX={10}
+    tiltMaxAngleY={10}
+    scale={1}
+    transitionSpeed={600}
+    className="bg-tertiary p-5 rounded-2xl border border-[rgba(139,250,255,0.07)] hover:border-[rgba(139,250,255,0.22)] transition-colors duration-300 hover:shadow-[0_20px_60px_rgba(139,250,255,0.06)]"
     style={{ width: CARD_W }}
   >
     <div className="relative w-full h-[200px]">
@@ -78,10 +76,17 @@ const Works = () => {
   const containerRef = useRef(null);
   const total = projects.length;
   const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 900;
 
   const startX = 80;
+  // endX: position strip so last card's right edge is 80px from right edge
   const endX = -(total * STEP - vw + 80);
-  const sectionHeight = total * STEP * 0.8 + 400;
+
+  // Section must be tall enough for the strip to fully travel.
+  // useScroll "start start"→"end end" maps sectionHeight - vh pixels of scroll to 0→1.
+  // So: sectionHeight - vh = |endX - startX|, plus buffer for spring settle.
+  const stripTravel = Math.abs(endX - startX);
+  const sectionHeight = stripTravel + vh + 320;
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -89,8 +94,7 @@ const Works = () => {
   });
 
   const rawX = useTransform(scrollYProgress, [0, 1], [startX, endX]);
-  // Spring adds a subtle organic lag — gives the "flying" feeling
-  const springX = useSpring(rawX, { stiffness: 55, damping: 18, mass: 0.9 });
+  const springX = useSpring(rawX, { stiffness: 60, damping: 20, mass: 0.8 });
 
   return (
     <section className="relative w-full" style={{ background: "transparent" }}>
@@ -99,7 +103,6 @@ const Works = () => {
       <div ref={containerRef} className="relative" style={{ height: sectionHeight }}>
         <div className="sticky top-0 h-screen flex flex-col">
 
-          {/* Header */}
           <div className={`${styles.paddingX} pt-16 pb-4 max-w-7xl mx-auto w-full flex-shrink-0`}>
             <p className={styles.sectionSubText}>My Work</p>
             <h2 className={styles.sectionHeadText}>Projects.</h2>
@@ -108,11 +111,7 @@ const Works = () => {
             </p>
           </div>
 
-          {/*
-            Card track: position-relative, no overflow clipping.
-            Strip is absolute-centered vertically so cards are never
-            cut off by the container boundary regardless of screen size.
-          */}
+          {/* Strip absolutely centered — no overflow container clipping cards */}
           <div className="flex-1 relative">
             <motion.div
               className="absolute flex"
@@ -132,7 +131,6 @@ const Works = () => {
             </motion.div>
           </div>
 
-          {/* Scroll hint */}
           <div className="pb-4 flex-shrink-0 flex justify-center">
             <p className="text-secondary text-[11px] tracking-widest uppercase opacity-30">
               scroll to explore →
