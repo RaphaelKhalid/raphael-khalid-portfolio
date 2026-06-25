@@ -1,60 +1,70 @@
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { styles } from "../styles";
 import { link } from "../assets";
 import { projects } from "../constants/index";
 import ProjectAnim from "./ProjectAnim";
 
-const ProjectCard = ({ index, name, description, tags, source_code_link }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { margin: "-15% 0px -15% 0px", once: false });
-  const fromLeft = index % 2 === 0;
+const COLS = 3;
+
+// Distribute cards round-robin across columns so they read left-to-right
+const columns = Array.from({ length: COLS }, (_, ci) =>
+  projects
+    .map((p, i) => ({ ...p, globalIndex: i }))
+    .filter((_, i) => i % COLS === ci)
+);
+
+// Column animation delays — left col fastest, right col slowest
+const COL_DELAY = [0, 0.08, 0.16];
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 36 },
+  show: (delay) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 24,
+      delay,
+    },
+  }),
+};
+
+const ProjectCard = ({ globalIndex, name, description, tags, source_code_link, colIndex, rowIndex }) => {
+  const delay = COL_DELAY[colIndex] + rowIndex * 0.06;
 
   return (
     <motion.div
-      ref={ref}
-      initial={{ opacity: 0, x: fromLeft ? -60 : 60 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0.25, x: fromLeft ? -30 : 30 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full max-w-[560px] mx-auto"
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="show"
+      custom={delay}
+      viewport={{ once: true, amount: 0.15 }}
+      className="bg-tertiary rounded-2xl overflow-hidden border border-[rgba(139,250,255,0.07)] hover:border-[rgba(139,250,255,0.2)] transition-colors duration-300 hover:shadow-[0_16px_48px_rgba(139,250,255,0.07)]"
     >
-      <div
-        className="bg-tertiary rounded-2xl overflow-hidden border transition-all duration-500"
-        style={{
-          borderColor: isInView
-            ? "rgba(139,250,255,0.22)"
-            : "rgba(139,250,255,0.05)",
-          boxShadow: isInView
-            ? "0 0 40px rgba(139,250,255,0.07), 0 20px 60px rgba(0,0,0,0.4)"
-            : "none",
-        }}
-      >
-        {/* Animated background */}
-        <div className="relative w-full h-[200px]">
-          <ProjectAnim index={index} />
-          <div className="absolute inset-0 flex justify-end m-3">
-            <a
-              href={source_code_link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer hover:scale-110 transition-transform"
-            >
-              <img src={link} alt="source code" className="w-1/2 h-1/2 object-contain" />
-            </a>
-          </div>
+      <div className="relative w-full h-[170px]">
+        <ProjectAnim index={globalIndex} />
+        <div className="absolute inset-0 flex justify-end m-2">
+          <a
+            href={source_code_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="white w-9 h-9 rounded-full flex justify-center items-center cursor-pointer hover:scale-110 transition-transform"
+          >
+            <img src={link} alt="source code" className="w-1/2 h-1/2 object-contain" />
+          </a>
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="p-5">
-          <h3 className="text-white font-bold text-[19px] leading-snug">{name}</h3>
-          <p className="mt-2 text-secondary text-[13px] leading-relaxed">{description}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <span key={tag.name} className={`text-[12px] ${tag.color}`}>
-                #{tag.name}
-              </span>
-            ))}
-          </div>
+      <div className="p-4">
+        <h3 className="text-white font-bold text-[15px] leading-snug">{name}</h3>
+        <p className="mt-1.5 text-secondary text-[12px] leading-relaxed line-clamp-3">{description}</p>
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {tags.map((tag) => (
+            <span key={tag.name} className={`text-[11px] ${tag.color}`}>
+              #{tag.name}
+            </span>
+          ))}
         </div>
       </div>
     </motion.div>
@@ -65,14 +75,13 @@ const Works = () => (
   <section className="relative w-full" style={{ background: "transparent" }}>
     <span className="hash-span" id="work">&nbsp;</span>
 
-    <div className={`${styles.paddingX} max-w-3xl mx-auto pt-16 pb-20`}>
-      {/* Header */}
+    <div className={`${styles.paddingX} max-w-7xl mx-auto pt-16 pb-20`}>
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-14"
+        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        className="mb-12"
       >
         <p className={styles.sectionSubText}>My Work</p>
         <h2 className={styles.sectionHeadText}>Projects.</h2>
@@ -81,10 +90,19 @@ const Works = () => (
         </p>
       </motion.div>
 
-      {/* Card river */}
-      <div className="flex flex-col gap-10">
-        {projects.map((project, i) => (
-          <ProjectCard key={i} index={i} {...project} />
+      {/* Masonry grid — 3 cols desktop, 2 tablet, 1 mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
+        {columns.map((col, ci) => (
+          <div key={ci} className="flex flex-col gap-5">
+            {col.map((project, ri) => (
+              <ProjectCard
+                key={project.globalIndex}
+                {...project}
+                colIndex={ci}
+                rowIndex={ri}
+              />
+            ))}
+          </div>
         ))}
       </div>
     </div>
