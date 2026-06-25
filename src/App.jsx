@@ -12,10 +12,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="relative z-0 bg-primary">
-        <div
-          className="bg-primary bg-cover bg-no-repeat bg-center"
-          style={{ zIndex: -1 }}
-        >
+        <div className="bg-primary">
           <Navbar />
           <Hero />
         </div>

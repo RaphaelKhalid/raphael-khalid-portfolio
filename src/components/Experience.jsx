@@ -108,27 +108,45 @@ const Experience = () => (
     </motion.div>
 
     <div className="mt-16 relative">
-      {/* Left rail */}
-      <div
+      {/* Left rail — draws in from top */}
+      <motion.div
         className="absolute top-0 bottom-0 w-[2px] pointer-events-none"
+        initial={{ scaleY: 0 }}
+        whileInView={{ scaleY: 1 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
         style={{
           left: "0.375rem",
+          transformOrigin: "top",
           background: "linear-gradient(to bottom, transparent, rgba(139,250,255,0.25) 20%, rgba(139,250,255,0.25) 80%, transparent)",
         }}
       />
-      {/* Right rail */}
-      <div
+      {/* Right rail — draws in from top */}
+      <motion.div
         className="absolute top-0 bottom-0 w-[2px] pointer-events-none"
+        initial={{ scaleY: 0 }}
+        whileInView={{ scaleY: 1 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
         style={{
           right: "0.375rem",
+          transformOrigin: "top",
           background: "linear-gradient(to bottom, transparent, rgba(139,250,255,0.25) 20%, rgba(139,250,255,0.25) 80%, transparent)",
         }}
       />
 
-      {/* Rungs */}
+      {/* Rungs — staggered entrance */}
       <div className="flex flex-col gap-4 py-4">
         {experiences.map((exp, i) => (
-          <LadderRung key={i} experience={exp} index={i} />
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+          >
+            <LadderRung experience={exp} index={i} />
+          </motion.div>
         ))}
       </div>
     </div>
