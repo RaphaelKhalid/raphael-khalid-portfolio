@@ -44,9 +44,6 @@
   color-scheme: dark;
 }
 
-html, body {
-  overflow-x: hidden;
-}
 
 .hash-span {
   margin-top: -100px;
