@@ -1,6 +1,7 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { styles } from "../styles";
+import { KnowledgeGraph } from "./canvas";
 
 const ROLES = ['Computer Scientist', 'Political Scientist', 'ML Engineer', 'Complexity Scientist'];
 
@@ -35,13 +36,16 @@ const Hero = () => {
 
   return (
     <section className="relative w-full h-screen mx-auto overflow-hidden" style={{ background: "transparent" }}>
+
+      {/* Subtle glow orbs — blended additively so they don't block stars */}
       <div className="orb-1" />
       <div className="orb-2" />
       <div className="orb-3" />
 
+      {/* Text — left half */}
       <motion.div
-        style={{ y }}
         className={`${styles.paddingX} absolute inset-0 top-[120px] max-w-7xl mx-auto flex flex-col justify-start items-start`}
+        style={{ zIndex: 2, y }}
       >
         <motion.p
           initial={{ opacity: 0, y: 30 }}
@@ -75,9 +79,18 @@ const Hero = () => {
         </motion.div>
       </motion.div>
 
+      {/* 3D Knowledge Graph — right side */}
+      <div
+        className="absolute right-0 top-0 w-full h-full md:w-[55%]"
+        style={{ zIndex: 1 }}
+      >
+        <Suspense fallback={null}>
+          <KnowledgeGraph />
+        </Suspense>
+      </div>
 
-      {/* Minimalist scroll indicator */}
-      <a href="#work" className="absolute bottom-10 left-8 flex items-center gap-3 group z-20">
+      {/* Scroll indicator */}
+      <a href="#work" className="absolute bottom-10 left-8 flex items-center gap-3 group" style={{ zIndex: 3 }}>
         <div className="relative w-[1px] h-12 bg-[rgba(139,250,255,0.12)] overflow-hidden">
           <div className="scroll-dot" />
         </div>
