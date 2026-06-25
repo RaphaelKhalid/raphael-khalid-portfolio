@@ -34,7 +34,7 @@ const Hero = () => {
   const spring = (delay) => ({ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay });
 
   return (
-    <section className="relative w-full h-screen mx-auto overflow-hidden">
+    <section className="relative w-full h-screen mx-auto overflow-hidden" style={{ background: "transparent" }}>
       <div className="orb-1" />
       <div className="orb-2" />
       <div className="orb-3" />
@@ -75,11 +75,6 @@ const Hero = () => {
         </motion.div>
       </motion.div>
 
-      {/* Bottom gradient fade into next section */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-[200px] pointer-events-none z-10"
-        style={{ background: 'linear-gradient(to bottom, transparent, #050816)' }}
-      />
 
       {/* Minimalist scroll indicator */}
       <a href="#work" className="absolute bottom-10 left-8 flex items-center gap-3 group z-20">
