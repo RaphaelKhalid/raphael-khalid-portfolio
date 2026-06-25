@@ -1,146 +1,94 @@
 import { useRef } from "react";
-import ParallaxTilt from "react-parallax-tilt";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { styles } from "../styles";
 import { link } from "../assets";
 import { projects } from "../constants/index";
 import ProjectAnim from "./ProjectAnim";
 
-const CARD_W = 340;
-const GAP = 28;
-const STEP = CARD_W + GAP;
-
-const CardWrapper = ({ index, springX, children }) => {
-  const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
-  const cardCenter = index * STEP + CARD_W / 2;
-
-  const screenCenter = useTransform(springX, (x) => x + cardCenter);
-  const scale = useTransform(
-    screenCenter,
-    [vw * 0.05, vw * 0.45, vw * 0.55, vw * 0.95],
-    [0.86, 1, 1, 0.86]
-  );
-  const opacity = useTransform(
-    screenCenter,
-    [-CARD_W * 0.5, CARD_W * 0.5, vw - CARD_W * 0.5, vw + CARD_W * 0.5],
-    [0, 1, 1, 0]
-  );
+const ProjectCard = ({ index, name, description, tags, source_code_link }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { margin: "-15% 0px -15% 0px", once: false });
+  const fromLeft = index % 2 === 0;
 
   return (
-    <motion.div style={{ scale, opacity }} className="flex-shrink-0">
-      {children}
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: fromLeft ? -60 : 60 }}
+      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0.25, x: fromLeft ? -30 : 30 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full max-w-[560px] mx-auto"
+    >
+      <div
+        className="bg-tertiary rounded-2xl overflow-hidden border transition-all duration-500"
+        style={{
+          borderColor: isInView
+            ? "rgba(139,250,255,0.22)"
+            : "rgba(139,250,255,0.05)",
+          boxShadow: isInView
+            ? "0 0 40px rgba(139,250,255,0.07), 0 20px 60px rgba(0,0,0,0.4)"
+            : "none",
+        }}
+      >
+        {/* Animated background */}
+        <div className="relative w-full h-[200px]">
+          <ProjectAnim index={index} />
+          <div className="absolute inset-0 flex justify-end m-3">
+            <a
+              href={source_code_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer hover:scale-110 transition-transform"
+            >
+              <img src={link} alt="source code" className="w-1/2 h-1/2 object-contain" />
+            </a>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-5">
+          <h3 className="text-white font-bold text-[19px] leading-snug">{name}</h3>
+          <p className="mt-2 text-secondary text-[13px] leading-relaxed">{description}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <span key={tag.name} className={`text-[12px] ${tag.color}`}>
+                #{tag.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 };
 
-const ProjectCard = ({ index, name, description, tags, source_code_link }) => (
-  <ParallaxTilt
-    tiltEnable={true}
-    tiltMaxAngleX={10}
-    tiltMaxAngleY={10}
-    scale={1}
-    transitionSpeed={600}
-    className="bg-tertiary p-5 rounded-2xl border border-[rgba(139,250,255,0.07)] hover:border-[rgba(139,250,255,0.22)] transition-colors duration-300 hover:shadow-[0_20px_60px_rgba(139,250,255,0.06)]"
-    style={{ width: CARD_W }}
-  >
-    <div className="relative w-full h-[200px]">
-      <ProjectAnim index={index} />
-      <div className="absolute inset-0 flex justify-end m-3">
-        <a
-          href={source_code_link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="white w-10 h-10 rounded-full flex justify-center items-center cursor-pointer"
-        >
-          <img src={link} alt="source code" className="w-1/2 h-1/2 object-contain" />
-        </a>
-      </div>
-    </div>
+const Works = () => (
+  <section className="relative w-full" style={{ background: "transparent" }}>
+    <span className="hash-span" id="work">&nbsp;</span>
 
-    <div className="mt-4">
-      <h3 className="text-white font-bold text-[20px] leading-tight">{name}</h3>
-      <p className="mt-2 text-secondary text-[13px] leading-relaxed line-clamp-3">{description}</p>
-    </div>
-
-    <div className="mt-3 flex flex-wrap gap-2">
-      {tags.map((tag) => (
-        <p key={`${name}-${tag.name}`} className={`text-[12px] ${tag.color}`}>
-          #{tag.name}
+    <div className={`${styles.paddingX} max-w-3xl mx-auto pt-16 pb-20`}>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="mb-14"
+      >
+        <p className={styles.sectionSubText}>My Work</p>
+        <h2 className={styles.sectionHeadText}>Projects.</h2>
+        <p className="mt-2 text-secondary text-[14px] max-w-xl leading-relaxed">
+          A diverse showcase — from machine learning to political science and the intersections in between.
         </p>
-      ))}
-    </div>
-  </ParallaxTilt>
-);
+      </motion.div>
 
-const Works = () => {
-  const containerRef = useRef(null);
-  const total = projects.length;
-  const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
-  const vh = typeof window !== "undefined" ? window.innerHeight : 900;
-
-  const startX = 80;
-  // endX: position strip so last card's right edge is 80px from right edge
-  const endX = -(total * STEP - vw + 80);
-
-  // Section must be tall enough for the strip to fully travel.
-  // useScroll "start start"→"end end" maps sectionHeight - vh pixels of scroll to 0→1.
-  // So: sectionHeight - vh = |endX - startX|, plus buffer for spring settle.
-  const stripTravel = Math.abs(endX - startX);
-  const sectionHeight = stripTravel + vh + 320;
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
-
-  const rawX = useTransform(scrollYProgress, [0, 1], [startX, endX]);
-  const springX = useSpring(rawX, { stiffness: 60, damping: 20, mass: 0.8 });
-
-  return (
-    <section className="relative w-full" style={{ background: "transparent" }}>
-      <span className="hash-span" id="work">&nbsp;</span>
-
-      <div ref={containerRef} className="relative" style={{ height: sectionHeight }}>
-        <div className="sticky top-0 h-screen flex flex-col">
-
-          <div className={`${styles.paddingX} pt-16 pb-4 max-w-7xl mx-auto w-full flex-shrink-0`}>
-            <p className={styles.sectionSubText}>My Work</p>
-            <h2 className={styles.sectionHeadText}>Projects.</h2>
-            <p className="mt-1 text-secondary text-[14px] max-w-xl leading-relaxed">
-              A diverse showcase — from machine learning to political science and the intersections in between.
-            </p>
-          </div>
-
-          {/* Strip absolutely centered — no overflow container clipping cards */}
-          <div className="flex-1 relative">
-            <motion.div
-              className="absolute flex"
-              style={{
-                x: springX,
-                top: "50%",
-                translateY: "-50%",
-                gap: `${GAP}px`,
-                left: 0,
-              }}
-            >
-              {projects.map((project, i) => (
-                <CardWrapper key={i} index={i} springX={springX}>
-                  <ProjectCard index={i} {...project} />
-                </CardWrapper>
-              ))}
-            </motion.div>
-          </div>
-
-          <div className="pb-4 flex-shrink-0 flex justify-center">
-            <p className="text-secondary text-[11px] tracking-widest uppercase opacity-30">
-              scroll to explore →
-            </p>
-          </div>
-
-        </div>
+      {/* Card river */}
+      <div className="flex flex-col gap-10">
+        {projects.map((project, i) => (
+          <ProjectCard key={i} index={i} {...project} />
+        ))}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 export default Works;
