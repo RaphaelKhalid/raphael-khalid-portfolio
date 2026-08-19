@@ -145,7 +145,7 @@ const projects = [
       { name: "robotics", color: "pink-text-gradient" },
     ],
     image: jobit,
-    source_code_link: "https://github.com/RaphaelKhalid",
+    source_code_link: "https://robotics-navy.vercel.app",
   },
   {
     name: "Instance Segmentation on Aerial Slum Images",
@@ -300,6 +300,17 @@ const projects = [
     ],
     image: conflict,
     source_code_link: "https://drive.google.com/file/d/1NAAxodp0dd6vLu--WMw-T8w7_wEHG5Rz/view",
+  },
+  {
+    name: "Before You Click Send",
+    description: "An AI-safety onboarding tool (built at BlueDot Impact's Breaking Barriers hackathon) that catches risky messages before they are sent and coaches safer alternatives. Live, interactive web app.",
+    tags: [
+      { name: "aisafety", color: "blue-text-gradient" },
+      { name: "react", color: "green-text-gradient" },
+      { name: "webapp", color: "pink-text-gradient" },
+    ],
+    image: redditpaper,
+    source_code_link: "https://before-you-click-send.vercel.app",
   },
 ];
 

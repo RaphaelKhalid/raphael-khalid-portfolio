@@ -627,9 +627,35 @@ function animRE(w, h) {
   };
 }
 
+// BYCS - message scanned before send  [amber scan / green cleared]
+function animBYCS(w, h) {
+  const cx = w / 2, cy = h / 2;
+  return (ctx, t) => {
+    ctx.fillStyle = 'rgba(8,10,22,0.22)';
+    ctx.fillRect(0, 0, w, h);
+    // envelope
+    const ew = w * 0.4, eh = ew * 0.62;
+    const ex = cx - ew / 2, ey = cy - eh / 2;
+    const cleared = Math.sin(t * 0.9) > 0.4;
+    const col = cleared ? '#34d399' : '#f5b642';
+    ctx.strokeStyle = col; ctx.lineWidth = 2;
+    ctx.shadowColor = col; ctx.shadowBlur = 12;
+    ctx.strokeRect(ex, ey, ew, eh);
+    ctx.beginPath();
+    ctx.moveTo(ex, ey); ctx.lineTo(cx, cy + eh * 0.12); ctx.lineTo(ex + ew, ey);
+    ctx.stroke();
+    // scan line sweeping down
+    const sy = ey + ((t * 0.5) % 1) * eh;
+    ctx.strokeStyle = `rgba(139,250,255,0.9)`;
+    ctx.shadowColor = '#8bfaff'; ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.moveTo(ex, sy); ctx.lineTo(ex + ew, sy); ctx.stroke();
+    ctx.shadowBlur = 0;
+  };
+}
+
 const ANIMS = [
   animRE, anim0, anim1, anim2, anim3, anim4, anim5, anim6, anim7,
-  anim8, anim9, anim10, anim11, anim12, anim13, anim14,
+  anim8, anim9, anim10, anim11, anim12, anim13, anim14, animBYCS,
 ];
 
 const ProjectAnim = ({ index }) => {
