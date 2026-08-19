@@ -653,9 +653,29 @@ function animBYCS(w, h) {
   };
 }
 
+// BAL - inverted pendulum self-balancing  [cyan]
+function animBAL(w, h) {
+  const cx = w / 2, baseY = h * 0.82, L = h * 0.5;
+  return (ctx, t) => {
+    ctx.fillStyle = 'rgba(8,10,22,0.22)';
+    ctx.fillRect(0, 0, w, h);
+    const ang = Math.sin(t * 2.2) * 0.25 * Math.exp(-((t % 4)) * 0.15) + Math.sin(t * 0.7) * 0.05;
+    const topX = cx + Math.sin(ang) * L, topY = baseY - Math.cos(ang) * L;
+    // wheel/base
+    ctx.strokeStyle = '#8bfaff'; ctx.lineWidth = 3; ctx.shadowColor = '#8bfaff'; ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.arc(cx, baseY, 14, 0, TAU); ctx.stroke();
+    // pendulum body
+    ctx.beginPath(); ctx.moveTo(cx, baseY); ctx.lineTo(topX, topY); ctx.stroke();
+    ctx.beginPath(); ctx.arc(topX, topY, 7, 0, TAU); ctx.fillStyle = '#e0f7ff'; ctx.fill();
+    // ground
+    ctx.shadowBlur = 0; ctx.strokeStyle = 'rgba(139,250,255,0.25)';
+    ctx.beginPath(); ctx.moveTo(0, baseY + 15); ctx.lineTo(w, baseY + 15); ctx.stroke();
+  };
+}
+
 const ANIMS = [
   animRE, anim0, anim1, anim2, anim3, anim4, anim5, anim6, anim7,
-  anim8, anim9, anim10, anim11, anim12, anim13, anim14, animBYCS,
+  anim8, anim9, anim10, anim11, anim12, anim13, anim14, animBYCS, animBAL,
 ];
 
 const ProjectAnim = ({ index }) => {

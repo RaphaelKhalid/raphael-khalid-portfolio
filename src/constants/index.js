@@ -312,6 +312,17 @@ const projects = [
     image: redditpaper,
     source_code_link: "https://before-you-click-send.vercel.app",
   },
+  {
+    name: "SelfBalance Lab",
+    description: "An interactive 3D self-balancing robot assembly simulator: drag real components onto a chassis, wire the pins, edit an Arduino PID sketch, and watch a Rapier-physics robot try to balance. Built with Three.js and Rapier; live PID tuning.",
+    tags: [
+      { name: "threejs", color: "blue-text-gradient" },
+      { name: "physics", color: "green-text-gradient" },
+      { name: "robotics", color: "pink-text-gradient" },
+    ],
+    image: redditpaper,
+    source_code_link: "https://selfbalance-lab.vercel.app",
+  },
 ];
 
 export { services, experiences, testimonials, projects };
