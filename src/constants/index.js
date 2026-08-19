@@ -126,6 +126,17 @@ const testimonials = [
 
 const projects = [
   {
+    name: "Deployment-Layer Refusal Erosion",
+    description: "An evaluation harness showing that an aligned model's refusals collapse when the same request is routed through an ordinary product system prompt, with no jailbreak. Replicated across three developers' models (Google Gemini, DeepSeek V4 Flash, and an OpenRouter-routed model) at p<0.0001 via an exact McNemar test, and validated against a blind human labeling pass. Ships with a live, interactive demo.",
+    tags: [
+      { name: "aisafety", color: "blue-text-gradient" },
+      { name: "evals", color: "green-text-gradient" },
+      { name: "research", color: "pink-text-gradient" },
+    ],
+    image: redditpaper,
+    source_code_link: "https://deployment-layer-refusal-erosion.vercel.app",
+  },
+  {
     name: "Robotics 101",
     description: "A 13-unit full-stack web application built independently to deepen robotics expertise, featuring interactive physics simulations, canvas-based rendering for robot control, and a puzzle-validation engine. Built with Python, TypeScript, Next.js, React, and Tailwind CSS; deployed to production.",
     tags: [
