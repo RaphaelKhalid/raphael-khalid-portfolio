@@ -584,8 +584,51 @@ function anim14(w, h) {
   };
 }
 
+// RE - Refusal Erosion  [cyan barrier / red breakthrough]
+function animRE(w, h) {
+  const N = 22;
+  const parts = Array.from({ length: N }, (_, i) => ({
+    y: h * (0.12 + 0.76 * (i / N)),
+    off: i / N,
+    spd: 0.16 + 0.05 * (i % 3),
+  }));
+  const cx = w * 0.52;
+  return (ctx, t) => {
+    ctx.fillStyle = 'rgba(8,10,22,0.22)';
+    ctx.fillRect(0, 0, w, h);
+    const erosion = Math.pow(Math.sin(t * 0.7) * 0.5 + 0.5, 2);
+    ctx.save();
+    ctx.strokeStyle = `rgba(139,250,255,${0.25 + 0.6 * (1 - erosion)})`;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#8bfaff';
+    ctx.shadowBlur = 14 * (1 - erosion) + 4;
+    ctx.setLineDash([6, 7]);
+    ctx.beginPath();
+    ctx.moveTo(cx, h * 0.08);
+    ctx.lineTo(cx, h * 0.92);
+    ctx.stroke();
+    ctx.restore();
+    parts.forEach((p) => {
+      let x = ((t * p.spd + p.off) % 1) * w;
+      let passed = x > cx;
+      if (passed && erosion < 0.45) {
+        x = cx - 6 - 3 * Math.abs(Math.sin(t * 6 + p.off * 10));
+        passed = false;
+      }
+      const col = passed ? '#ff5a52' : '#8bfaff';
+      ctx.beginPath();
+      ctx.arc(x, p.y, passed ? 3 : 2.4, 0, TAU);
+      ctx.fillStyle = col;
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 10;
+      ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+  };
+}
+
 const ANIMS = [
-  anim0, anim1, anim2, anim3, anim4, anim5, anim6, anim7,
+  animRE, anim0, anim1, anim2, anim3, anim4, anim5, anim6, anim7,
   anim8, anim9, anim10, anim11, anim12, anim13, anim14,
 ];
 
