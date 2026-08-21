@@ -1,45 +1,11 @@
-﻿import {
+import {
+  web,
   mobile,
   backend,
   creator,
-  web,
-  javascript,
-  typescript,
-  html,
-  css,
-  reactjs,
-  redux,
-  tailwind,
-  nodejs,
-  mongodb,
-  git,
-  figma,
-  docker,
-  meta,
-  tesla,
-  shopify,
-  carrent,
-  wavenet,
-  khawaja,
-  waste,
-  hegemony,
-  bubble,
-  monopoly,
-  chess,
-  conflict,
-  jobit,
-  tripguide,
-  threejs,
-  beatbox,
+  cfgl,
+  wharton,
   minerva,
-  daum,
-  buraq,
-  gensler,
-  debatespaces,
-  slumml,
-  mml,
-  redditpaper,
-  psych,
 } from "../assets";
 
 export const navLinks = [
@@ -59,7 +25,7 @@ const experiences = [
   {
     title: "Course Instructor",
     company_name: "Center for Future Global Leaders",
-    icon: meta,
+    icon: cfgl,
     iconBg: "#FFFFFF",
     date: "January 2025 - Present",
     points: [
@@ -80,7 +46,7 @@ const experiences = [
   {
     title: "Residential Counselor",
     company_name: "Wharton Global Youth at UPenn",
-    icon: shopify,
+    icon: wharton,
     iconBg: "#FFFFFF",
     date: "Summer 2024",
     points: [
@@ -100,30 +66,6 @@ const experiences = [
   },
 ];
 
-const testimonials = [
-  {
-    testimonial: "I thought it was impossible to make a website as beautiful as our product, but Rick proved me wrong.",
-    name: "Sara Lee",
-    designation: "CFO",
-    company: "Acme Co",
-    image: "https://randomuser.me/api/portraits/women/4.jpg",
-  },
-  {
-    testimonial: "I've never met a web developer who truly cares about their clients' success like Rick does.",
-    name: "Chris Brown",
-    designation: "COO",
-    company: "DEF Corp",
-    image: "https://randomuser.me/api/portraits/men/5.jpg",
-  },
-  {
-    testimonial: "After Rick optimized our website, our traffic increased by 50%. We can't thank them enough!",
-    name: "Lisa Wang",
-    designation: "CTO",
-    company: "456 Enterprises",
-    image: "https://randomuser.me/api/portraits/women/6.jpg",
-  },
-];
-
 const projects = [
   {
     name: "Deployment-Layer Refusal Erosion",
@@ -133,7 +75,6 @@ const projects = [
       { name: "evals", color: "green-text-gradient" },
       { name: "research", color: "pink-text-gradient" },
     ],
-    image: redditpaper,
     source_code_link: "https://deployment-layer-refusal-erosion.vercel.app",
   },
   {
@@ -144,7 +85,6 @@ const projects = [
       { name: "react", color: "green-text-gradient" },
       { name: "robotics", color: "pink-text-gradient" },
     ],
-    image: jobit,
     source_code_link: "https://robotics-navy.vercel.app",
   },
   {
@@ -155,7 +95,6 @@ const projects = [
       { name: "torch", color: "green-text-gradient" },
       { name: "machinelearning", color: "pink-text-gradient" },
     ],
-    image: slumml,
     source_code_link: "https://drive.google.com/file/d/1n3MbnRve5zXM-yRi7PJOXz4bVbLFForH/view?usp=drive_link",
   },
   {
@@ -166,7 +105,6 @@ const projects = [
       { name: "policy", color: "green-text-gradient" },
       { name: "research", color: "pink-text-gradient" },
     ],
-    image: conflict,
     source_code_link: "https://github.com/RaphaelKhalid",
   },
   {
@@ -177,7 +115,6 @@ const projects = [
       { name: "causalinference", color: "green-text-gradient" },
       { name: "syntheticcontrol", color: "pink-text-gradient" },
     ],
-    image: mml,
     source_code_link: "https://drive.google.com/file/d/1Mwl-dVUWBQbSKpz2uwWV5hDuay-rg5w8/view?usp=drive_link",
   },
   {
@@ -188,7 +125,6 @@ const projects = [
       { name: "mockstudy", color: "green-text-gradient" },
       { name: "research", color: "pink-text-gradient" },
     ],
-    image: psych,
     source_code_link: "https://drive.google.com/file/d/1-AZh-H-xQinn-xJCOoEh8xwiOMsfnipy/view?usp=sharing",
   },
   {
@@ -199,7 +135,6 @@ const projects = [
       { name: "nlp", color: "green-text-gradient" },
       { name: "machinelearning", color: "pink-text-gradient" },
     ],
-    image: redditpaper,
     source_code_link: "https://drive.google.com/file/d/1SMcLEZ17I7rw9c_mj24EAfpLjrlH367m/view?usp=drive_link",
   },
   {
@@ -210,7 +145,6 @@ const projects = [
       { name: "tensorflow", color: "green-text-gradient" },
       { name: "machinelearning", color: "pink-text-gradient" },
     ],
-    image: beatbox,
     source_code_link: "https://github.com/RaphaelKhalid/Python/tree/main/Live%20Audio%20Classifier%20with%20CNNs%20for%20Beatbox",
   },
   {
@@ -221,7 +155,6 @@ const projects = [
       { name: "tensorflow", color: "green-text-gradient" },
       { name: "generativeaudio", color: "pink-text-gradient" },
     ],
-    image: wavenet,
     source_code_link: "https://drive.google.com/file/d/1pCqwpuC8xM4Mxc_ufunzxWLG8bU4n_bE/view?usp=sharing",
   },
   {
@@ -232,7 +165,6 @@ const projects = [
       { name: "causality", color: "green-text-gradient" },
       { name: "politicalscience", color: "pink-text-gradient" },
     ],
-    image: khawaja,
     source_code_link: "https://drive.google.com/file/d/1mUFbG2ObSiok4ZHjtUuutQ5Kx47gPdNc/view?usp=sharing",
   },
   {
@@ -243,7 +175,6 @@ const projects = [
       { name: "simulations", color: "green-text-gradient" },
       { name: "networkx", color: "pink-text-gradient" },
     ],
-    image: waste,
     source_code_link: "https://drive.google.com/file/d/1aHRyuxobHT3GT39-MNwFL5fTLs26FnHs/view?usp=sharing",
   },
   {
@@ -254,7 +185,6 @@ const projects = [
       { name: "systemdynamics", color: "green-text-gradient" },
       { name: "politicalscience", color: "pink-text-gradient" },
     ],
-    image: hegemony,
     source_code_link: "https://drive.google.com/file/d/1VVsRwBbYCj8BuZ8oeXB1XxpPKQbs23mV/view?usp=sharing",
   },
   {
@@ -265,7 +195,6 @@ const projects = [
       { name: "networks", color: "green-text-gradient" },
       { name: "netlogo", color: "pink-text-gradient" },
     ],
-    image: bubble,
     source_code_link: "https://drive.google.com/file/d/1R9XF_3Yak5ajcmvEthjr2mAzhzRHdlbY/view?usp=sharing",
   },
   {
@@ -276,7 +205,6 @@ const projects = [
       { name: "networks", color: "green-text-gradient" },
       { name: "research", color: "pink-text-gradient" },
     ],
-    image: monopoly,
     source_code_link: "https://drive.google.com/file/d/1BnQ3PqWDanh213NLP57V93Db6IjH8ol0/view?usp=sharing",
   },
   {
@@ -287,7 +215,6 @@ const projects = [
       { name: "pygame", color: "green-text-gradient" },
       { name: "chess", color: "pink-text-gradient" },
     ],
-    image: chess,
     source_code_link: "https://drive.google.com/file/d/11z8VYY05OapTW_UYkTvDLS1ncze-JTrm/view?usp=sharing",
   },
   {
@@ -298,7 +225,6 @@ const projects = [
       { name: "networks", color: "green-text-gradient" },
       { name: "research", color: "pink-text-gradient" },
     ],
-    image: conflict,
     source_code_link: "https://drive.google.com/file/d/1NAAxodp0dd6vLu--WMw-T8w7_wEHG5Rz/view",
   },
   {
@@ -309,7 +235,6 @@ const projects = [
       { name: "react", color: "green-text-gradient" },
       { name: "webapp", color: "pink-text-gradient" },
     ],
-    image: redditpaper,
     source_code_link: "https://before-you-click-send.vercel.app",
   },
   {
@@ -320,9 +245,8 @@ const projects = [
       { name: "physics", color: "green-text-gradient" },
       { name: "robotics", color: "pink-text-gradient" },
     ],
-    image: redditpaper,
     source_code_link: "https://selfbalance-lab.vercel.app",
   },
 ];
 
-export { services, experiences, testimonials, projects };
+export { services, experiences, projects };

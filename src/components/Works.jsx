@@ -40,9 +40,9 @@ const ProjectCard = ({ globalIndex, name, description, tags, source_code_link, c
       whileInView="show"
       custom={delay}
       viewport={{ once: true, amount: 0.15 }}
-      className="bg-tertiary rounded-2xl overflow-hidden border border-[rgba(139,250,255,0.07)] hover:border-[rgba(139,250,255,0.2)] transition-colors duration-300 hover:shadow-[0_16px_48px_rgba(139,250,255,0.07)]"
+      className="bg-panel rounded-xl overflow-hidden border border-line-soft hover:border-line transition-colors duration-200 hover:shadow-card"
     >
-      <div className="relative w-full h-[170px]">
+      <div className="anim-frame relative w-full h-[170px]">
         <ProjectAnim index={globalIndex} />
         <div className="absolute inset-0 flex justify-end m-2">
           <a
@@ -57,11 +57,11 @@ const ProjectCard = ({ globalIndex, name, description, tags, source_code_link, c
       </div>
 
       <div className="p-4">
-        <h3 className="text-white font-bold text-[15px] leading-snug">{name}</h3>
-        <p className="mt-1.5 text-secondary text-[12px] leading-relaxed line-clamp-3">{description}</p>
+        <h3 className="font-display text-fg font-semibold text-[15px] leading-snug tracking-[-0.01em]">{name}</h3>
+        <p className="mt-2 text-fg-dim text-[12.5px] leading-relaxed line-clamp-3">{description}</p>
         <div className="mt-2.5 flex flex-wrap gap-1.5">
           {tags.map((tag) => (
-            <span key={tag.name} className={`text-[11px] ${tag.color}`}>
+            <span key={tag.name} className={`font-mono text-[10.5px] ${tag.color}`}>
               #{tag.name}
             </span>
           ))}

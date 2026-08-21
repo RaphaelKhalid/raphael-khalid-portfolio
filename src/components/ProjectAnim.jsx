@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { subscribe } from '../utils/animScheduler';
 
 const TAU = Math.PI * 2;
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -678,18 +679,41 @@ const ANIMS = [
   anim8, anim9, anim10, anim11, anim12, anim13, anim14, animBYCS, animBAL,
 ];
 
+const SHADOW_CAP = 6;
+
+// ctx.shadowBlur is by far the most expensive property in Canvas 2D — cost
+// scales with the blur radius, and these factories set it 43 times across the
+// file, occasionally to 20. Clamping once at the context is a one-line change
+// with the same visual result at this size; editing fifteen factories is not.
+function clampShadow(ctx) {
+  const proto = Object.getPrototypeOf(ctx);
+  const desc = Object.getOwnPropertyDescriptor(proto, "shadowBlur");
+  if (!desc || !desc.set) return;
+  Object.defineProperty(ctx, "shadowBlur", {
+    configurable: true,
+    get: () => desc.get.call(ctx),
+    set(v) {
+      desc.set.call(ctx, v > SHADOW_CAP ? SHADOW_CAP : v);
+    },
+  });
+}
+
 const ProjectAnim = ({ index }) => {
   const canvasRef = useRef(null);
-  const rafRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d", { alpha: false });
+    clampShadow(ctx);
 
+    // Deliberately below CSS resolution, not above it. This is out-of-focus
+    // background texture behind a scrim; rendering at 0.65 costs 42% of the
+    // fill and raster of a 1:1 buffer and no one can tell.
+    const SCALE = 0.65;
     const setSize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      canvas.width = Math.max(1, Math.round(canvas.offsetWidth * SCALE));
+      canvas.height = Math.max(1, Math.round(canvas.offsetHeight * SCALE));
     };
     setSize();
 
@@ -697,22 +721,56 @@ const ProjectAnim = ({ index }) => {
     let draw = factory(canvas.width, canvas.height);
     let startTime = null;
 
-    const loop = (ts) => {
-      if (!startTime) startTime = ts;
-      const t = (ts - startTime) / 1000;
-      draw(ctx, t);
-      rafRef.current = requestAnimationFrame(loop);
+    // The muting used to be a CSS `filter` on the canvas element. Measured, that
+    // doubled dropped frames: a filter on an element whose content changes every
+    // frame re-runs the whole filter pass every frame, on the compositor. Doing
+    // it inside the canvas is two full-canvas fills and costs almost nothing.
+    const mute = () => {
+      // One plain source-over wash. A `saturation` blend looked slightly better
+      // and measured much worse — non-separable blend modes are not cheap. This
+      // pulls every card toward the ink ground, which is the point.
+      ctx.fillStyle = "rgba(11, 13, 18, 0.5)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
-    rafRef.current = requestAnimationFrame(loop);
+
+    const render = (ts) => {
+      if (startTime === null) startTime = ts;
+      draw(ctx, (ts - startTime) / 1000);
+      mute();
+    };
+
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (calm) {
+      render(0);                       // one frame, then never again
+      return undefined;
+    }
+
+    let unsubscribe = null;
+    // Only animate what is actually on screen. With a viewport of cards this
+    // takes the live loop count from seventeen to whatever is visible.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !unsubscribe) {
+          unsubscribe = subscribe(render);
+        } else if (!entry.isIntersecting && unsubscribe) {
+          unsubscribe();
+          unsubscribe = null;
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+    io.observe(canvas);
 
     const ro = new ResizeObserver(() => {
       setSize();
       draw = factory(canvas.width, canvas.height);
+      startTime = null;
     });
     ro.observe(canvas.parentElement || canvas);
 
     return () => {
-      cancelAnimationFrame(rafRef.current);
+      if (unsubscribe) unsubscribe();
+      io.disconnect();
       ro.disconnect();
     };
   }, [index]);
@@ -720,7 +778,8 @@ const ProjectAnim = ({ index }) => {
   return (
     <canvas
       ref={canvasRef}
-      style={{ width: '100%', height: '100%', display: 'block', borderRadius: '1rem' }}
+      aria-hidden="true"
+      style={{ width: "100%", height: "100%", display: "block" }}
     />
   );
 };
