@@ -2,6 +2,7 @@ import { BrowserRouter } from "react-router-dom";
 import {
   AmbientField,
   Contact,
+  Demos,
   Experience,
   Hero,
   Navbar,
@@ -15,6 +16,7 @@ const App = () => {
       <div className="relative" style={{ zIndex: 1 }}>
         <Navbar />
         <Hero />
+        <Demos />
         <Works />
         <Experience />
         <Contact />

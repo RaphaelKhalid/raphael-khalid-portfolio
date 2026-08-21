@@ -1,80 +1,137 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { styles } from "../styles";
 
-const STRANDS = [
-  { k: "safety", v: "evaluating the deployment layer" },
-  { k: "control", v: "robot estimation and control" },
-  { k: "complexity", v: "power, cities, collective behaviour" },
+const RefusalMatrix = lazy(() => import("./demos/RefusalMatrix"));
+
+const FACTS = [
+  ["Minerva University", "CS & Political Science"],
+  ["13", "interactive robotics labs shipped"],
+  ["165", "graded model responses, 3 models"],
 ];
 
 const Hero = () => {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 600], [0, -70]);
   const ease = [0.16, 1, 0.3, 1];
+  const panelRef = useRef(null);
+  const [live, setLive] = useState(false);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const el = panelRef.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(([e]) => setLive(e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <section className="relative w-full min-h-screen mx-auto overflow-hidden">
-      <motion.div
-        style={{ y, zIndex: 2 }}
-        className={`${styles.paddingX} relative max-w-7xl mx-auto flex flex-col justify-center min-h-screen pt-24 pb-20`}
+    <section className="relative w-full">
+      <div
+        className={`${styles.paddingX} max-w-7xl mx-auto pt-28 pb-8 grid gap-12 lg:gap-14 items-start`}
+        style={{ gridTemplateColumns: "minmax(0, 0.85fr) minmax(0, 1.15fr)" }}
       >
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.05, ease }}
-          className="font-mono text-[11px] tracking-[0.18em] uppercase text-fg-faint"
-        >
-          Raphael Khalid
-        </motion.p>
+        <div className="lg:col-span-1 col-span-full">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease }}
+            className="font-mono text-[11px] tracking-[0.18em] uppercase text-fg-faint"
+          >
+            AI safety · robotics · complex systems
+          </motion.p>
 
-        <h1 className={`${styles.heroHeadText} mt-5 max-w-[min(100%,920px)]`}>
-          <span className="line-mask" style={{ "--i": 0 }}>
-            <span>I measure the systems</span>
-          </span>
-          <span className="line-mask" style={{ "--i": 1 }}>
-            <span>that behave differently</span>
-          </span>
-          <span className="line-mask" style={{ "--i": 2 }}>
-            <span>
-              than their <span className="text-amber">parts predict.</span>
+          <h1 className={`${styles.heroHeadText} mt-3`}>
+            <span className="line-mask" style={{ "--i": 0 }}>
+              <span>Raphael Khalid</span>
             </span>
-          </span>
-        </h1>
+          </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 16, filter: "blur(7px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.9, delay: 0.42, ease }}
-          className={`${styles.heroSubText} mt-7 max-w-[58ch]`}
-        >
-          Wrappers that void a model&apos;s safety training. Controllers that hold a
-          robot up. Power transitions that show up in a phase space before they
-          show up in the news. Below: the ones you can run.
-        </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 14, filter: "blur(7px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.9, delay: 0.25, ease }}
+            className="mt-5 text-[17px] leading-relaxed text-fg-dim max-w-[46ch]"
+          >
+            I test whether AI systems still behave once a product is wrapped
+            around them, and I build simulations that make control and complex
+            systems something you can poke at rather than read about.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.4, ease }}
+            className="mt-8 flex flex-col gap-3"
+          >
+            {FACTS.map(([k, v]) => (
+              <div key={v} className="flex items-baseline gap-3 border-l border-line pl-3">
+                <span className="font-display text-fg text-[15px] tabular">{k}</span>
+                <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-fg-faint">
+                  {v}
+                </span>
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.52, ease }}
+            className="mt-9 flex gap-3 flex-wrap"
+          >
+            <a
+              href="#demos"
+              className="font-mono text-[11.5px] px-4 py-2.5 rounded-full border border-amber-lo text-amber hover:bg-amber hover:text-ink transition-colors duration-200"
+            >
+              run the demos ↓
+            </a>
+            <a
+              href="#work"
+              className="font-mono text-[11.5px] px-4 py-2.5 rounded-full border border-line text-fg-dim hover:text-fg hover:border-fg-faint transition-colors duration-200"
+            >
+              all projects
+            </a>
+          </motion.div>
+        </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.56, ease }}
-          className="mt-10 flex flex-wrap gap-x-6 gap-y-4"
+          ref={panelRef}
+          initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 1, delay: 0.3, ease }}
+          className="lab panel-demo col-span-full lg:col-span-1 w-full"
         >
-          {STRANDS.map(({ k, v }) => (
-            <div key={k} className="border-l border-line pl-3">
-              <div className="font-display text-[14px] text-fg">{k}</div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.13em] text-fg-faint mt-1">
-                {v}
-              </div>
-            </div>
-          ))}
+          <div className="flex items-baseline gap-3 px-4 py-2.5 border-b border-line-soft flex-wrap">
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-fg-faint">
+              live — refusal erosion
+            </span>
+            <span className="text-[12px] text-fg-dim">the bare model refuses; the wrapped one does not</span>
+            <span
+              className="ml-auto font-mono text-[10px]"
+              style={{ color: live ? "#79C08E" : "#5B606C" }}
+            >
+              {live ? "running" : "idle"}
+            </span>
+          </div>
+          <div className="p-4">
+            <Suspense
+              fallback={
+                <div className="min-h-[300px] flex items-center justify-center font-mono text-[11px] text-fg-faint">
+                  loading…
+                </div>
+              }
+            >
+              <RefusalMatrix />
+            </Suspense>
+          </div>
         </motion.div>
-      </motion.div>
+      </div>
 
       <a
-        href="#work"
-        className="absolute bottom-10 left-6 sm:left-16 flex items-center gap-3 group"
-        style={{ zIndex: 3 }}
+        href="#demos"
+        className={`${styles.paddingX} max-w-7xl mx-auto flex items-center gap-3 group pb-10`}
       >
-        <div className="relative w-[1px] h-12 bg-line overflow-hidden">
+        <div className="relative w-[1px] h-10 bg-line overflow-hidden">
           <div className="scroll-dot" />
         </div>
         <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-fg-faint group-hover:text-fg transition-colors duration-200">

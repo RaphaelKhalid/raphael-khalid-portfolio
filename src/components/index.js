@@ -4,8 +4,9 @@ import Experience from "./Experience";
 import Works from "./Works";
 import Contact from "./Contact";
 import AmbientField from "./AmbientField";
+import Demos from "./Demos";
 
-export { Hero, Navbar, Experience, Works, Contact, AmbientField };
+export { Hero, Navbar, Experience, Works, Contact, AmbientField, Demos };
 
 // The three.js canvases (StarsCanvas, KnowledgeGraph, Earth, Ball, Computers)
 // are intentionally no longer re-exported here. They are the forked template's

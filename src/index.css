@@ -535,3 +535,55 @@ h1, h2, h3, h4 {
   pointer-events: none;
   background: linear-gradient(180deg, rgba(7, 8, 11, 0.18) 0%, rgba(7, 8, 11, 0) 45%, rgba(14, 16, 21, 0.92) 100%);
 }
+
+
+/* ==========================================================================
+   Demos
+   The three robotics labs were written for a terminal-green theme and are
+   styled almost entirely through CSS custom properties. Rather than editing
+   1,500 lines, `.lab` redefines those properties against this site's tokens.
+   ========================================================================== */
+.lab {
+  --bg-card: var(--panel-3);
+  --border: var(--line);
+  --text-primary: var(--fg);
+  --text-secondary: var(--fg-dim);
+  --text-muted: var(--fg-faint);
+  --font-geist-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-geist-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+.sim-canvas-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0b0d12;
+  border: 1px solid var(--line-soft);
+  position: relative;
+}
+
+.sim-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The labs render into a fixed simulation coordinate space (560x360, 580x460)
+   and the element is then stretched to the column width. Past about 1.3x the
+   backing store that is both soft and, on machines without GPU compositing,
+   genuinely expensive to repaint every frame. Cap the upscale and centre it. */
+.lab .sim-canvas-wrap {
+  max-width: 740px;
+  margin-inline: auto;
+}
+
+.panel-demo {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  overflow: hidden;
+  margin: 0;
+}
+
+.lab input[type="range"] {
+  accent-color: var(--amber);
+}

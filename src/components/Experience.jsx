@@ -5,7 +5,7 @@ import { experiences } from "../constants/index";
 import SectionWrapper from "../hoc";
 import { textVariant } from "../utils/motions";
 
-const LadderRung = ({ experience, index }) => {
+const LadderRung = ({ experience }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -145,7 +145,7 @@ const Experience = () => (
             viewport={{ once: true, amount: 0.15 }}
             transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
           >
-            <LadderRung experience={exp} index={i} />
+            <LadderRung experience={exp} />
           </motion.div>
         ))}
       </div>

@@ -9,6 +9,7 @@ import {
 } from "../assets";
 
 export const navLinks = [
+  { id: "demos", title: "Demos" },
   { id: "work", title: "Projects" },
   { id: "experience", title: "Experience" },
   { id: "contact", title: "Contact" },

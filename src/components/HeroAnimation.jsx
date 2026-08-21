@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import { useState } from "react";
 import { Typewriter } from "react-typewriter";
 import { styles } from "../styles";
 
