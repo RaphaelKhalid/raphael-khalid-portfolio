@@ -259,7 +259,7 @@ function anim7(w, h) {
       if (pts[i].length < 2) return;
       ctx.beginPath();
       ctx.moveTo(pts[i][0].x, pts[i][0].y);
-      pts[i].forEach((p, j) => {
+      pts[i].forEach((p) => {
         ctx.lineTo(p.x, p.y);
       });
       ctx.strokeStyle = tr.col;
