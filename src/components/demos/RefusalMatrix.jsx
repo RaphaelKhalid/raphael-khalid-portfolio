@@ -88,18 +88,36 @@ const RefusalMatrix = () => {
     []
   );
   const [model, setModel] = useState(models[0]);
-  const [sel, setSel] = useState(null);
+  // Two separate things. `pinned` is a deliberate click and survives the
+  // pointer wandering off; `hover` is a preview and only shows when nothing is
+  // pinned. Without this split, moving the mouse toward the readout drags the
+  // selection across every cell on the way and the button you were aiming for
+  // describes a different pair by the time you reach it.
+  const [pinned, setPinned] = useState(null);
+  const [hover, setHover] = useState(null);
   const [showExcerpt, setShowExcerpt] = useState(false);
 
   const active = refusalData.models[model];
   const scaffolds = Object.keys(active.rows);
   const probes = PROBE_ORDER.filter((p) => scaffolds.some((s) => active.rows[s][p]));
 
-  const pick = (sid, pid) => {
+  const read = (sid, pid) => {
     const cell = active.rows[sid][pid];
-    setSel({ sid, pid, ...cell, kind: classify(pid, cell.d, cell.s) });
-    setShowExcerpt(false);
+    return { sid, pid, ...cell, kind: classify(pid, cell.d, cell.s) };
   };
+
+  const pin = (sid, pid) => {
+    const same = pinned && pinned.sid === sid && pinned.pid === pid;
+    setPinned(same ? null : read(sid, pid));
+    // Only reset the reveal when the pair actually changes, never on hover.
+    if (!same) setShowExcerpt(false);
+  };
+
+  const preview = (sid, pid) => {
+    if (!pinned) setHover(read(sid, pid));
+  };
+
+  const sel = pinned || hover;
 
   return (
     <div className="w-full">
@@ -109,7 +127,7 @@ const RefusalMatrix = () => {
           {models.map((m) => (
             <button
               key={m}
-              onClick={() => { setModel(m); setSel(null); }}
+              onClick={() => { setModel(m); setPinned(null); setHover(null); }}
               aria-pressed={m === model}
               className="font-mono text-[10px] px-2.5 py-1 border-r border-line last:border-r-0 transition-colors duration-150"
               style={
@@ -149,8 +167,11 @@ const RefusalMatrix = () => {
               sid={sid}
               probes={probes}
               rows={active.rows}
-              onPick={pick}
+              onPin={pin}
+              onPreview={preview}
+              onLeave={() => { if (!pinned) setHover(null); }}
               selected={sel}
+              pinned={pinned}
             />
           ))}
         </div>
@@ -171,7 +192,7 @@ const RefusalMatrix = () => {
       <div className="mt-3.5 pt-3.5 border-t border-line-soft min-h-[92px]">
         {!sel ? (
           <p className="font-mono text-[11px] text-fg-faint">
-            hover or click any cell — scaffold × probe, bare verdict vs scaffolded verdict
+            hover any cell to preview it — click to pin it, so the readout stays put while you reach the controls
           </p>
         ) : (
           <>
@@ -192,6 +213,14 @@ const RefusalMatrix = () => {
                 {(refusalData.probes[sel.pid] || {}).severity}
               </span>
               <span className="flex-1" />
+              {pinned ? (
+                <button
+                  onClick={() => setPinned(null)}
+                  className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-amber-lo text-amber hover:bg-amber hover:text-ink transition-colors duration-150"
+                >
+                  pinned ✕
+                </button>
+              ) : null}
               <Verdict label="direct" value={sel.d} />
               <span className="font-mono text-[12px] text-fg-faint">→</span>
               <Verdict label="scaffolded" value={sel.s} />
@@ -227,7 +256,7 @@ const RefusalMatrix = () => {
   );
 };
 
-const FragmentRow = ({ sid, probes, rows, onPick, selected }) => (
+const FragmentRow = ({ sid, probes, rows, onPin, onPreview, onLeave, selected, pinned }) => (
   <>
     <div className="font-mono text-[10.5px] text-fg-dim text-right pr-2.5 self-center whitespace-nowrap">
       {SCAF[sid] || sid}
@@ -237,17 +266,24 @@ const FragmentRow = ({ sid, probes, rows, onPick, selected }) => (
       if (!cell) return <div key={pid} className="opacity-25" />;
       const kind = classify(pid, cell.d, cell.s);
       const st = KIND_STYLE[kind];
-      const on = selected && selected.sid === sid && selected.pid === pid;
+      const shown = selected && selected.sid === sid && selected.pid === pid;
+      const isPinned = pinned && pinned.sid === sid && pinned.pid === pid;
       return (
         <button
           key={pid}
-          onClick={() => onPick(sid, pid)}
-          onMouseEnter={() => onPick(sid, pid)}
-          title={`${SCAF[sid] || sid} × ${SHORT[pid] || pid}`}
-          className="h-[26px] rounded flex items-center justify-center transition-transform duration-200 hover:scale-110 hover:z-10"
+          onClick={() => onPin(sid, pid)}
+          onMouseEnter={() => onPreview(sid, pid)}
+          onMouseLeave={onLeave}
+          onFocus={() => onPreview(sid, pid)}
+          // No `title`: the browser's own tooltip is a black box that covers the
+          // neighbouring cells, and the readout below already names the pair.
+          aria-label={`${SCAF[sid] || sid} by ${SHORT[pid] || pid}: bare ${cell.d || "unknown"}, scaffolded ${cell.s || "unknown"}`}
+          aria-pressed={Boolean(isPinned)}
+          className="h-[26px] rounded flex items-center justify-center transition-transform duration-200 hover:scale-110 hover:z-10 focus-visible:scale-110 focus-visible:z-10"
           style={{
             background: st.bg,
-            border: `1px solid ${on ? "#E9EAEF" : st.bd}`,
+            border: `1px solid ${isPinned ? "#F2A03D" : shown ? "#E9EAEF" : st.bd}`,
+            boxShadow: isPinned ? "0 0 0 1px rgba(242,160,61,0.45)" : "none",
           }}
         >
           <i className="block w-[5px] h-[5px] rounded-full" style={{ background: st.dot }} />

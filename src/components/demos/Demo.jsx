@@ -1,13 +1,9 @@
 import { Component, Suspense, lazy, useEffect, useRef, useState } from "react";
 
-// Every demo on this page goes through here. The rule the site has to hold is
-// that only what you are looking at is allowed to compute — there are already
-// eighteen decorative card canvases sharing one budgeted scheduler, and these
-// simulations are far heavier than a card.
-//
-// So: the demo component is not merely paused when off screen, it is not
-// mounted at all. Its own effect cleanup tears down its rAF loop, and React
-// throws away the state. Scrolling past a demo costs nothing.
+// Only what you are looking at is allowed to compute. A demo is not merely
+// paused when it is not selected — it is not mounted, so its effect cleanup
+// tears down its rAF loop and React discards the state. With one pane and a
+// sidebar, that means exactly one simulation is ever running.
 
 const REGISTRY = {
   refusal: lazy(() => import("./RefusalMatrix")),
@@ -29,15 +25,28 @@ class Boundary extends Component {
   }
 }
 
-const Skeleton = ({ label }) => (
-  <div className="flex items-center justify-center h-full min-h-[240px] text-fg-faint font-mono text-[11px]">
-    {label}
+const Note = ({ children }) => (
+  <div className="flex items-center justify-center h-full min-h-[240px] text-fg-faint font-mono text-[11px] text-center px-6">
+    {children}
   </div>
 );
 
-const Demo = ({ id, title, note, minHeight = 320 }) => {
+// An embedded site can refuse to be framed, and a cross-origin frame will not
+// tell us that it did. So the escape hatch is always present in the header
+// rather than something we try to detect and swap in.
+const Embed = ({ src, title }) => (
+  <iframe
+    src={src}
+    title={title}
+    loading="lazy"
+    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+    className="w-full h-full block rounded-lg border border-line-soft bg-[#0b0d12]"
+  />
+);
+
+const Demo = ({ id, src, title, height = 560 }) => {
   const hostRef = useRef(null);
-  const [live, setLive] = useState(false);
+  const [near, setNear] = useState(false);
   const [calm] = useState(
     () =>
       typeof window !== "undefined" &&
@@ -48,47 +57,33 @@ const Demo = ({ id, title, note, minHeight = 320 }) => {
     if (calm) return undefined;
     const el = hostRef.current;
     if (!el) return undefined;
-    const io = new IntersectionObserver(
-      ([e]) => setLive(e.isIntersecting),
-      { rootMargin: "120px 0px" }
-    );
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), {
+      rootMargin: "200px 0px",
+    });
     io.observe(el);
     return () => io.disconnect();
   }, [calm]);
 
-  const Lab = REGISTRY[id];
+  const Lab = id ? REGISTRY[id] : null;
 
   return (
-    <figure ref={hostRef} className="lab panel-demo" style={{ minHeight }}>
-      <figcaption className="flex items-baseline gap-3 flex-wrap px-4 py-2.5 border-b border-line-soft">
-        <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-fg-faint">
-          {title}
-        </span>
-        {note ? (
-          <span className="text-[12px] text-fg-dim">{note}</span>
-        ) : null}
-        <span
-          className="ml-auto font-mono text-[10px]"
-          style={{ color: live ? "#79C08E" : "#5B606C" }}
-        >
-          {live ? "running" : "idle"}
-        </span>
-      </figcaption>
-
-      <div className="p-4">
-        {calm ? (
-          <Skeleton label="motion reduced — open the source repo to run this" />
-        ) : live ? (
-          <Boundary fallback={<Skeleton label="this demo failed to start" />}>
-            <Suspense fallback={<Skeleton label="loading…" />}>
+    <div ref={hostRef} className="lab w-full" style={{ height }}>
+      {calm ? (
+        <Note>motion reduced — open the source for the live version</Note>
+      ) : !near ? (
+        <Note>scroll into view to run</Note>
+      ) : src ? (
+        <Embed src={src} title={title} />
+      ) : (
+        <Boundary fallback={<Note>this demo failed to start</Note>}>
+          <Suspense fallback={<Note>loading…</Note>}>
+            <div className="h-full overflow-y-auto pr-1">
               <Lab />
-            </Suspense>
-          </Boundary>
-        ) : (
-          <Skeleton label="scroll into view to run" />
-        )}
-      </div>
-    </figure>
+            </div>
+          </Suspense>
+        </Boundary>
+      )}
+    </div>
   );
 };
 
