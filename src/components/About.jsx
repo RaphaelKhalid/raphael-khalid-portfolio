@@ -1,4 +1,5 @@
-﻿import React from "react";
+/* eslint-disable react/no-unknown-property -- react-tilt takes `options` on
+   the element it wraps. This component is not mounted in App.jsx. */
 import ParallaxTilt from "react-parallax-tilt";
 import { motion } from "framer-motion";
 import { styles } from "../styles";
