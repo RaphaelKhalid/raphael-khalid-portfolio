@@ -32,6 +32,14 @@ const LANDMARKS = [
   { id: 4, x: 460, y: 380, color: "#D9756A" },
   { id: 5, x: 290, y: 230, color: "#8E86D8" }
 ];
+// A landmark behind a wall is not observable. Distance alone was letting the
+// robot "see" through the map, which defeats the whole point of the fog.
+function hasLineOfSight(ox, oy, tx, ty) {
+  const dist = Math.hypot(tx - ox, ty - oy);
+  if (dist < 1) return true;
+  return raycast(ox, oy, Math.atan2(ty - oy, tx - ox)) >= dist - 2;
+}
+
 function raycast(ox, oy, angle) {
   let minDist = MAX_RANGE;
   const dx = Math.cos(angle), dy = Math.sin(angle);
@@ -181,7 +189,8 @@ function SLAMLab({ onUncertaintyLow }) {
     for (const lm of LANDMARKS) {
       const dist = Math.hypot(lm.x - r.x, lm.y - r.y);
       const obs = observedRef.current.find((o) => o.id === lm.id);
-      const isVisible = dist < LANDMARK_DETECT_RANGE;
+      const inRange = dist < LANDMARK_DETECT_RANGE;
+      const isVisible = inRange && hasLineOfSight(r.x, r.y, lm.x, lm.y);
       if (isVisible && !obs) {
         observedRef.current.push({
           id: lm.id,
@@ -199,6 +208,10 @@ function SLAMLab({ onUncertaintyLow }) {
         obs.y += (lm.y - obs.y) * 0.05;
       }
       const known = !!obs;
+      // Undiscovered landmarks are not drawn at all unless the robot can
+      // actually see them. Once observed they stay on the map, because that is
+      // what a map is.
+      if (!known && !isVisible) continue;
       if (isVisible) {
         ctx.strokeStyle = lm.color + "66";
         ctx.setLineDash([2, 3]);
@@ -409,15 +422,26 @@ function SLAMLab({ onUncertaintyLow }) {
   }, []);
   useEffect(() => {
     const gate = makeFrameGate(30);
-    const update = () => {
+    let lastTs = 0;
+    // Everything below is per-60fps-frame, so it has to be scaled by real
+    // elapsed time — otherwise gating the loop to 30fps halves the robot's
+    // speed and makes the steering feel like it is wading.
+    const update = (ts) => {
       const r = robotRef.current;
       const keys = keysRef.current;
+      const now = ts || performance.now();
+      const k = lastTs ? Math.min(3, (now - lastTs) / 16.667) : 1;
+      lastTs = now;
+
       const MAX_SPEED = 4.5;
       const ACCEL = 0.45;
       const FRICTION = 0.82;
       const MAX_TURN = 0.055;
+      const TURN_RAMP = 0.22;   // how fast yaw reaches its target — the feel knob
+      const RADIUS = 14;
+
       const speed = Math.hypot(r.vx, r.vy);
-      const turnFactor = Math.min(1, speed / 2);
+      const turnFactor = Math.min(1, 0.45 + speed / 4);
       const wp = waypointRef.current;
       let autoTurn = 0, autoThrust = false;
       if (wp) {
@@ -428,51 +452,82 @@ function SLAMLab({ onUncertaintyLow }) {
         } else {
           const desired = Math.atan2(dy, dx);
           let da = desired - r.angle;
-          while (da > Math.PI)
-            da -= Math.PI * 2;
-          while (da < -Math.PI)
-            da += Math.PI * 2;
+          while (da > Math.PI) da -= Math.PI * 2;
+          while (da < -Math.PI) da += Math.PI * 2;
           autoTurn = Math.max(-1, Math.min(1, da * 3)) * MAX_TURN;
           autoThrust = Math.abs(da) < 1;
         }
       }
-      const manualTurn = keys.has("ArrowLeft") || keys.has("a") ? -MAX_TURN * turnFactor : keys.has("ArrowRight") || keys.has("d") ? MAX_TURN * turnFactor : 0;
-      r.va = manualTurn !== 0 ? manualTurn : autoTurn * Math.max(0.2, turnFactor);
+
+      const left = keys.has("ArrowLeft") || keys.has("a");
+      const right = keys.has("ArrowRight") || keys.has("d");
+      const manualTurn = left ? -MAX_TURN * turnFactor : right ? MAX_TURN * turnFactor : 0;
+      const targetTurn = manualTurn !== 0 ? manualTurn : autoTurn * Math.max(0.3, turnFactor);
+      // Ramp toward the target instead of snapping to it. A binary yaw rate is
+      // most of why the old steering felt twitchy rather than driven.
+      r.va += (targetTurn - r.va) * Math.min(1, TURN_RAMP * k);
+
       if (keys.has("ArrowUp") || keys.has("w") || autoThrust) {
-        r.vx += ACCEL * Math.cos(r.angle);
-        r.vy += ACCEL * Math.sin(r.angle);
+        r.vx += ACCEL * Math.cos(r.angle) * k;
+        r.vy += ACCEL * Math.sin(r.angle) * k;
       } else if (keys.has("ArrowDown") || keys.has("s")) {
-        r.vx -= ACCEL * Math.cos(r.angle) * 0.7;
-        r.vy -= ACCEL * Math.sin(r.angle) * 0.7;
+        r.vx -= ACCEL * Math.cos(r.angle) * 0.7 * k;
+        r.vy -= ACCEL * Math.sin(r.angle) * 0.7 * k;
       }
+
       const spd0 = Math.hypot(r.vx, r.vy);
       if (spd0 > MAX_SPEED) {
-        r.vx = r.vx / spd0 * MAX_SPEED;
-        r.vy = r.vy / spd0 * MAX_SPEED;
+        r.vx = (r.vx / spd0) * MAX_SPEED;
+        r.vy = (r.vy / spd0) * MAX_SPEED;
       }
-      r.vx *= FRICTION;
-      r.vy *= FRICTION;
-      const nx = r.x + r.vx, ny = r.y + r.vy;
-      let blocked = false;
-      for (const w of WALLS) {
-        const wx = w.x2 - w.x1, wy = w.y2 - w.y1;
-        const len2 = wx * wx + wy * wy;
-        const t = Math.max(0, Math.min(1, ((nx - w.x1) * wx + (ny - w.y1) * wy) / len2));
-        const cx = w.x1 + t * wx, cy = w.y1 + t * wy;
-        if (Math.hypot(nx - cx, ny - cy) < 14) {
-          blocked = true;
-          break;
+      const decay = Math.pow(FRICTION, k);
+      r.vx *= decay;
+      r.vy *= decay;
+
+      // Nearest wall contact for a candidate position, or null.
+      const contact = (x, y) => {
+        for (const w of WALLS) {
+          const wx = w.x2 - w.x1, wy = w.y2 - w.y1;
+          const len2 = wx * wx + wy * wy || 1;
+          const t = Math.max(0, Math.min(1, ((x - w.x1) * wx + (y - w.y1) * wy) / len2));
+          const cx = w.x1 + t * wx, cy = w.y1 + t * wy;
+          if (Math.hypot(x - cx, y - cy) < RADIUS) return { w, cx, cy };
         }
-      }
-      if (!blocked) {
+        return null;
+      };
+
+      const nx = r.x + r.vx * k, ny = r.y + r.vy * k;
+      const hit = contact(nx, ny);
+      let blocked = false;
+      if (!hit) {
         r.x = nx;
         r.y = ny;
       } else {
-        r.vx *= -0.3;
-        r.vy *= -0.3;
-        waypointRef.current = null;
+        // Slide along the wall rather than bouncing off it. The old code did
+        // vx *= -0.3, which threw you backwards and meant every scrape had to be
+        // undone by reversing. Keep the tangential component, drop the normal one.
+        const wx = hit.w.x2 - hit.w.x1, wy = hit.w.y2 - hit.w.y1;
+        const L = Math.hypot(wx, wy) || 1;
+        const tx = wx / L, ty = wy / L;
+        const along = (r.vx * tx + r.vy * ty) * 0.88;
+        let px = r.x - hit.cx, py = r.y - hit.cy;
+        const pl = Math.hypot(px, py) || 1;
+        px /= pl; py /= pl;                       // push a little off the surface
+        const sx = r.x + tx * along * k + px * 0.5;
+        const sy = r.y + ty * along * k + py * 0.5;
+        if (!contact(sx, sy)) {
+          r.x = sx;
+          r.y = sy;
+          r.vx = tx * along;
+          r.vy = ty * along;
+        } else {
+          blocked = true;                          // a corner: bleed off, never reverse
+          r.vx *= 0.25;
+          r.vy *= 0.25;
+        }
       }
-      r.angle += r.va;
+
+      r.angle += r.va * k;
       const spd = Math.hypot(r.vx, r.vy);
       const moving = spd > 0.2;
       const trail = trailRef.current;

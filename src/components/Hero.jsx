@@ -27,7 +27,7 @@ const Hero = () => {
   return (
     <section className="relative w-full">
       <div
-        className={`${styles.paddingX} max-w-7xl mx-auto pt-28 pb-8 grid gap-12 lg:gap-14 items-start`}
+        className={`${styles.paddingX} max-w-7xl mx-auto pt-24 pb-4 grid gap-12 lg:gap-14 items-start`}
         style={{ gridTemplateColumns: "minmax(0, 0.85fr) minmax(0, 1.15fr)" }}
       >
         <div className="lg:col-span-1 col-span-full">
@@ -129,7 +129,7 @@ const Hero = () => {
 
       <a
         href="#demos"
-        className={`${styles.paddingX} max-w-7xl mx-auto flex items-center gap-3 group pb-10`}
+        className={`${styles.paddingX} max-w-7xl mx-auto flex items-center gap-3 group pb-6 pt-2`}
       >
         <div className="relative w-[1px] h-10 bg-line overflow-hidden">
           <div className="scroll-dot" />
