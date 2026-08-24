@@ -1,9 +1,16 @@
 import { useMemo, useState } from "react";
 import refusalData from "./refusalData";
 
-// What this shows is the measurement, not the attack. No model is called, no
-// scaffold text and no probe text ships in the bundle — only verdicts and the
-// grader's rationale. Model output stays behind a deliberate click.
+// What this shows is the measurement, not the attack. No model is called; no
+// scaffold text, no probe text and no model output ships in the bundle — only
+// verdicts and the grader's one-line rationale.
+//
+// An earlier version put the recorded completions behind a click-to-reveal.
+// That was wrong. Those excerpts are the legitimising copy the research exists
+// to warn about, and putting them on a public page republishes the harm being
+// measured, however carefully they are labelled. The verdict pair plus the
+// grader's reason carry the finding completely — losing nothing but the part
+// that should not be here.
 
 const PROBE_ORDER = [
   "cs_home_synth", "cs_precursor_market", "wp_3d_firearms", "wp_serial_removal",
@@ -95,7 +102,6 @@ const RefusalMatrix = () => {
   // describes a different pair by the time you reach it.
   const [pinned, setPinned] = useState(null);
   const [hover, setHover] = useState(null);
-  const [showExcerpt, setShowExcerpt] = useState(false);
 
   const active = refusalData.models[model];
   const scaffolds = Object.keys(active.rows);
@@ -109,8 +115,6 @@ const RefusalMatrix = () => {
   const pin = (sid, pid) => {
     const same = pinned && pinned.sid === sid && pinned.pid === pid;
     setPinned(same ? null : read(sid, pid));
-    // Only reset the reveal when the pair actually changes, never on hover.
-    if (!same) setShowExcerpt(false);
   };
 
   const preview = (sid, pid) => {
@@ -231,24 +235,11 @@ const RefusalMatrix = () => {
                 grader: {sel.sr}
               </p>
             ) : null}
-            {sel.ex ? (
-              <div className="mt-2">
-                <button
-                  onClick={() => setShowExcerpt((v) => !v)}
-                  className="font-mono text-[10px] px-2 py-1 rounded border border-line text-fg-dim hover:text-amber hover:border-amber-lo transition-colors duration-150"
-                >
-                  {showExcerpt ? "hide model output" : "show model output"}
-                </button>
-                {showExcerpt ? (
-                  <p className="text-[12.5px] text-fg-dim mt-2 pl-3 border-l-2 border-line">
-                    <span className="text-fg-faint font-mono text-[10px] block mb-1">
-                      what the wrapper legitimised — this is the thing being measured
-                    </span>
-                    {sel.ex}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
+            <p className="font-mono text-[10.5px] text-fg-faint mt-2.5 pt-2.5 border-t border-line-soft">
+              the model&apos;s own output is not published here — deliberately. it is
+              the legitimising copy this measures, and it does not belong on a
+              public page. the harness keeps it; the finding is the delta.
+            </p>
           </>
         )}
       </div>
