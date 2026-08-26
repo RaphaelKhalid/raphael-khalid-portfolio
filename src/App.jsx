@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import { BrowserRouter } from "react-router-dom";
 import {
   AmbientField,
@@ -21,6 +22,7 @@ const App = () => {
         <Experience />
         <Contact />
       </div>
+      <Analytics />
     </BrowserRouter>
   );
 };
