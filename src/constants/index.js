@@ -69,6 +69,61 @@ const experiences = [
 
 const projects = [
   {
+    name: "AutoLabs",
+    description:
+      "A public laboratory where autonomous agents design, run, and report AI-safety experiments end to end — a spend ledger, frozen protocol hashes, and every public claim checked against the record. The live flagship run trains a Matryoshka sparse autoencoder on Qwen2.5-7B to surface persona-relevant directions that prompting can't reach.",
+    tags: [
+      { name: "aisafety", color: "blue-text-gradient" },
+      { name: "interpretability", color: "green-text-gradient" },
+      { name: "agents", color: "pink-text-gradient" },
+    ],
+    source_code_link: "https://autolabs-ebon.vercel.app/",
+  },
+  {
+    name: "Afterlight",
+    description:
+      "An agent-powered lab for reproducible AI-safety research: a harness that lets agents propose, execute, and write up experiments while keeping the receipts — protocols, results, and limitations in the open. Live web front end.",
+    tags: [
+      { name: "aisafety", color: "blue-text-gradient" },
+      { name: "agents", color: "green-text-gradient" },
+      { name: "research", color: "pink-text-gradient" },
+    ],
+    source_code_link: "https://afterlight-research.vercel.app/",
+  },
+  {
+    name: "RALYtable — Interpretability for Reasoning Models",
+    description:
+      "Interpretability tooling aimed at reasoning models: probing and reading the internal state behind a model's chain of thought rather than trusting the words it emits. Live, interactive web app.",
+    tags: [
+      { name: "interpretability", color: "blue-text-gradient" },
+      { name: "reasoning", color: "green-text-gradient" },
+      { name: "research", color: "pink-text-gradient" },
+    ],
+    source_code_link: "https://ralytable.vercel.app/",
+  },
+  {
+    name: "Watcher — Monitor-Evasion Benchmark",
+    description:
+      "A benchmark measuring whether a model under oversight learns to evade its monitor — quantifying how monitorability degrades once a model is optimized against a watcher, and what that means for scalable oversight.",
+    tags: [
+      { name: "aisafety", color: "blue-text-gradient" },
+      { name: "evals", color: "green-text-gradient" },
+      { name: "oversight", color: "pink-text-gradient" },
+    ],
+    source_code_link: "https://github.com/RaphaelKhalid/watcher-monitor-evasion-benchmark",
+  },
+  {
+    name: "RoolyTooly — Self-Improving Code Harness",
+    description:
+      "A self-improving inference harness that lifts a model's LiveCodeBench-hard pass rate from 90% to 93% by letting it iterate on its own tool use and test feedback. Live write-up.",
+    tags: [
+      { name: "agents", color: "blue-text-gradient" },
+      { name: "codegen", color: "green-text-gradient" },
+      { name: "eval", color: "pink-text-gradient" },
+    ],
+    source_code_link: "https://roolytooly.vercel.app/",
+  },
+  {
     name: "Deployment-Layer Refusal Erosion",
     description: "An evaluation harness showing that an aligned model's refusals collapse when the same request is routed through an ordinary product system prompt, with no jailbreak. Replicated across three developers' models (Google Gemini, DeepSeek V4 Flash, and an OpenRouter-routed model) at p<0.0001 via an exact McNemar test, and validated against a blind human labeling pass. Ships with a live, interactive demo.",
     tags: [

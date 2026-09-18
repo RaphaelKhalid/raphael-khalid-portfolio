@@ -11,6 +11,41 @@ import Demo from "./demos/Demo";
 // only one simulation is mounted at a time.
 const GROUPS = [
   {
+    label: "Live research",
+    items: [
+      {
+        key: "autolabs",
+        src: "https://autolabs-ebon.vercel.app/",
+        name: "AutoLabs",
+        tag: "Flagship",
+        href: "https://autolabs-ebon.vercel.app/",
+        note: "A public lab where autonomous agents run AI-safety experiments end to end — this is the live run.",
+        blurb:
+          "The current run trains a Matryoshka sparse autoencoder on Qwen2.5-7B to surface persona-relevant directions that prompting can't reach. What you see below is the live page: a spend ledger, frozen protocol hashes, and a training curve the pod reports as it checkpoints — no screenshots, the real thing.",
+      },
+      {
+        key: "afterlight",
+        src: "https://afterlight-research.vercel.app/",
+        name: "Afterlight",
+        tag: "AI safety",
+        href: "https://afterlight-research.vercel.app/",
+        note: "An agent-powered lab for reproducible AI-safety research, receipts and all.",
+        blurb:
+          "A harness that lets agents propose, execute, and write up experiments while keeping the protocols, results and limitations in the open — the reproducibility scaffolding AutoLabs is built on.",
+      },
+      {
+        key: "ralytable",
+        src: "https://ralytable.vercel.app/",
+        name: "RALYtable",
+        tag: "Interpretability",
+        href: "https://ralytable.vercel.app/",
+        note: "Interpretability for reasoning models: read the internal state, not just the words.",
+        blurb:
+          "Probing tooling aimed at reasoning models — reading the internal state behind a chain of thought rather than trusting the text it emits. Live, interactive.",
+      },
+    ],
+  },
+  {
     label: "Built & deployed",
     items: [
       {
