@@ -1,25 +1,32 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { styles } from "../styles";
 
-const RefusalMatrix = lazy(() => import("./demos/RefusalMatrix"));
+const AUTOLABS_URL = "https://autolabs-ebon.vercel.app/";
 
 const FACTS = [
-  ["Minerva University", "CS & Political Science"],
-  ["13", "interactive robotics labs shipped"],
-  ["165", "graded model responses, 3 models"],
+  ["Live now", "AutoLabs · experiment 3C"],
+  ["Reproducible", "ledger-backed agent experiments"],
+  ["p < 0.0001", "refusal erosion across 3 models"],
 ];
 
 const Hero = () => {
   const ease = [0.16, 1, 0.3, 1];
   const panelRef = useRef(null);
   const [live, setLive] = useState(false);
+  const [seen, setSeen] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSeen(true);
+      return undefined;
+    }
     const el = panelRef.current;
     if (!el) return undefined;
-    const io = new IntersectionObserver(([e]) => setLive(e.isIntersecting));
+    const io = new IntersectionObserver(([e]) => {
+      setLive(e.isIntersecting);
+      if (e.isIntersecting) setSeen(true);
+    });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -37,7 +44,7 @@ const Hero = () => {
             transition={{ duration: 0.5, ease }}
             className="font-mono text-[11px] tracking-[0.18em] uppercase text-fg-faint"
           >
-            AI safety · robotics · complex systems
+            AI safety · interpretability · autonomous research
           </motion.p>
 
           <h1 className={`${styles.heroHeadText} mt-3`}>
@@ -52,8 +59,11 @@ const Hero = () => {
             transition={{ duration: 0.9, delay: 0.25, ease }}
             className="mt-5 text-[17px] leading-relaxed text-fg-dim max-w-[46ch]"
           >
-            I test whether AI systems still behave once a product is wrapped
-            around them, and I build simulations that make control and complex
+            I run <span className="text-fg font-medium">AutoLabs</span>, a public
+            lab where autonomous agents design, run and report AI-safety
+            experiments end to end — right now it is training a sparse
+            autoencoder to find persona directions you can&apos;t reach by
+            prompting. I also build simulations that make control and complex
             systems something you can poke at rather than read about.
           </motion.p>
 
@@ -80,8 +90,16 @@ const Hero = () => {
             className="mt-9 flex gap-3 flex-wrap"
           >
             <a
-              href="#demos"
+              href={AUTOLABS_URL}
+              target="_blank"
+              rel="noreferrer"
               className="font-mono text-[11.5px] px-4 py-2.5 rounded-full border border-amber-lo text-amber hover:bg-amber hover:text-ink transition-colors duration-200"
+            >
+              open AutoLabs ↗
+            </a>
+            <a
+              href="#demos"
+              className="font-mono text-[11.5px] px-4 py-2.5 rounded-full border border-line text-fg-dim hover:text-fg hover:border-fg-faint transition-colors duration-200"
             >
               run the demos ↓
             </a>
@@ -103,9 +121,11 @@ const Hero = () => {
         >
           <div className="flex items-baseline gap-3 px-4 py-2.5 border-b border-line-soft flex-wrap">
             <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-fg-faint">
-              live — refusal erosion
+              live — autolabs · experiment 3C
             </span>
-            <span className="text-[12px] text-fg-dim">the bare model refuses; the wrapped one does not</span>
+            <span className="text-[12px] text-fg-dim">
+              a sparse autoencoder hunting persona directions prompting can&apos;t reach
+            </span>
             <span
               className="ml-auto font-mono text-[10px]"
               style={{ color: live ? "#79C08E" : "#5B606C" }}
@@ -113,16 +133,32 @@ const Hero = () => {
               {live ? "running" : "idle"}
             </span>
           </div>
-          <div className="p-4">
-            <Suspense
-              fallback={
-                <div className="min-h-[300px] flex items-center justify-center font-mono text-[11px] text-fg-faint">
-                  loading…
-                </div>
-              }
+          <div className="p-3">
+            {seen ? (
+              <iframe
+                src={AUTOLABS_URL}
+                title="AutoLabs — live"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                className="w-full block rounded-lg border border-line-soft bg-[#0b0d12]"
+                style={{ height: 430 }}
+              />
+            ) : (
+              <div
+                className="w-full flex items-center justify-center font-mono text-[11px] text-fg-faint rounded-lg border border-line-soft bg-[#0b0d12]"
+                style={{ height: 430 }}
+              >
+                loading the live lab…
+              </div>
+            )}
+            <a
+              href={AUTOLABS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-2 block text-center font-mono text-[10px] text-fg-faint hover:text-amber transition-colors duration-150"
             >
-              <RefusalMatrix />
-            </Suspense>
+              cramped in a frame? open the full lab ↗
+            </a>
           </div>
         </motion.div>
       </div>

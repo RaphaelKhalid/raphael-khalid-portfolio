@@ -86,7 +86,9 @@ const Works = () => (
         <p className={styles.sectionSubText}>My Work</p>
         <h2 className={styles.sectionHeadText}>Projects.</h2>
         <p className="mt-2 text-secondary text-[14px] max-w-xl leading-relaxed">
-          A diverse showcase — from machine learning to political science and the intersections in between.
+          Led by AutoLabs and a cluster of live AI-safety and interpretability
+          labs, then the wider body of work — machine learning, robotics,
+          complex systems and political science.
         </p>
       </motion.div>
 
