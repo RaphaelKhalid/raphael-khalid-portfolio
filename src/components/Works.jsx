@@ -9,7 +9,6 @@ const COLS = 3;
 // Distribute cards round-robin across columns so they read left-to-right
 const columns = Array.from({ length: COLS }, (_, ci) =>
   projects
-    .map((p, i) => ({ ...p, globalIndex: i }))
     .filter((_, i) => i % COLS === ci)
 );
 
@@ -30,7 +29,7 @@ const cardVariants = {
   }),
 };
 
-const ProjectCard = ({ globalIndex, name, description, tags, source_code_link, colIndex, rowIndex }) => {
+const ProjectCard = ({ artwork, name, description, tags, source_code_link, colIndex, rowIndex }) => {
   const delay = COL_DELAY[colIndex] + rowIndex * 0.06;
 
   return (
@@ -43,7 +42,7 @@ const ProjectCard = ({ globalIndex, name, description, tags, source_code_link, c
       className="bg-panel rounded-xl overflow-hidden border border-line-soft hover:border-line transition-colors duration-200 hover:shadow-card"
     >
       <div className="anim-frame relative w-full h-[170px]">
-        <ProjectAnim index={globalIndex} />
+        <ProjectAnim artwork={artwork} />
         <div className="absolute inset-0 flex justify-end m-2">
           <a
             href={source_code_link}
@@ -98,7 +97,7 @@ const Works = () => (
           <div key={ci} className="flex flex-col gap-5">
             {col.map((project, ri) => (
               <ProjectCard
-                key={project.globalIndex}
+                key={project.name}
                 {...project}
                 colIndex={ci}
                 rowIndex={ri}
