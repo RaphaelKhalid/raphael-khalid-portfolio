@@ -674,10 +674,27 @@ function animBAL(w, h) {
   };
 }
 
-const ANIMS = [
-  animRE, anim0, anim1, anim2, anim3, anim4, anim5, anim6, anim7,
-  anim8, anim9, anim10, anim11, anim12, anim13, anim14, animBYCS, animBAL,
-];
+// Named artwork stays attached to its project when the list is reordered.
+const ANIMS = {
+  "refusal-erosion": animRE,
+  "orbital-rings": anim0,
+  "grid-wave": anim1,
+  "particle-storm": anim2,
+  "network-pulse": anim3,
+  "ripple-field": anim4,
+  "fireflies": anim5,
+  "spectrum": anim6,
+  "lissajous-web": anim7,
+  "spiral-galaxy": anim8,
+  "branching-tree": anim9,
+  "solar-power": anim10,
+  "bubble-drift": anim11,
+  "kaleidoscope": anim12,
+  "falling-pieces": anim13,
+  "fluid-smoke": anim14,
+  "envelope": animBYCS,
+  "balance": animBAL,
+};
 
 const SHADOW_CAP = 6;
 
@@ -698,7 +715,7 @@ function clampShadow(ctx) {
   });
 }
 
-const ProjectAnim = ({ index }) => {
+const ProjectAnim = ({ artwork }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -717,7 +734,7 @@ const ProjectAnim = ({ index }) => {
     };
     setSize();
 
-    const factory = ANIMS[index % ANIMS.length];
+    const factory = ANIMS[artwork] ?? anim0;
     let draw = factory(canvas.width, canvas.height);
     let startTime = null;
 
@@ -773,12 +790,13 @@ const ProjectAnim = ({ index }) => {
       io.disconnect();
       ro.disconnect();
     };
-  }, [index]);
+  }, [artwork]);
 
   return (
     <canvas
       ref={canvasRef}
       aria-hidden="true"
+      data-artwork={artwork}
       style={{ width: "100%", height: "100%", display: "block" }}
     />
   );
