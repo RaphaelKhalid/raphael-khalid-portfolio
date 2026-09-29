@@ -36,9 +36,10 @@ const STEPS = [
     act: tour => tour.pressWaymo(),
   },
   {
-    scroll: "#work",
+    scroll: [".plate", 190],
     mark: () => $(".plate"),
-    near: r => [r.left + r.width * 0.3, r.top - 50],
+    // Waits in the open paper above the plate, right of the section's text.
+    near: r => [r.right - r.width * 0.22, r.top - 90],
     say: "specimens: autolabs first, then the rest of the work",
     ms: 5200,
   },
@@ -142,6 +143,7 @@ export function createTour({ getEngine, mark, label, tapRing, onChange }) {
     if (active) return;
     active = true; guide.ready = false;
     document.documentElement.classList.add("raly-touring");
+    getEngine()?.setPace(1.9);
     go(0);
   }
 
@@ -151,6 +153,7 @@ export function createTour({ getEngine, mark, label, tapRing, onChange }) {
     clearTimeout(stepTimer); timers.forEach(clearTimeout); timers = [];
     mark.classList.remove("on");
     document.documentElement.classList.remove("raly-touring");
+    getEngine()?.setPace(1);
     getEngine()?.setPointer(null);
     try { localStorage.setItem("raly-toured", "1"); } catch { /* storage may be unavailable */ }
     onChange?.({ active: false, finished });
