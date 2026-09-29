@@ -40,7 +40,7 @@ const Embed = ({ src, title }) => (
     title={title}
     loading="lazy"
     sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-    className="w-full h-full block rounded-lg border border-line-soft bg-[#0b0d12]"
+    className="w-full h-full block rounded-[5px] border border-hair-soft bg-raised"
   />
 );
 
