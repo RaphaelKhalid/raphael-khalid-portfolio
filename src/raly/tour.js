@@ -20,7 +20,7 @@ const STEPS = [
     ms: 5200,
   },
   {
-    scroll: "#demos",
+    scroll: ['nav[aria-label="Demos"]', 150],
     mark: () => $('[data-demo="waymo"]'),
     near: r => [r.right + 90, r.top + 10],
     say: "first, a live one: the waymo emergency response",
@@ -28,6 +28,7 @@ const STEPS = [
     act: tour => tour.tap($('[data-demo="waymo"]'), 0.5, 0.5, el => el.getAttribute("aria-pressed") !== "true" && el.click()),
   },
   {
+    scroll: [".panel-demo", 70],
     mark: () => $('iframe[src^="' + WAYMO_ORIGIN + '"]'),
     near: r => [r.left - 40, r.top + 140],
     say: "pressing play: 72 hours of a hijacked fleet",
@@ -87,9 +88,12 @@ export function createTour({ getEngine, mark, label, tapRing, onChange }) {
 
   function later(ms, fn) { timers.push(setTimeout(() => active && fn(), ms)); }
 
-  function scrollToSection(selector) {
+  // A step scrolls to a selector (to a section's anchor), or to [selector, gap
+  // above it] to land on something inside a section.
+  function scrollToSection(target) {
+    const [selector, gap] = Array.isArray(target) ? target : [target, 20];
     const el = $(selector);
-    if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + scrollY - 20), behavior: "smooth" });
+    if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + scrollY - gap), behavior: "smooth" });
   }
 
   // A small ring where raly "presses", then the press itself.

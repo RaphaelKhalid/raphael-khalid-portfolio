@@ -160,7 +160,7 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
       if (faithful && sinceMove < 2.5 && distance > 0.45) {
         mode = 'follow';
         target.copy(pointer);
-        return clamp(distance * 1.2, 0.6, 5.5);
+        return clamp(distance * 0.95, 0.5, 4.4);
       }
       if (!faithful && sinceMove < 0.9 && distance > 1.8) {
         mode = 'follow';
@@ -254,7 +254,7 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
         remaining -= step;
         const desiredSpeed = decide(step, env);
         keepInside(env);
-        steer(step, desiredSpeed * (env.energy ?? 1), mode === 'startle' ? 1.6 : faithful && mode === 'follow' ? 2.3 : 1);
+        steer(step, desiredSpeed * (env.energy ?? 1), mode === 'startle' ? 1.6 : faithful && mode === 'follow' ? 2.0 : 1);
       }
       buildBody();
     }
