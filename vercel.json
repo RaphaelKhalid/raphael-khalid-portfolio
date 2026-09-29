@@ -1,6 +1,12 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "raphael-khalid.vercel.app" }],
+      "destination": "https://raphaelkhalid.com/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "raphael-khalid.vercel.app" }],
       "destination": "https://raphaelkhalid.com/:path*",
