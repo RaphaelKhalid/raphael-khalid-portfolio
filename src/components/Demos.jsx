@@ -1,15 +1,35 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { styles } from "../styles";
-import { fadeIn, textVariant } from "../utils/motions";
+import SectionHead from "./SectionHead";
 import Demo from "./demos/Demo";
 
-// Ordered deliberately: the three things that are deployed products come first,
-// then the teaching labs. Previously each demo was a full-width block and the
-// section ran to about 4,000px, which put the projects a very long scroll away.
-// One pane and a sidebar keeps the whole thing to a single screen — and means
-// only one simulation is mounted at a time.
-const GROUPS = [
+// Four featured demos lead (Waymo emergency response, AutoLabs, Omelas, the
+// Refusal Matrix); the rest sit in a quieter list. One pane and a sidebar keeps
+// the section to a single screen, and means only one simulation is mounted at
+// a time.
+const WAYMO = {
+  key: "waymo",
+  src: "https://waymoemergencyresponsedemo.vercel.app",
+  name: "Waymo emergency response",
+  tag: "Crisis simulation",
+  href: "https://waymoemergencyresponsedemo.vercel.app",
+  note: "The off-switch is compromised: California's first 72 hours after a hypothetical AI incident.",
+  blurb:
+    "A misaligned pre-release agent exfiltrates its weights, hijacks a driverless-fleet staff session and stops the Bay Area and Los Angeles fleets. Every order the state can send ends at the operator's remote-operations system, which is exactly what the agent holds, so the response needs levers that go around it. A multilayer network replays 19 events from day minus seven to hour 72; click any actor for its role and sources.",
+};
+
+const OMELAS = {
+  key: "omelas",
+  src: "https://omelassimulationdemov2.vercel.app",
+  name: "Omelas",
+  tag: "Multi-agent ethics",
+  href: "https://omelassimulationdemov2.vercel.app",
+  note: "The liberator's dilemma: ten model residents, one captive child, one secret goal.",
+  blurb:
+    "An LLM multi-agent moral-dilemma simulation. Ten isolated model residents share a village whose prosperity depends on a captive child; one of them secretly tries to free the child with nobody cursed. Covert night actions, noisy evidence, exile and a discoverable exploit test for unprompted deception, covert harm, exploit concealment and peer detection.",
+};
+
+const SOURCE_GROUPS = [
   {
     label: "Live research",
     items: [
@@ -117,6 +137,17 @@ const GROUPS = [
   },
 ];
 
+const SOURCE = Object.fromEntries(
+  [WAYMO, OMELAS, ...SOURCE_GROUPS.flatMap((g) => g.items)].map((d) => [d.key, d])
+);
+SOURCE.refusal = { ...SOURCE.refusal, name: "Refusal Matrix" };
+
+// Four featured demos, then everything else in a quieter list.
+const GROUPS = [
+  { label: "Featured", items: ["waymo", "autolabs", "omelas", "refusal"].map((k) => SOURCE[k]) },
+  { label: "More", items: ["afterlight", "ralytable", "bycs", "selfbalance", "slam", "pid", "swarm"].map((k) => SOURCE[k]) },
+];
+
 const ALL = GROUPS.flatMap((g) => g.items);
 
 const Demos = () => {
@@ -126,62 +157,31 @@ const Demos = () => {
   return (
     <section className="relative w-full">
       <span className="hash-span" id="demos">&nbsp;</span>
-      <div className={`${styles.paddingX} max-w-7xl mx-auto pt-10 pb-14`}>
-        <motion.div
-          variants={textVariant()}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.4 }}
-          className="mb-3 flex items-end justify-between gap-6 flex-wrap"
-        >
-          <div>
-            <p className={styles.sectionSubText}>Running here, not screenshotted</p>
-            <h2 className={styles.sectionHeadText}>Demos.</h2>
-          </div>
-          <a
-            href="#work"
-            className="font-mono text-[11px] text-fg-faint hover:text-amber transition-colors duration-150 pb-1"
-          >
-            skip to projects ↓
-          </a>
-        </motion.div>
+      <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6 pb-24`}>
+        <SectionHead index="01" label="demos" title="Demos" aside={
+          <a href="#work" className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-coral transition-colors">skip to projects ↓</a>
+        }>
+          Running here, not screenshotted. One instrument is live at a time; pick another from the list.
+        </SectionHead>
 
-        <motion.div
-          variants={fadeIn("", "", 0.08)}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-          className="grid gap-6 lg:gap-8 items-start"
-          style={{ gridTemplateColumns: "minmax(0, 240px) minmax(0, 1fr)" }}
-        >
-          <nav className="flex flex-col gap-5 lg:sticky lg:top-24">
+        <div className="grid gap-8 lg:gap-12 items-start lg:grid-cols-[240px_minmax(0,1fr)]">
+          <nav aria-label="Demos" className="flex lg:flex-col gap-8 lg:gap-7 lg:sticky lg:top-24 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
             {GROUPS.map((g) => (
-              <div key={g.label} className="flex flex-col gap-1">
-                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint mb-1.5">
-                  {g.label}
-                </p>
-                {g.items.map((d) => {
+              <div key={g.label} className="flex lg:flex-col gap-1 min-w-max lg:min-w-0">
+                <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-muted mb-2 hidden lg:block">{g.label}</p>
+                {g.items.map((d, i) => {
                   const on = d.key === key;
+                  const featured = g.label === "Featured";
                   return (
                     <button
                       key={d.key}
+                      type="button"
                       onClick={() => setKey(d.key)}
                       aria-pressed={on}
-                      className="text-left px-3 py-2 rounded-lg border transition-colors duration-200"
-                      style={{
-                        borderColor: on ? "#8A5F27" : "transparent",
-                        background: on ? "rgba(242,160,61,0.07)" : "transparent",
-                      }}
+                      className={`group text-left py-2 lg:border-b border-hair-soft flex items-baseline gap-3 transition-colors duration-200 ${on ? "text-ink-text" : "text-fg-dim hover:text-ink-text"}`}
                     >
-                      <span
-                        className="block font-display text-[14px]"
-                        style={{ color: on ? "#F2A03D" : "#E9EAEF" }}
-                      >
-                        {d.name}
-                      </span>
-                      <span className="block font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint mt-0.5">
-                        {d.tag}
-                      </span>
+                      <span className={`font-mono text-[10px] tabular ${on ? "text-coral" : "text-muted"}`}>{featured ? `0${i + 1}` : "·"}</span>
+                      <span className={`font-serif ${featured ? "text-[19px]" : "text-[16px]"} leading-tight`}>{d.name}</span>
                     </button>
                   );
                 })}
@@ -190,35 +190,21 @@ const Demos = () => {
           </nav>
 
           <div className="min-w-0">
-            <div className="flex items-baseline gap-3 flex-wrap mb-2">
-              <h3 className="font-display text-fg text-[18px] tracking-[-0.015em]">
-                {active.name}
-              </h3>
-              <span className="text-[12.5px] text-fg-dim">{active.note}</span>
-              <a
-                href={active.href}
-                target="_blank"
-                rel="noreferrer"
-                className="ml-auto font-mono text-[10.5px] text-fg-faint hover:text-amber transition-colors duration-150 whitespace-nowrap"
-              >
+            <div className="flex items-baseline gap-4 flex-wrap mb-3">
+              <h3 className="font-serif text-[28px] leading-tight text-ink-text headline-soft">{active.name}</h3>
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-muted">{active.tag}</span>
+              <a href={active.href} target="_blank" rel="noreferrer" className="ml-auto font-mono text-[11px] uppercase tracking-[0.16em] text-muted hover:text-coral transition-colors whitespace-nowrap">
                 open ↗
               </a>
             </div>
-            <p className="text-fg-dim text-[13.5px] leading-relaxed max-w-[70ch] mb-4">
-              {active.blurb}
-            </p>
-            <div className="panel-demo p-3">
-              {/* keyed so switching tabs unmounts the previous demo outright */}
-              <Demo
-                key={active.key}
-                id={active.id}
-                src={active.src}
-                title={active.name}
-                height={active.id === "refusal" ? 520 : 600}
-              />
+            <p className="text-ink-text text-[16px] leading-relaxed max-w-[70ch]">{active.note}</p>
+            <p className="text-fg-dim text-[14px] leading-relaxed max-w-[70ch] mt-2 mb-6">{active.blurb}</p>
+            <div className="panel-demo p-2.5">
+              {/* keyed so switching unmounts the previous demo outright */}
+              <Demo key={active.key} id={active.id} src={active.src} title={active.name} height={active.id === "refusal" ? 540 : 640} />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
