@@ -266,6 +266,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       const at = screenToWorld(clientX, clientY);
       if (at) swimmer.setPointer(at.clone());
     },
+    /** How briskly it follows: 1 normally, higher while it guides the tour. */
+    setPace(value) { swimmer.setPace(value); },
     /** True if the point is on raly's body. */
     hover(clientX, clientY) { return Boolean(nearestOnBody(clientX, clientY)); },
     /** A click on the body: it flinches away and pigment blooms where it was touched. */

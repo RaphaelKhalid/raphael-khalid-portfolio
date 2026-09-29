@@ -36,11 +36,19 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
   const head = new Vector3(), heading = new Vector3(), dorsal = new Vector3(), omega = new Vector3();
   const trail = [];
   const TRAIL_STEP = 0.035, TRAIL_MAX = Math.ceil((bodyWorld + 1.5) / TRAIL_STEP);
+  // The tightest circle the head may swim. The body replays the head's path,
+  // so a tighter turn than this folds the body through itself.
+  const MIN_TURN_RADIUS = bodyWorld * 0.3;
+  const MAX_DEPTH_HEADING = 0.38;
   let speed = 0, bank = 0, bankVelocity = 0, elapsed = 0, stroke = 0;
 
   const target = new Vector3(), waypoint = new Vector3();
   let nextWaypoint = 0, mode = 'wander', inspecting = false;
   const pointer = new Vector3(), pointerVelocity = new Vector3();
+  // Where it is actually heading while it follows: eases after the cursor, so
+  // sudden cursor jumps become long curves rather than snaps.
+  const followPoint = new Vector3();
+  let followReady = false, pace = 1;
   let pointerPresent = false, pointerTime = -Infinity, pointerSeen = -Infinity, pointerSpeed = 0, pointerSample = -Infinity;
   let startleUntil = -Infinity, startleCooldown = -Infinity, orbitSign = 1;
   const flee = new Vector3();
@@ -114,7 +122,8 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
     // Turning straight around: loop through the screen plane.
     if (axis.lengthSq() < 1e-6) axis.copy(Z).multiplyScalar(orbitSign);
     axis.normalize();
-    const maxTurn = (0.34 + 0.24 * Math.min(speed, 3)) * turnGain;
+    const radius = mode === 'startle' ? MIN_TURN_RADIUS * 0.6 : MIN_TURN_RADIUS;
+    const maxTurn = Math.min((0.34 + 0.24 * Math.min(speed, 3)) * turnGain, speed / radius + 0.12);
     va.copy(axis).multiplyScalar(Math.min(angle * 1.4, maxTurn));
     omega.lerp(va, 1 - Math.exp(-dt * 2.2));
     const rate = omega.length();
@@ -122,6 +131,13 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
       qa.setFromAxisAngle(vb.copy(omega).divideScalar(rate), rate * dt);
       heading.applyQuaternion(qa).normalize();
       dorsal.applyQuaternion(qa);
+    }
+    // Stay mostly side-on to the viewer: swimming end-on into the screen
+    // foreshortens the body into a crumpled mass.
+    if (Math.abs(heading.z) > MAX_DEPTH_HEADING) {
+      const flat = Math.hypot(heading.x, heading.y) || 1e-6, keep = Math.sqrt(1 - MAX_DEPTH_HEADING ** 2) / flat;
+      heading.set(heading.x * keep, heading.y * keep, Math.sign(heading.z) * MAX_DEPTH_HEADING);
+      omega.x *= 0.5; omega.y *= 0.5;
     }
     // Keep the patterned back mostly toward the viewer, a little upward.
     up.set(0, 0.35, 1).addScaledVector(heading, -heading.dot(up.set(0, 0.35, 1)));
@@ -157,10 +173,12 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
     }
     if (pointerPresent && elapsed - pointerSeen < 14) {
       const distance = Math.hypot(head.x - pointer.x, head.y - pointer.y);
+      if (!followReady) { followPoint.copy(pointer); followReady = true; }
+      followPoint.lerp(pointer, 1 - Math.exp(-dt * 1.8));
       if (faithful && sinceMove < 2.5 && distance > 0.45) {
         mode = 'follow';
-        target.copy(pointer);
-        return clamp(distance * 0.95, 0.5, 4.4);
+        target.copy(followPoint);
+        return clamp(distance * 0.57 * pace, 0.35, 2.65 * pace);
       }
       if (!faithful && sinceMove < 0.9 && distance > 1.8) {
         mode = 'follow';
@@ -254,7 +272,7 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
         remaining -= step;
         const desiredSpeed = decide(step, env);
         keepInside(env);
-        steer(step, desiredSpeed * (env.energy ?? 1), mode === 'startle' ? 1.6 : faithful && mode === 'follow' ? 2.0 : 1);
+        steer(step, desiredSpeed * (env.energy ?? 1), mode === 'startle' ? 1.6 : faithful && mode === 'follow' ? 1.5 : 1);
       }
       buildBody();
     }
@@ -281,8 +299,10 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
       }
       return { distance: best, fraction: bestK / (K - 1) };
     },
+    /** Follow speed multiplier: 1 for the cursor, faster while guiding a tour. */
+    setPace(value) { pace = value; },
     setPointer(point) {
-      if (!point) { pointerPresent = false; return; }
+      if (!point) { pointerPresent = false; followReady = false; return; }
       const now = elapsed;
       if (pointerPresent) {
         // Speed over the time since the previous sample, not the last move.
