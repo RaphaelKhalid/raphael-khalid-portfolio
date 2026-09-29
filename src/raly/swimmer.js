@@ -17,7 +17,9 @@ import { SPINE_SAMPLES } from './anatomy.js';
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const Z = new Vector3(0, 0, 1);
 
-export function createSwimmer(specimen, { scale, random = Math.random }) {
+// `faithful`: follow the cursor closely (head straight to it, body trailing),
+// and never startle from cursor speed alone; only a click startles.
+export function createSwimmer(specimen, { scale, random = Math.random, faithful = false }) {
   const K = SPINE_SAMPLES;
   const rest = specimen.spine.samples.map(p => p.clone());
   const restLength = specimen.spine.length;
@@ -96,6 +98,9 @@ export function createSwimmer(specimen, { scale, random = Math.random }) {
       b.yMin + random() * (b.yMax - b.yMin),
       b.zMin + random() * (b.zMax - b.zMin),
     );
+    // With wrapping edges, it sometimes just keeps going, out one side and
+    // back in the other.
+    if (b.wrap && random() < 0.35) waypoint.x = Math.sign(heading.x || 1) * (b.halfWidth + 6);
     nextWaypoint = elapsed + 6 + random() * 5;
   }
 
@@ -152,7 +157,12 @@ export function createSwimmer(specimen, { scale, random = Math.random }) {
     }
     if (pointerPresent && elapsed - pointerSeen < 14) {
       const distance = Math.hypot(head.x - pointer.x, head.y - pointer.y);
-      if (sinceMove < 0.9 && distance > 1.8) {
+      if (faithful && sinceMove < 2.5 && distance > 0.45) {
+        mode = 'follow';
+        target.copy(pointer);
+        return clamp(distance * 1.2, 0.6, 5.5);
+      }
+      if (!faithful && sinceMove < 0.9 && distance > 1.8) {
         mode = 'follow';
         target.copy(pointer);
         return clamp(distance * 0.5, 0.7, 3.0);
@@ -172,11 +182,11 @@ export function createSwimmer(specimen, { scale, random = Math.random }) {
 
   function keepInside(env) {
     const b = env.bounds;
-    target.x = clamp(target.x, b.center.x - b.xRange, b.center.x + b.xRange);
+    if (!b.wrap) target.x = clamp(target.x, b.center.x - b.xRange, b.center.x + b.xRange);
     target.y = clamp(target.y, b.yMin, b.yMax);
     target.z = clamp(target.z, b.zMin, b.zMax);
     // If the head has drifted out, aim well back inside.
-    if (Math.abs(head.x - b.center.x) > b.xRange + 0.6) target.x = b.center.x - Math.sign(head.x - b.center.x) * b.xRange * 0.4;
+    if (!b.wrap && Math.abs(head.x - b.center.x) > b.xRange + 0.6) target.x = b.center.x - Math.sign(head.x - b.center.x) * b.xRange * 0.4;
     if (head.y < b.yMin - 0.4) target.y = b.yMin + 1.2;
     if (head.y > b.yMax + 0.6) target.y = b.yMax - 1.2;
   }
@@ -244,7 +254,7 @@ export function createSwimmer(specimen, { scale, random = Math.random }) {
         remaining -= step;
         const desiredSpeed = decide(step, env);
         keepInside(env);
-        steer(step, desiredSpeed * (env.energy ?? 1), mode === 'startle' ? 1.6 : 1);
+        steer(step, desiredSpeed * (env.energy ?? 1), mode === 'startle' ? 1.6 : faithful && mode === 'follow' ? 2.3 : 1);
       }
       buildBody();
     }
@@ -282,7 +292,7 @@ export function createSwimmer(specimen, { scale, random = Math.random }) {
       pointer.copy(point); pointerPresent = true; pointerSeen = now; pointerSample = now;
       if (pointerVelocity.lengthSq() > 0.01) pointerTime = now;
       // A fast flick close to the body is a threat.
-      if (!inspecting && pointerSpeed > 11 && now > startleCooldown && this.nearest(point).distance < 2.1) {
+      if (!faithful && !inspecting && pointerSpeed > 11 && now > startleCooldown && this.nearest(point).distance < 2.1) {
         startleUntil = now + 1.7; startleCooldown = now + 4;
         flee.copy(head).sub(point).setZ(0);
         if (flee.lengthSq() < 1e-4) flee.set(-heading.y, heading.x, 0);
@@ -308,6 +318,26 @@ export function createSwimmer(specimen, { scale, random = Math.random }) {
         omega.addScaledVector(normal, -spin * 0.5);
       }
     },
+    /** Moves the whole body (head and wake) by `shift`, unchanged otherwise. */
+    teleport(shift, bounds) {
+      head.add(shift);
+      trail.forEach(point => point.add(shift));
+      // Carry on in the same direction, back into view.
+      if (bounds) {
+        waypoint.set(bounds.center.x + Math.sign(heading.x || 1) * bounds.xRange * 0.3, head.y, head.z);
+        nextWaypoint = elapsed + 5 + random() * 3;
+      }
+    },
+    /** Re-enters at `point`, swimming along `direction`. */
+    enterFrom(point, direction) {
+      head.copy(point);
+      heading.copy(direction).normalize();
+      dorsal.set(0, 0.35, 1).addScaledVector(heading, -heading.dot(dorsal.set(0, 0.35, 1))).normalize();
+      omega.set(0, 0, 0); bank = 0; bankVelocity = 0;
+      layStraightTrail();
+      waypoint.set(point.x - Math.sign(point.x) * (Math.abs(point.x) + 2), point.y, 0);
+      nextWaypoint = elapsed + 6;
+    },
     /** A deliberate touch: it flinches away from `point`, blanching. */
     poke(point) {
       if (inspecting) return;
@@ -328,5 +358,6 @@ export function createSwimmer(specimen, { scale, random = Math.random }) {
       Object.assign(output.mood, { curious: 0, startle: 0, feed: 0, turn: 0 });
     },
     get mode() { return mode; },
+    get heading() { return heading; },
   };
 }

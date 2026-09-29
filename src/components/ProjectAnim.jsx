@@ -715,19 +715,101 @@ function clampShadow(ctx) {
   });
 }
 
-const ProjectAnim = ({ artwork }) => {
+// Paper tone. The factories were drawn for a dark ground with neon ink; on the
+// field journal they are redrawn through a context that remaps every colour:
+// dark grounds and trails become paper, bright neon becomes deep ink of the
+// same hue, whites become ink, glows are dropped and additive blending becomes
+// multiply. The fifteen factories themselves stay untouched.
+const PAPER = [244, 235, 223];
+const INK = [46, 40, 38];
+const colorCache = new Map();
+
+function parseColor(value) {
+  const hex = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hex) {
+    const h = hex[1].length === 3 ? hex[1].split("").map(c => c + c).join("") : hex[1];
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16), 1];
+  }
+  const fn = value.match(/^(rgba?|hsla?)\(([^)]+)\)$/i);
+  if (!fn) return null;
+  const parts = fn[2].split(/[\s,/]+/).filter(Boolean).map(parseFloat);
+  const alpha = parts.length > 3 ? parts[3] : 1;
+  if (fn[1].toLowerCase().startsWith("rgb")) return [parts[0], parts[1], parts[2], alpha];
+  const [h, s, l] = [parts[0] / 360, parts[1] / 100, parts[2] / 100];
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+  const channel = t => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 0.5 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
+  return [channel(h + 1 / 3) * 255, channel(h) * 255, channel(h - 1 / 3) * 255, alpha];
+}
+
+function toPaper(value) {
+  if (typeof value !== "string") return value;
+  const cached = colorCache.get(value);
+  if (cached) return cached;
+  const rgba = parseColor(value.trim());
+  let out = value;
+  if (rgba) {
+    const [r, g, b, a] = rgba.map((v, i) => (i < 3 ? v / 255 : v));
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
+    const s = max === min ? 0 : (max - min) / (1 - Math.abs(2 * l - 1));
+    let rgb;
+    if (l < 0.2) rgb = PAPER;                        // grounds and trails
+    else if (s < 0.15) rgb = INK;                    // whites and greys
+    else {
+      // Same hue, pulled down to ink depth and slightly desaturated.
+      const k = (0.2 + (1 - l) * 0.35) / Math.max(l, 1e-3);
+      const mean = (r + g + b) / 3;
+      rgb = [r, g, b].map(c => Math.max(0, Math.min(255, (mean + (c - mean) * 0.85) * k * 255)));
+    }
+    out = `rgba(${rgb.map(Math.round).join(",")},${a})`;
+  }
+  colorCache.set(value, out);
+  return out;
+}
+
+function paperContext(ctx) {
+  const bound = new Map();
+  const wrapGradient = gradient => {
+    const add = gradient.addColorStop.bind(gradient);
+    gradient.addColorStop = (offset, color) => add(offset, toPaper(color));
+    return gradient;
+  };
+  return new Proxy(ctx, {
+    get(target, key) {
+      const value = target[key];
+      if (typeof value !== "function") return value;
+      if (!bound.has(key)) {
+        const fn = String(key).startsWith("create") && String(key).endsWith("Gradient")
+          ? (...args) => wrapGradient(value.apply(target, args))
+          : value.bind(target);
+        bound.set(key, fn);
+      }
+      return bound.get(key);
+    },
+    set(target, key, value) {
+      if (key === "fillStyle" || key === "strokeStyle") target[key] = toPaper(value);
+      else if (key === "shadowBlur" || key === "shadowColor") target.shadowBlur = 0;
+      else if (key === "globalCompositeOperation") target[key] = value === "lighter" || value === "screen" || value === "plus-lighter" ? "multiply" : value;
+      else target[key] = value;
+      return true;
+    },
+  });
+}
+
+const ProjectAnim = ({ artwork, tone = "dark" }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: false });
-    clampShadow(ctx);
+    const raw = canvas.getContext("2d", { alpha: false });
+    clampShadow(raw);
+    const paper = tone === "paper";
+    const ctx = paper ? paperContext(raw) : raw;
 
     // Deliberately below CSS resolution, not above it. This is out-of-focus
     // background texture behind a scrim; rendering at 0.65 costs 42% of the
     // fill and raster of a 1:1 buffer and no one can tell.
-    const SCALE = 0.65;
+    const SCALE = paper ? Math.min(window.devicePixelRatio || 1, 1.5) : 0.65;
     const setSize = () => {
       canvas.width = Math.max(1, Math.round(canvas.offsetWidth * SCALE));
       canvas.height = Math.max(1, Math.round(canvas.offsetHeight * SCALE));
@@ -746,6 +828,7 @@ const ProjectAnim = ({ artwork }) => {
       // One plain source-over wash. A `saturation` blend looked slightly better
       // and measured much worse — non-separable blend modes are not cheap. This
       // pulls every card toward the ink ground, which is the point.
+      if (paper) return;
       ctx.fillStyle = "rgba(11, 13, 18, 0.5)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     };
@@ -790,7 +873,7 @@ const ProjectAnim = ({ artwork }) => {
       io.disconnect();
       ro.disconnect();
     };
-  }, [artwork]);
+  }, [artwork, tone]);
 
   return (
     <canvas
