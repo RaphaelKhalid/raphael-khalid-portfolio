@@ -177,6 +177,7 @@ const Demos = () => {
                       key={d.key}
                       type="button"
                       onClick={() => setKey(d.key)}
+                      data-demo={d.key}
                       aria-pressed={on}
                       className={`group text-left py-2 lg:border-b border-hair-soft flex items-baseline gap-3 transition-colors duration-200 ${on ? "text-ink-text" : "text-fg-dim hover:text-ink-text"}`}
                     >

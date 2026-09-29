@@ -21,7 +21,7 @@ Single-page React app built with Vite, designed as a naturalist's field journal:
 1. `RalyLayer` renders a `position: fixed`, transparent, full-viewport WebGL canvas (`z-index: 0`) where raly, the site's resident organism, swims behind the page. It never takes pointer events; clicks are hit-tested against raly's projected body instead.
 2. The main content wrapper (`z-index: 1`). Sections have no backgrounds, so raly shows through.
 
-**Section flow (`App.jsx`):** `Navbar → Hero → Demos → Works → Experience → Contact`
+**Section flow (`App.jsx`):** `Navbar → Hero → Demos → Works → Experience → Photographs → Contact`
 
 **raly (`src/raly/`):** a three.js organism ported from the membrane studies (study 08).
 - `engine.js` builds the scene, runs the swimmer and skin simulation, handles viewport-edge and floor collisions and the click response, and publishes raly's screen position to `ralyScreen` in `store.js`. It is loaded lazily.
@@ -33,7 +33,8 @@ Single-page React app built with Vite, designed as a naturalist's field journal:
 - `ReactiveHeadline`: "running experiments" rendered by a WebGL2 shader over a signed-distance field of the real glyphs. Each letter moves between engraving, interference, wet-ink and geometric styles, driven by cursor proximity and speed, raly's position, neighbor coupling and a slow idle wave. The DOM keeps the real text for accessibility. Reduced motion or no WebGL2 falls back to plain type.
 - `Demos`: four featured demos (Waymo emergency response, AutoLabs, Omelas, Refusal Matrix), then a "more" list. Only one demo is mounted at a time (`demos/Demo.jsx` lazy-loads internal labs or iframes external ones).
 - `Works`: projects as numbered specimen plates with `PlateArt` (deterministic SVG line art); AutoLabs is the featured plate.
-- `Experience`: a notebook timeline. `Contact`: an emailjs form on the `SunlitFloor` caustic band.
+- `Experience`: a notebook timeline. `Photographs`: a draggable strip of mounted prints with a lightbox; images are served from raphael-photography.vercel.app. `Contact`: an emailjs form on the `SunlitFloor` caustic band.
+- `src/raly/tour.js`: raly as a guide. It auto-starts once per browser after 8 s idle on the hero (or with `?tour`, or the nav/hero buttons), scrolls through the sections, draws a hairline mark and caption around each stop, selects the Waymo demo and posts `{type: "replay:play"}` to its iframe. Any real scroll, key, click or touch ends it. Steps are the `STEPS` array.
 
 **Theme tokens:** `tailwind.config.js` defines the journal palette (`paper`, `raised`, `ink-text`, `muted`, `hair`, `cobalt`, `magenta`, `coral`). The old dark-theme token names (`fg`, `panel`, `line`, …) are remapped to paper equivalents so the demo labs follow the theme without edits. Base styles are in `src/index.css`.
 
