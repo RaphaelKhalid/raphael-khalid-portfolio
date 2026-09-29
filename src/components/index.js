@@ -3,13 +3,12 @@ import Navbar from "./Navbar";
 import Experience from "./Experience";
 import Works from "./Works";
 import Contact from "./Contact";
-import AmbientField from "./AmbientField";
 import Demos from "./Demos";
+import RalyLayer from "./RalyLayer";
+import Photographs from "./Photographs";
 
-export { Hero, Navbar, Experience, Works, Contact, AmbientField, Demos };
+export { Hero, Navbar, Experience, Works, Contact, Demos, RalyLayer, Photographs };
 
-// The three.js canvases (StarsCanvas, KnowledgeGraph, Earth, Ball, Computers)
-// are intentionally no longer re-exported here. They are the forked template's
-// signature, and they compete with the demo canvases for GPU time. The files
-// remain in src/components/canvas/ — import them directly if one is ever
-// wanted back.
+// The older three.js canvases (StarsCanvas, KnowledgeGraph, Earth, Ball,
+// Computers) and the dark-theme pieces (AmbientField) are no
+// longer used; their files remain in src/components if one is ever wanted.

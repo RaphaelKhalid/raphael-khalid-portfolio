@@ -8,39 +8,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run dev       # start dev server (Vite, localhost:5173)
 npm run build     # production build → dist/
 npm run preview   # serve the dist/ build locally
-npm run lint      # ESLint across src/ (max-warnings 0)
+npm run lint      # ESLint across src/ (max-warnings 0; the older demo labs carry pre-existing warnings)
 ```
 
 No test suite exists. Verify changes by running `npm run build` (catches import/JSX errors) and visually inspecting via `npm run dev`.
 
 ## Architecture
 
-Single-page React app built with Vite. All content is on one scrolling page — no routes are used despite `react-router-dom` being installed (only `<BrowserRouter>` wraps the app for `<Link>` in the Navbar).
+Single-page React app built with Vite, designed as a naturalist's field journal: warm paper (#F4EBDF), ink text, hairline rules, Fraunces for headlines, IBM Plex Sans for body text, IBM Plex Mono for labels. `<BrowserRouter>` only wraps the app for links; there are no routes.
 
 **Rendering layers (z-index order):**
-1. `StarsCanvas` — `position: fixed`, `z-index: 0`, pitch-black background with a rotating WebGL star field. Covers the entire page permanently.
-2. Main content div — `z-index: 1`, all sections are `background: transparent` so stars show through.
+1. `RalyLayer` renders a `position: fixed`, transparent, full-viewport WebGL canvas (`z-index: 0`) where raly, the site's resident organism, swims behind the page. It never takes pointer events; clicks are hit-tested against raly's projected body instead.
+2. The main content wrapper (`z-index: 1`). Sections have no backgrounds, so raly shows through.
 
-**Section flow (`App.jsx`):** `Navbar → Hero → Works → Experience → Contact`
+**Section flow (`App.jsx`):** `Navbar → Hero → Demos → Works → Experience → Photographs → Contact`
 
-**`SectionWrapper` HOC** (`src/hoc/SectionWrapper.jsx`) wraps `Experience` and `Contact`. It adds `max-w-7xl mx-auto` padding, a `whileInView` stagger animation trigger, and injects a `<span id={idName}>` anchor for nav links. Components wrapped with it receive the animation variants from `src/utils/motions.js` automatically.
+**raly (`src/raly/`):** a three.js organism ported from the membrane studies (study 08).
+- `engine.js` builds the scene, runs the swimmer and skin simulation, handles viewport-edge and floor collisions and the click response, and publishes raly's screen position to `ralyScreen` in `store.js`. It is loaded lazily.
+- `anatomy.js` grows a seeded specimen, and `swimmer.js` steers it so the body follows its own wake.
+- `materials.js` holds the skin shaders, `pattern.js` a reaction-diffusion pigment on the GPU, `frames.js` the body frames used for collisions and hit tests, and `audio.js` opt-in microphone music analysis. The nav's "listen" toggle reaches the engine through `store.js`.
+- Floor: the contact section's `#sunlit-floor` when it is on screen, otherwise the bottom of the viewport. While `#top` (the hero) is visible, raly keeps to the right half.
 
 **Key components:**
+- `ReactiveHeadline`: "running experiments" rendered by a WebGL2 shader over a signed-distance field of the real glyphs. Each letter moves between engraving, interference, wet-ink and geometric styles, driven by cursor proximity and speed, raly's position, neighbor coupling and a slow idle wave. The DOM keeps the real text for accessibility. Reduced motion or no WebGL2 falls back to plain type.
+- `Demos`: four featured demos (Waymo emergency response, AutoLabs, Omelas, Refusal Matrix), then a "more" list. Only one demo is mounted at a time (`demos/Demo.jsx` lazy-loads internal labs or iframes external ones).
+- `Works`: projects as numbered specimen plates with `PlateArt` (deterministic SVG line art); AutoLabs is the featured plate.
+- `Experience`: a notebook timeline. `Photographs`: a draggable strip of mounted prints with a lightbox; images are served from raphael-photography.vercel.app. `Contact`: an emailjs form on the `SunlitFloor` caustic band.
+- `src/raly/tour.js`: raly as a guide. It auto-starts once per browser after 8 s idle on the hero (or with `?tour`, or the nav/hero buttons), scrolls through the sections, draws a hairline mark and caption around each stop, selects the Waymo demo and posts `{type: "replay:play"}` to its iframe. Any real scroll, key, click or touch ends it. Steps are the `STEPS` array.
 
-- `Hero` — full-viewport intro with typewriter role cycling and a Three.js `KnowledgeGraph` canvas on the right half. The graph renders 7 skill-domain nodes (ML, Complexity, Political Science, etc.) as glowing spheres connected by edges, with `OrbitControls` for drag interaction.
+**Theme tokens:** `tailwind.config.js` defines the journal palette (`paper`, `raised`, `ink-text`, `muted`, `hair`, `cobalt`, `magenta`, `coral`). The old dark-theme token names (`fg`, `panel`, `line`, …) are remapped to paper equivalents so the demo labs follow the theme without edits. Base styles are in `src/index.css`.
 
-- `Works` — masonry grid. Cards are distributed round-robin across 3 columns so reading order is left-to-right. Each `ProjectCard` uses `whileInView` with `once: true` and column/row-staggered spring delays. Card backgrounds are driven by `ProjectAnim`.
+**Content data** lives in `src/constants/index.js` (`navLinks`, `experiences`, `projects`). Demo entries live in `src/components/Demos.jsx`.
 
-- `ProjectAnim` — pure Canvas 2D. There are 15 unique animation factories (one per project, indexed by `index % 15`). Each factory closes over its own particle/geometry state and returns a `draw(ctx, t)` function called via `requestAnimationFrame`. A `ResizeObserver` re-initialises the factory when the card resizes.
-
-- `Experience` — ladder UI. Each row is a `LadderRung` with expand/collapse via `AnimatePresence`. Two vertical rail lines animate in with `scaleY` on `whileInView`.
-
-- `KnowledgeGraph` — separate Three.js canvas (`@react-three/fiber`). Hover labels are plain DOM `<div>` overlays (not `Html` from drei, which is expensive). Performance hints: `dpr={[1, 1.5]}`, `powerPreference: "high-performance"`, `gl={{ alpha: true }}`.
-
-- `StarsCanvas` — `maath` random sphere distribution, `PointMaterial`, rotates every frame. 4 000 points, `dpr` capped at 1.5.
-
-**Content data** lives entirely in `src/constants/index.js` — `navLinks`, `experiences`, and `projects` arrays. Adding/editing projects or experience entries only requires editing this file.
-
-**Styling:** Tailwind utility classes + `src/index.css` for custom animations (orb drifts, scroll-dot, blink-cursor, per-project blob keyframes). `src/styles.js` exports a `styles` object with shared responsive text/padding class strings.
-
-**Deployment:** Vercel (`.vercel/project.json` present). `npm run build` then push to `master` triggers auto-deploy.
+**Deployment:** Vercel project `raphael-khalid-eb4r`, served at raphaelkhalid.com. `vercel.json` permanently redirects the old `raphael-khalid.vercel.app` host to the custom domain. Pushing to `master` deploys.
