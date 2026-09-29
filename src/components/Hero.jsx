@@ -13,8 +13,9 @@ const Hero = () => (
         design, run and report AI-safety experiments, and I build simulations that let
         you poke at control, emergence and institutions instead of reading about them.
       </p>
-      <p className="mt-5 font-mono text-[11px] tracking-[0.16em] uppercase text-muted">
-        AI safety · interpretability · autonomous research · complexity
+      <p className="mt-5 flex gap-6 font-mono text-[11px] tracking-[0.16em] uppercase">
+        <a href="https://www.linkedin.com/in/raphael-khalid/" target="_blank" rel="noreferrer" className="text-ink-text hover:text-coral transition-colors">LinkedIn ↗</a>
+        <a href="https://github.com/RaphaelKhalid" target="_blank" rel="noreferrer" className="text-ink-text hover:text-coral transition-colors">GitHub ↗</a>
       </p>
       <button
         type="button"
