@@ -1,156 +1,48 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { styles } from "../styles";
 import { experiences } from "../constants/index";
-import SectionWrapper from "../hoc";
-import { textVariant } from "../utils/motions";
+import SectionHead from "./SectionHead";
 
-const LadderRung = ({ experience }) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      {/* Rung row */}
-      <div
-        className="relative flex items-center cursor-pointer group select-none"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onClick={() => setOpen((v) => !v)}
-      >
-        {/* Left knot */}
-        <div
-          className={`w-3 h-3 rounded-full border-2 flex-shrink-0 transition-colors duration-200 z-10
-            ${open ? "border-white bg-white" : "border-[#8BFAFF] bg-transparent"}`}
-        />
-
-        {/* Left bar segment */}
-        <div
-          className={`h-[2px] w-6 flex-shrink-0 transition-colors duration-200
-            ${open ? "bg-white" : "bg-[#8BFAFF] opacity-50"}`}
-        />
-
-        {/* Rung label */}
-        <div
-          className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 px-5 py-3 rounded-xl
-            transition-all duration-200 flex-1
-            ${open ? "bg-white/8" : "group-hover:bg-white/5"}`}
-        >
-          <span
-            className={`font-semibold text-[15px] transition-colors duration-200
-              ${open ? "text-white" : "text-[#8BFAFF]"}`}
-          >
-            {experience.company_name}
-          </span>
-          <span className="text-secondary text-[13px]">·</span>
-          <span
-            className={`text-[14px] transition-colors duration-200
-              ${open ? "text-white" : "text-white/70"}`}
-          >
-            {experience.title}
-          </span>
-          <span className="text-secondary text-[13px]">·</span>
-          <span className="text-secondary text-[13px]">{experience.date}</span>
-
-          <span
-            className={`ml-auto text-[11px] transition-all duration-200 opacity-0 group-hover:opacity-60
-              ${open ? "opacity-60" : ""}`}
-          >
-            {open ? "▲ collapse" : "▼ expand"}
-          </span>
-        </div>
-
-        {/* Right bar segment */}
-        <div
-          className={`h-[2px] w-6 flex-shrink-0 transition-colors duration-200
-            ${open ? "bg-white" : "bg-[#8BFAFF] opacity-50"}`}
-        />
-
-        {/* Right knot */}
-        <div
-          className={`w-3 h-3 rounded-full border-2 flex-shrink-0 transition-colors duration-200 z-10
-            ${open ? "border-white bg-white" : "border-[#8BFAFF] bg-transparent"}`}
-        />
-      </div>
-
-      {/* Expandable detail panel */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            key="detail"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.22, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <ul className="ml-[3.25rem] mr-[3.25rem] mt-2 mb-3 pl-4 space-y-2 border-l border-white/10">
-              {experience.points.map((point, i) => (
-                <li
-                  key={i}
-                  className="text-secondary text-[13px] leading-relaxed pl-3"
-                >
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
+// Experience as a field notebook: dates in the margin, the role in serif, the
+// notes beneath, one hairline running down the page.
 const Experience = () => (
-  <>
-    <motion.div variants={textVariant()}>
-      <p className={styles.sectionSubText}>What I have done so far</p>
-      <h2 className={styles.sectionHeadText}>Work Experience.</h2>
-    </motion.div>
-
-    <div className="mt-16 relative">
-      {/* Left rail — draws in from top */}
-      <motion.div
-        className="absolute top-0 bottom-0 w-[2px] pointer-events-none"
-        initial={{ scaleY: 0 }}
-        whileInView={{ scaleY: 1 }}
-        viewport={{ once: true, amount: 0.1 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          left: "0.375rem",
-          transformOrigin: "top",
-          background: "linear-gradient(to bottom, transparent, rgba(139,250,255,0.25) 20%, rgba(139,250,255,0.25) 80%, transparent)",
-        }}
-      />
-      {/* Right rail — draws in from top */}
-      <motion.div
-        className="absolute top-0 bottom-0 w-[2px] pointer-events-none"
-        initial={{ scaleY: 0 }}
-        whileInView={{ scaleY: 1 }}
-        viewport={{ once: true, amount: 0.1 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
-        style={{
-          right: "0.375rem",
-          transformOrigin: "top",
-          background: "linear-gradient(to bottom, transparent, rgba(139,250,255,0.25) 20%, rgba(139,250,255,0.25) 80%, transparent)",
-        }}
-      />
-
-      {/* Rungs — staggered entrance */}
-      <div className="flex flex-col gap-4 py-4">
+  <section className="relative w-full">
+    <span className="hash-span" id="experience">&nbsp;</span>
+    <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6 pb-24`}>
+      <SectionHead index="03" label="experience" title="Field notes" />
+      <ol className="relative">
         {experiences.map((exp, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+          <motion.li
+            key={`${exp.company_name}-${exp.date}`}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: i * 0.05 }}
+            className="grid md:grid-cols-[180px_28px_minmax(0,1fr)] grid-cols-[18px_minmax(0,1fr)] gap-x-4 pb-12 last:pb-0"
           >
-            <LadderRung experience={exp} />
-          </motion.div>
+            <p className="hidden md:block font-mono text-[11px] tracking-[0.12em] uppercase text-muted pt-2 text-right">{exp.date}</p>
+            <div className="relative flex justify-center">
+              <span className="absolute top-0 bottom-[-3rem] w-px bg-hair" aria-hidden="true" />
+              <span className="relative mt-[11px] w-[7px] h-[7px] rounded-full border border-ink-text bg-paper" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="md:hidden font-mono text-[10.5px] tracking-[0.12em] uppercase text-muted mb-1">{exp.date}</p>
+              <h3 className="font-serif text-[26px] leading-tight text-ink-text headline-soft">{exp.title}</h3>
+              <p className="mt-1 text-[14px] text-fg-dim">{exp.company_name}</p>
+              <ul className="mt-4 space-y-2 max-w-[70ch]">
+                {exp.points.map((point, k) => (
+                  <li key={k} className="text-[14px] leading-relaxed text-fg-dim pl-4 relative">
+                    <span className="absolute left-0 top-[0.7em] w-2 h-px bg-muted" aria-hidden="true" />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.li>
         ))}
-      </div>
+      </ol>
     </div>
-  </>
+  </section>
 );
 
-export default SectionWrapper(Experience, "experience");
+export default Experience;
