@@ -11,10 +11,12 @@ import { ralyScreen } from './store.js';
 // raly, the site's resident organism (membrane study 08, in site form).
 //
 // It lives in one fixed, transparent canvas that covers the viewport, behind
-// the page's text. The viewport is its world: it swims in from the right,
-// wanders, collides with the viewport edges and with a floor (the bottom of
-// the view, or the contact section's sunlit floor when that is on screen),
-// and slides along them. It ignores the cursor; a click on its body makes it
+// the page's text. The viewport is its world: it swims in from the right and
+// wanders. The sides are portals: out one side, back in the other. It tends to
+// turn back before the top, and if it leaves through the top it comes back in
+// from the left or the right, as if through a portal. It keeps above a floor
+// (the bottom of the view, or the contact section's sunlit floor when that is
+// on screen). It ignores the cursor; a click on its body makes it
 // flinch, flash and grow new pigment where it was touched. With permission it
 // listens to music through the microphone.
 //
@@ -75,7 +77,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   const shared = createShared({ spineLength: specimen.spine.length, scale: SCALE, pattern: pattern.texture });
   shared.palette.value.set(specimen.palette.hue, specimen.palette.warmth);
   shared.morph.value.set(0, 0, 0, 1);
-  const swimmer = createSwimmer(specimen, { scale: SCALE, random });
+  const swimmer = createSwimmer(specimen, { scale: SCALE, random, faithful: true });
   const organism = new THREE.Group(); organism.scale.setScalar(SCALE); scene.add(organism);
   const meshes = specimen.surfaces.map(surface => {
     const mesh = new THREE.Mesh(surface.geometry, createSkinMaterial(shared, surface));
@@ -89,7 +91,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
 
   // --- world bounds from the viewport ---------------------------------------
   const view = { width: 1, height: 1, floorScreen: null, heroBias: 1 };
-  const bounds = { center: new THREE.Vector3(), xRange: 5, yMin: -1.8, yMax: 2.2, zMin: -0.9, zMax: 0.6, halfWidth: 8, halfHeight: 4.4, floorY: -3.35 };
+  const bounds = { center: new THREE.Vector3(), xRange: 5, yMin: -1.8, yMax: 2.2, zMin: -0.9, zMax: 0.6, halfWidth: 8, halfHeight: 4.4, floorY: -3.35, wrap: true };
   const raycaster = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
   const ndc = new THREE.Vector2(), hitPoint = new THREE.Vector3();
   function screenToWorld(x, y, out = hitPoint) {
@@ -123,38 +125,29 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     bounds.xRange = Math.max(0.5, full * (1 - 0.6 * bias));
   }
 
-  // --- collisions ----------------------------------------------------------
-  const walls = { inside: false };
-  const point = new THREE.Vector3(), probe = new THREE.Vector3(), shift = new THREE.Vector3(), normal = new THREE.Vector3(), forward = new THREE.Vector3();
-  function resolveWalls(body) {
-    frames.update(body, shared.genome.value.x);
-    camera.getWorldDirection(forward);
-    const tanHalf = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
-    let floor = 0, left = 0, right = 0, top = 0, outside = false;
-    const margin = 0.96;
-    for (let k = 0; k <= 32; k++) {
-      for (const s of [-1, -0.5, 0, 0.5, 1]) {
-        frames.pointOn(k / 32, s, point);
-        floor = Math.max(floor, bounds.floorY + 0.25 - point.y);
-        const depth = forward.dot(probe.subVectors(point, camera.position));
-        probe.copy(point).project(camera);
-        const halfWidth = depth * tanHalf * camera.aspect, halfHeight = depth * tanHalf;
-        if (probe.x > margin) right = Math.max(right, (probe.x - margin) * halfWidth);
-        if (probe.x < -margin) left = Math.max(left, (-margin - probe.x) * halfWidth);
-        if (probe.y > margin) top = Math.max(top, (probe.y - margin) * halfHeight);
-        if (Math.abs(probe.x) > 1 || probe.y > 1) outside = true;
-      }
+  const probe = new THREE.Vector3();
+  // Portals: once the whole body is past a side, it reappears past the other;
+  // past the top, it comes back in from the left or right, 50/50.
+  const portalShift = new THREE.Vector3(), portalPoint = new THREE.Vector3(), portalDirection = new THREE.Vector3();
+  function portal() {
+    if (!ralyScreen.visible && ralyScreen.right === -1e4) return false;
+    const margin = 40, worldPerPx = (2 * bounds.halfWidth) / view.width;
+    const span = (view.width + (ralyScreen.right - ralyScreen.left) + 2 * margin) * worldPerPx;
+    // Only on the way out: arriving from off-screen never triggers a portal.
+    const heading = swimmer.heading;
+    if (ralyScreen.right < -margin && heading.x < 0) { swimmer.teleport(portalShift.set(span, 0, 0), bounds); return true; }
+    if (ralyScreen.left > view.width + margin && heading.x > 0) { swimmer.teleport(portalShift.set(-span, 0, 0), bounds); return true; }
+    if (ralyScreen.bottom < -margin && heading.y > 0) {
+      const side = Math.random() < 0.5 ? -1 : 1;
+      portalPoint.set(side * (bounds.halfWidth + 3.5), (bounds.yMin + bounds.yMax) / 2, 0);
+      swimmer.enterFrom(portalPoint, portalDirection.set(-side, -0.12, 0));
+      return true;
     }
-    if (!walls.inside) { walls.inside = !outside; if (!walls.inside) return false; }
-    shift.set(left - right, floor - top, 0).multiplyScalar(0.8);
-    if (shift.lengthSq() < 1e-8) return false;
-    normal.copy(shift).normalize();
-    swimmer.collide(shift, normal);
-    return true;
+    return false;
   }
+
   function enter() {
     swimmer.reset({ center: new THREE.Vector3(bounds.halfWidth + 3.5, 0.6, -0.3) });
-    walls.inside = false;
   }
   function restInHero() {
     swimmer.setInspect(true, { center: new THREE.Vector3(bounds.halfWidth * 0.45, 0.4, 0) });
@@ -179,7 +172,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     updateBounds();
     const env = { bounds, food: null, feeding: false, energy: 1 + 0.6 * sound.level };
     const body = swimmer.update(dt, env);
-    if (!reducedMotion && resolveWalls(body)) swimmer.update(0, env);
+    if (!reducedMotion && portal()) swimmer.update(0, env);
     shared.spinePos.value.set(body.spinePos);
     shared.spineQuat.value.set(body.spineQuat);
     organism.position.copy(body.position); organism.quaternion.copy(body.quaternion);
@@ -267,6 +260,12 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     setFloor(screenY) { view.floorScreen = screenY; },
     /** 1 while the hero is on screen (keep right, clear of the headline), 0 elsewhere. */
     setHeroBias(value) { view.heroBias = value; },
+    /** It follows the cursor (viewport CSS px), or pass null when the cursor leaves. */
+    setPointer(clientX, clientY) {
+      if (clientX === null) { swimmer.setPointer(null); return; }
+      const at = screenToWorld(clientX, clientY);
+      if (at) swimmer.setPointer(at.clone());
+    },
     /** True if the point is on raly's body. */
     hover(clientX, clientY) { return Boolean(nearestOnBody(clientX, clientY)); },
     /** A click on the body: it flinches away and pigment blooms where it was touched. */

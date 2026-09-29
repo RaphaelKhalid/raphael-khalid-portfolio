@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { styles } from "../styles";
 import { projects } from "../constants/index";
-import PlateArt from "./PlateArt";
+import ProjectAnim from "./ProjectAnim";
 import SectionHead from "./SectionHead";
 
 // Projects as numbered specimen plates. AutoLabs, the flagship, gets the
@@ -33,7 +33,8 @@ const Plate = ({ project, index, featured = false }) => (
     className={`plate group block rounded-[6px] overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-0.5 ${featured ? "lg:grid lg:grid-cols-[1.15fr_1fr]" : ""}`}
   >
     <div className={`plate-art relative ${featured ? "h-[220px] lg:h-full lg:min-h-[340px] lg:border-b-0 lg:border-r lg:border-hair-soft" : "h-[150px]"}`}>
-      <PlateArt name={project.name} index={index} height={featured ? 260 : 150} />
+      {/* Each project's own animation from the original site, in ink on paper. */}
+      <ProjectAnim artwork={project.artwork} tone="paper" />
       <span className="absolute top-3 left-4 font-mono text-[10px] tracking-[0.16em] uppercase text-muted">
         plate {String(index + 1).padStart(2, "0")}
       </span>

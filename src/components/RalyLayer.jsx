@@ -2,8 +2,9 @@ import { useEffect, useRef } from "react";
 import { setRaly, ralyScreen } from "../raly/store";
 
 // raly's layer: a fixed, transparent canvas across the whole viewport, behind
-// the page's text. It never takes pointer events; clicks are hit-tested
-// against raly's body instead, so the page underneath stays fully usable.
+// the page's text. raly follows the mouse. The canvas never takes pointer
+// events; clicks are hit-tested against raly's body instead, so the page
+// underneath stays fully usable.
 
 const INTERACTIVE = "a, button, input, textarea, select, label, iframe, summary, [role='button'], [data-no-raly]";
 
@@ -67,6 +68,8 @@ const RalyLayer = () => {
     };
     const onMove = event => {
       lastPointer = event;
+      // raly follows the mouse; touch is left alone so the page can scroll.
+      if (engine && event.pointerType !== "touch") engine.setPointer(event.clientX, event.clientY);
       if (hoverQueued || event.pointerType === "touch") return;
       hoverQueued = true;
       requestAnimationFrame(() => {
@@ -79,6 +82,8 @@ const RalyLayer = () => {
     addEventListener("pointerdown", onDown, { passive: true });
     addEventListener("pointerup", onUp, { passive: true });
     addEventListener("pointermove", onMove, { passive: true });
+    const onLeave = () => engine?.setPointer(null);
+    document.addEventListener("pointerleave", onLeave);
 
     return () => {
       disposed = true;
@@ -86,6 +91,7 @@ const RalyLayer = () => {
       removeEventListener("pointerdown", onDown);
       removeEventListener("pointerup", onUp);
       removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerleave", onLeave);
       engine?.dispose();
       setRaly(null);
     };
