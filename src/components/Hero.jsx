@@ -16,6 +16,14 @@ const Hero = () => (
       <p className="mt-5 font-mono text-[11px] tracking-[0.16em] uppercase text-muted">
         AI safety · interpretability · autonomous research · complexity
       </p>
+      <button
+        type="button"
+        onClick={() => dispatchEvent(new Event("raly:tour"))}
+        className="mt-8 w-fit inline-flex items-center gap-3 font-mono text-[11px] tracking-[0.16em] uppercase text-coral hover:text-ink-text transition-colors"
+      >
+        <span aria-hidden="true" className="inline-block w-6 h-px bg-current" />
+        let raly show you around
+      </button>
     </div>
     <div className={`${styles.paddingX} max-w-[1440px] w-full mx-auto`}>
       <a href="#demos" className="flex items-center justify-between h-[60px] border-t border-hair group">

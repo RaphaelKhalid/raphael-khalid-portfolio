@@ -41,7 +41,7 @@ const Contact = () => {
     <section className="relative w-full">
       <span className="hash-span" id="contact">&nbsp;</span>
       <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6`}>
-        <SectionHead index="04" label="contact" title="Say hello." />
+        <SectionHead index="05" label="contact" title="Say hello." />
         <form onSubmit={submit} className="grid md:grid-cols-2 gap-x-12 gap-y-8 max-w-[980px]">
           <Field label="Your name">
             <input className={inputClass} type="text" name="name" required value={form.name} onChange={change} placeholder="What should I call you?" />

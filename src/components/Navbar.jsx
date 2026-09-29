@@ -3,7 +3,7 @@ import { navLinks } from "../constants";
 import { onRaly } from "../raly/store";
 import { styles } from "../styles";
 
-// A quiet top bar: the wordmark, four places to go, and raly's music switch.
+// A quiet top bar: the wordmark, the places to go, raly's tour and its music switch.
 // It steps out of the way while you read downward and returns when you scroll
 // back up.
 const Listen = ({ compact = false }) => {
@@ -77,6 +77,11 @@ const Navbar = () => {
                 </a>
               </li>
             ))}
+            <li>
+              <button type="button" onClick={() => dispatchEvent(new Event("raly:tour"))} className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-coral transition-colors duration-200">
+                tour
+              </button>
+            </li>
             <li><Listen /></li>
           </ul>
           <div className="md:hidden flex items-center gap-5">
