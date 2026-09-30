@@ -13,6 +13,8 @@ const Field = ({ label, children }) => (
   </label>
 );
 
+const EMAIL = "raphaelbahadurkhan@gmail.com";
+
 const inputClass =
   "bg-transparent border-0 border-b border-hair focus:border-ink-text outline-none py-2.5 text-[16px] text-ink-text placeholder:text-muted/70 transition-colors";
 
@@ -28,11 +30,12 @@ const Contact = () => {
       .send(
         "service_q66h0cg",
         "template_pqb7xwz",
-        { from_name: form.name, to_name: "Raphael Khalid", from_email: form.email, to_email: "raphael@uni.minerva.edu", message: form.message },
+        { from_name: form.name, to_name: "Raphael Khalid", from_email: form.email, to_email: EMAIL, message: form.message },
         "Sg0gvTnXP8iUMIKvv"
       )
       .then(
         () => { setStatus("sent"); setForm({ name: "", email: "", message: "" }); },
+        // Keep what they wrote, so the direct-email fallback can carry it.
         error => { console.error(error); setStatus("failed"); }
       );
   };
@@ -60,9 +63,22 @@ const Contact = () => {
             </button>
             <p className="font-mono text-[11px] tracking-[0.12em] uppercase text-muted" role="status">
               {status === "sent" && "Thank you, I'll write back soon."}
-              {status === "failed" && "That didn't go through. Please try again."}
+              {status === "failed" && (
+                <>
+                  That didn&apos;t go through.{" "}
+                  <a
+                    className="text-ink-text underline underline-offset-4 hover:text-coral normal-case tracking-normal"
+                    href={`mailto:${EMAIL}?subject=${encodeURIComponent("Hello from raphaelkhalid.com")}&body=${encodeURIComponent(form.message)}`}
+                  >
+                    Email {EMAIL}
+                  </a>
+                </>
+              )}
             </p>
-            <a href="https://github.com/RaphaelKhalid" target="_blank" rel="noreferrer" className="ml-auto font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-coral transition-colors">
+            <a href={`mailto:${EMAIL}`} className="ml-auto font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-coral transition-colors">
+              email ↗
+            </a>
+            <a href="https://github.com/RaphaelKhalid" target="_blank" rel="noreferrer" className=" font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-coral transition-colors">
               github ↗
             </a>
           </div>
