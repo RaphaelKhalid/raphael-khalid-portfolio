@@ -158,9 +158,7 @@ const Demos = () => {
     <section className="relative w-full">
       <span className="hash-span" id="demos">&nbsp;</span>
       <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6 pb-24`}>
-        <SectionHead index="01" label="demos" title="Demos" aside={
-          <a href="#work" className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-coral transition-colors">skip to projects ↓</a>
-        }>
+        <SectionHead index="01" label="demos" title="Demos">
           Running here, not screenshotted. One instrument is live at a time; pick another from the list.
         </SectionHead>
 
