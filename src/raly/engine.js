@@ -41,6 +41,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   renderer.setClearColor(0x000000, 0);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // Light intensities are in three.js's physical units (r155+); the factor
+  // of pi keeps them as they were tuned under the older convention.
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(FOV, 16 / 9, 0.5, 80);
@@ -55,14 +57,14 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   const environment = pmrem.fromScene(room, 0.035);
   scene.environment = environment.texture;
   room.dispose(); pmrem.dispose();
-  scene.add(new THREE.HemisphereLight(0xfff1dc, 0x6b4f5a, 0.25));
-  const sun = new THREE.DirectionalLight(0xfff0dc, 1.2);
+  scene.add(new THREE.HemisphereLight(0xfff1dc, 0x6b4f5a, 0.25 * Math.PI));
+  const sun = new THREE.DirectionalLight(0xfff0dc, 1.2 * Math.PI);
   sun.position.set(-1.5, 9, 4.5); sun.castShadow = true;
   sun.shadow.mapSize.set(quality === 'high' ? 1024 : 512, quality === 'high' ? 1024 : 512);
   Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 10, bottom: -10, near: 0.5, far: 30 });
   sun.shadow.radius = 14; sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
-  const fill = new THREE.DirectionalLight(0x9cc8ff, 0.4); fill.position.set(6, 1.5, 5);
-  const back = new THREE.DirectionalLight(0xffa25e, 2.2); back.position.set(-2.5, 3.5, -7);
+  const fill = new THREE.DirectionalLight(0x9cc8ff, 0.4 * Math.PI); fill.position.set(6, 1.5, 5);
+  const back = new THREE.DirectionalLight(0xffa25e, 2.2 * Math.PI); back.position.set(-2.5, 3.5, -7);
   scene.add(sun, sun.target, fill, back);
   // A soft contact shadow on whatever it rests on.
   const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(80, 30), new THREE.ShadowMaterial({ opacity: 0 }));
@@ -248,7 +250,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   }
   function schedule() {
     cancelAnimationFrame(frameId); state.last = 0;
-    if (state.running && !document.hidden) frameId = requestAnimationFrame(tick);
+    if (compiled && state.running && !document.hidden) frameId = requestAnimationFrame(tick);
   }
 
   // --- touch ---------------------------------------------------------------
@@ -265,8 +267,20 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
 
   resize(); updateBounds();
   if (reducedMotion) restInHero(); else enter();
-  simulate(0); render();
-  const onResize = () => { resize(); updateBounds(); if (!state.running) { simulate(0); render(); } };
+  simulate(0);
+  // raly's skin shader is large, and on Windows the driver takes seconds to
+  // compile it. Compile it in the background (the page stays responsive),
+  // then draw; the canvas fades in once it is ready.
+  let compiled = false, disposed = false;
+  function whenCompiled() {
+    if (disposed) return;
+    compiled = true;
+    render();
+    canvas.classList.add('is-ready');
+    schedule();
+  }
+  renderer.compileAsync(scene, camera).then(whenCompiled, whenCompiled);
+  const onResize = () => { resize(); updateBounds(); if (compiled && !state.running) { simulate(0); render(); } };
   addEventListener('resize', onResize);
   document.addEventListener('visibilitychange', schedule);
 
@@ -330,6 +344,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     advance(seconds, step = 1 / 60) { for (let t = 0; t < seconds; t += step) simulate(step); render(); },
     capture() { render(); return canvas.toDataURL('image/png'); },
     dispose() {
+      disposed = true;
       state.running = false; cancelAnimationFrame(frameId);
       removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', schedule);
