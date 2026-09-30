@@ -119,26 +119,32 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   pointer-events: none;
 }
 
-.raly-caption {
+/* What raly says when clicked: a small paper note above its head. */
+.raly-says {
   position: fixed;
   left: 0;
   top: 0;
-  /* In raly's layer, behind the page: it never covers content. */
-  z-index: 0;
+  z-index: 16;
   pointer-events: none;
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
-  white-space: nowrap;
+  max-width: min(280px, calc(100vw - 24px));
+  padding: 7px 13px 8px;
+  background: var(--raised);
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  box-shadow: 0 10px 24px -16px rgba(46, 40, 38, 0.45);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ink);
   opacity: 0;
-  transition: opacity 600ms var(--e-soft);
+  scale: 0.9;
+  transform-origin: 50% 100%;
+  transition: opacity 260ms var(--e-soft), scale 420ms var(--e-out);
   will-change: transform;
 }
-
-.raly-caption[data-touched="true"] {
-  color: var(--muted);
+.raly-says.on {
+  opacity: 1;
+  scale: 1;
 }
 
 html.over-raly, html.over-raly body {

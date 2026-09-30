@@ -3,13 +3,13 @@ import { styles } from "../styles";
 import { experiences } from "../constants/index";
 import SectionHead from "./SectionHead";
 
-// Experience as a field notebook: dates in the margin, the role in serif, the
-// notes beneath, one hairline running down the page.
+// Experience as a field notebook: dates in the margin, a small marker, the
+// role in serif and the notes beneath.
 const Experience = () => (
   <section className="relative w-full">
     <span className="hash-span" id="experience">&nbsp;</span>
     <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6 pb-24`}>
-      <SectionHead index="03" label="experience" title="Field notes" />
+      <SectionHead index="03" label="experience" title="Experience" />
       <ol className="relative">
         {experiences.map((exp, i) => (
           <motion.li
@@ -22,7 +22,6 @@ const Experience = () => (
           >
             <p className="hidden md:block font-mono text-[11px] tracking-[0.12em] uppercase text-muted pt-2 text-right">{exp.date}</p>
             <div className="relative flex justify-center">
-              <span className="absolute top-0 bottom-[-3rem] w-px bg-hair" aria-hidden="true" />
               <span className="relative mt-[11px] w-[7px] h-[7px] rounded-full border border-ink-text bg-paper" aria-hidden="true" />
             </div>
             <div>

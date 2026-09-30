@@ -16,7 +16,7 @@ const STEPS = [
   {
     mark: () => $("#top h1"),
     near: r => [r.right - r.width * 0.2, r.bottom + 40],
-    say: "I'm raly. raphael runs experiments. let me show you around.",
+    say: "i'm raly. let me show you around.",
     ms: 5200,
   },
   {
@@ -40,21 +40,21 @@ const STEPS = [
     mark: () => $(".plate"),
     // Waits in the open paper above the plate, right of the section's text.
     near: r => [r.right - r.width * 0.22, r.top - 90],
-    say: "specimens: autolabs first, then the rest of the work",
+    say: "projects: autolabs first, then the rest of the work",
     ms: 5200,
   },
   {
     scroll: "#experience",
     mark: () => $("#experience")?.parentElement?.querySelector("h2"),
     near: r => [r.right + 160, r.top + 30],
-    say: "field notes: where he has worked",
+    say: "experience: where he has worked",
     ms: 4400,
   },
   {
     scroll: "#photographs",
     mark: () => $('[data-photo="2"]'),
     near: r => [r.right + 120, r.top - 30],
-    say: "after hours: his photographs",
+    say: "photography: his pictures",
     ms: 6400,
     act: tour => {
       // Bring a print to the middle of the strip, open it, then put it back.
