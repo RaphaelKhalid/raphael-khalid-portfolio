@@ -12,10 +12,17 @@ import { ralyScreen } from "../raly/store";
 //   wet ink       raly nearby: the letter swells and soaks darker, crisply
 //   geometric     rare: pressure builds when raly lingers; a letter rebuilds
 //                 itself from print modules and nudges its neighbours
+//   marbling      suminagashi rings of cobalt, coral and ink, slowly swirling
+//   risograph     two misregistered halftone screens, coral over cobalt
+//   watercolor    a cobalt-to-rose wash that pools darker at its edges
+//
+// Which style slow or fast attention brings out rotates every few seconds,
+// so hovering the words keeps turning up something new.
 //
 // Letters are coupled to their neighbours and remember recent input (fast
-// attack, slow decay); with no one around, a slow wave folds through the
-// words and carries each style across in turn. All styles are drawn inside a
+// attack, slow decay); with no one around, a slow wave rolls through the
+// words and carries each style across in turn. Turns stay gentle: tilt is
+// capped and the springs are damped, so letters sway rather than flip. All styles are drawn inside a
 // distance field of the real glyphs, so the words stay readable. The DOM
 // keeps the real text for screen readers, selection and search.
 
@@ -65,6 +72,7 @@ precision highp float;
 uniform sampler2D uSdf;
 uniform vec4 uA[${MAX_LETTERS}];     // engraving, interference, wet ink, geometric
 uniform vec4 uB[${MAX_LETTERS}];     // flow x, flow y, seed, unused
+uniform vec4 uC[${MAX_LETTERS}];     // marbling, risograph, watercolor, unused
 uniform vec2 uRes;
 uniform float uRange;
 uniform float uPx;
@@ -103,11 +111,15 @@ void main() {
 
   vec4 a = uA[vLetter];
   vec4 b = uB[vLetter];
+  vec3 c = uC[vLetter].xyz;
   // One style at a time: the strongest wins, sharply.
   vec4 a4 = a * a * a * a;
-  float strongest = max(max(a.x, a.y), max(a.z, a.w));
-  vec4 w = a4 / max(a4.x + a4.y + a4.z + a4.w, 1e-5) * strongest;
-  float wBase = 1.0 - (w.x + w.y + w.z + w.w);
+  vec3 c4 = c * c * c * c;
+  float strongest = max(max(max(a.x, a.y), max(a.z, a.w)), max(c.x, max(c.y, c.z)));
+  float total = max(a4.x + a4.y + a4.z + a4.w + c4.x + c4.y + c4.z, 1e-5);
+  vec4 w = a4 / total * strongest;
+  vec3 wc = c4 / total * strongest;
+  float wBase = 1.0 - (w.x + w.y + w.z + w.w + wc.x + wc.y + wc.z);
 
   // Engraving: contour lines following the outline, bent by recent motion.
   vec2 flow = b.xy;
@@ -147,9 +159,41 @@ void main() {
   float tint = hash(cellId * 1.7 + 3.1);
   vec3 geoColor = tint > 0.86 ? vec3(0.13, 0.26, 0.68) : tint > 0.76 ? vec3(0.88, 0.36, 0.22) : INK;
 
-  float cover = wBase * inside + w.x * engraved + w.y * stripes + w.z * swell + w.w * geometric;
+  // Marbling: rings floated on water and combed by a slow current.
+  vec2 m = p / (uCell * 7.0);
+  m += 0.7 * vec2(fbm(m * 0.9 + vec2(uTime * 0.04, b.z * 5.0)), fbm(m * 0.9 + vec2(3.1, -uTime * 0.035)));
+  float rings = sin(length(m - vec2(0.4 + b.z, 0.6)) * 10.0 + fbm(m * 1.7 + b.z) * 5.0 - uTime * 0.35);
+  vec3 marbleColor = mix(INK, vec3(0.12, 0.2, 0.62), smoothstep(-0.2, 0.45, rings));
+  marbleColor = mix(marbleColor, vec3(0.86, 0.36, 0.2), smoothstep(0.7, 0.92, rings));
+  marbleColor = mix(marbleColor, vec3(0.93, 0.88, 0.8), smoothstep(0.955, 1.0, rings) * 0.8);
+  float marble = inside;
+
+  // Risograph: coral and cobalt halftone screens, slightly out of register.
+  float tone = 0.35 + 0.45 * smoothstep(-uCell * 2.5, 0.0, d) + 0.12 * sin(uTime * 0.8 + b.z * 6.0);
+  float cs = uCell * 0.42;
+  vec2 ra = mat2(0.966, -0.259, 0.259, 0.966) * p;
+  vec2 rb = mat2(0.259, -0.966, 0.966, 0.259) * (p + vec2(1.8, -1.2) * uPx);
+  float dotA = 1.0 - smoothstep(-aa, aa, length(fract(ra / cs) - 0.5) * cs - sqrt(tone) * cs * 0.52);
+  float dotB = (1.0 - smoothstep(-aa, aa, length(fract(rb / cs) - 0.5) * cs - sqrt(1.0 - tone * 0.6) * cs * 0.42))
+    * (1.0 - smoothstep(-aa, aa, sdfAt(p + vec2(1.8, -1.2) * uPx)));
+  float riso = max(dotA * inside, dotB);
+  vec3 risoColor = (dotA * vec3(0.9, 0.36, 0.22) + dotB * vec3(0.14, 0.2, 0.62)) / max(dotA + dotB, 1e-4);
+  risoColor *= 1.0 - 0.38 * dotA * dotB;
+
+  // Watercolor: a soft wash, pigment pooling at the edge, paper grain.
+  float wet = fbm(p * 0.012 + b.z * 7.0 + uTime * 0.02);
+  float wd = d + (wet - 0.5) * 5.0 * uPx;
+  float rim = exp(-pow((wd + 1.5 * uPx) / (2.4 * uPx), 2.0));
+  vec3 wash = mix(vec3(0.17, 0.3, 0.64), vec3(0.74, 0.22, 0.38), smoothstep(0.3, 0.8, fbm(p * 0.005 + b.z * 3.0 + uTime * 0.01)));
+  float granule = noise(p * 0.4 / uPx + b.z * 50.0);
+  vec3 waterColor = wash * (0.8 + 0.3 * granule) * (1.0 - 0.4 * rim);
+  float water = clamp((0.62 + 0.12 * granule) * (1.0 - smoothstep(-2.5 * uPx, 0.5 * uPx, wd)) + rim * 0.45, 0.0, 1.0) * inside;
+
+  float cover = wBase * inside + w.x * engraved + w.y * stripes + w.z * swell + w.w * geometric
+    + wc.x * marble + wc.y * riso + wc.z * water;
   vec3 color = (wBase * inside * INK + w.x * engraved * engraveColor + w.y * stripes * interfereColor
-    + w.z * swell * inkColor + w.w * geometric * geoColor) / max(cover, 1e-4);
+    + w.z * swell * inkColor + w.w * geometric * geoColor
+    + wc.x * marble * marbleColor + wc.y * riso * risoColor + wc.z * water * waterColor) / max(cover, 1e-4);
   cover = clamp(cover, 0.0, 1.0);
   outColor = vec4(color * cover, cover);
 }`;
@@ -243,7 +287,7 @@ const ReactiveHeadline = ({ className = "" }) => {
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     const uniform = name => gl.getUniformLocation(program, name);
-    const U = Object.fromEntries(["uSdf", "uBox", "uPose", "uA", "uB", "uRes", "uRange", "uPx", "uTime", "uCell", "uPhase", "uRaly", "uPad", "uDepth"].map(n => [n, uniform(n)]));
+    const U = Object.fromEntries(["uSdf", "uBox", "uPose", "uA", "uB", "uC", "uRes", "uRange", "uPx", "uTime", "uCell", "uPhase", "uRaly", "uPad", "uDepth"].map(n => [n, uniform(n)]));
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -257,7 +301,7 @@ const ReactiveHeadline = ({ className = "" }) => {
     let letters = [];
     let layout = { pad: 0, scale: 1, fontPx: 100, range: 18 };
     const boxes = new Float32Array(MAX_LETTERS * 4), poses = new Float32Array(MAX_LETTERS * 4);
-    const stateA = new Float32Array(MAX_LETTERS * 4), stateB = new Float32Array(MAX_LETTERS * 4);
+    const stateA = new Float32Array(MAX_LETTERS * 4), stateB = new Float32Array(MAX_LETTERS * 4), stateC = new Float32Array(MAX_LETTERS * 4);
 
     function build() {
       const style = getComputedStyle(text);
@@ -295,7 +339,7 @@ const ReactiveHeadline = ({ className = "" }) => {
             box: [x0 + start, baseline - ascent * 0.92, x0 + end, baseline + descent * 0.9],
             cx: (x0 + (start + end) / 2) / scale - pad, cy: (baseline - ascent * 0.4) / scale - pad,
             seed: old?.seed ?? Math.random(),
-            engrave: 0, interfere: 0, ink: 0, geo: 0, pressure: 0, geoTimer: 0, flow: [0, 0],
+            engrave: 0, interfere: 0, ink: 0, geo: 0, marble: 0, riso: 0, water: 0, pressure: 0, geoTimer: 0, flow: [0, 0],
             pose: old?.pose ?? [0, 0, 0, 0], velocity: old?.velocity ?? [0, 0, 0, 0],
           });
         }
@@ -341,7 +385,12 @@ const ReactiveHeadline = ({ className = "" }) => {
       lastRaly = [rx, ry];
       const idle = performance.now() - pointer.lastMove > 3000;
       const geometricAllowed = layout.fontPx >= 96;
-      const cycle = time / 9, style = Math.floor(cycle) % (geometricAllowed ? 4 : 3);
+      // Style slots: 0 engraving, 1 interference, 2 wet ink, 3 geometric,
+      // 4 marbling, 5 risograph, 6 watercolor. The idle wave carries them in turn.
+      const idleStyles = geometricAllowed ? [0, 4, 1, 6, 2, 5, 3] : [0, 4, 1, 6, 2, 5];
+      const cycle = time / 8, style = idleStyles[Math.floor(cycle) % idleStyles.length];
+      // What slow and fast attention bring out rotates every few seconds.
+      const attentionStyle = [0, 4, 6][Math.floor(time / 14) % 3], quickStyle = [1, 5][Math.floor(time / 14) % 2];
       const crest = (cycle % 1) * (letters.length + 8) - 4;
       const sigma = layout.fontPx * 0.9, ralySigma = layout.fontPx * 1.1;
       const ralyWeight = innerWidth < 760 ? 0.45 : 1;
@@ -353,7 +402,9 @@ const ReactiveHeadline = ({ className = "" }) => {
         const rdx = rx - l.cx, rdy = ry - l.cy;
         const rp = ralyScreen.visible ? ralyWeight * Math.exp(-(rdx * rdx + rdy * rdy) / (2 * ralySigma * ralySigma)) : 0;
         const wave = idle ? Math.exp(-(((i - crest) / 1.7) ** 2)) : 0;
-        const targets = [prox * slow, prox * fast, Math.min(1, rp * 1.2 + ralyScreen.startle * rp), 0];
+        const targets = [0, 0, Math.min(1, rp * 1.2 + ralyScreen.startle * rp), 0, 0, 0, 0];
+        targets[attentionStyle] = Math.max(targets[attentionStyle], prox * slow);
+        targets[quickStyle] = Math.max(targets[quickStyle], prox * fast);
         targets[style] = Math.max(targets[style], 0.7 * wave);
         l.pressure = Math.max(0, l.pressure + dt * ((rp > 0.7 ? 0.7 : 0) + (prox * slow > 0.8 ? 0.22 : 0) - 0.12));
         if (geometricAllowed && l.pressure > 1 && l.geoTimer <= 0) {
@@ -368,34 +419,40 @@ const ReactiveHeadline = ({ className = "" }) => {
         l.flow[0] = approach(l.flow[0], flowTarget[0], 3, 0.6, dt);
         l.flow[1] = approach(l.flow[1], flowTarget[1], 3, 0.6, dt);
 
-        // 3D pose: lean away from the cursor and lift toward it; ripple as
-        // raly passes; a slow fold travels through when no one is around.
-        const lean = prox * 0.55;
+        // 3D pose: lean away from the cursor and lift toward it; sway as raly
+        // passes; a slow roll travels through when no one is around, and every
+        // letter floats a little, out of step with its neighbours.
+        const lean = prox * 0.3;
         const poseTarget = [
-          clamp(-dy / sigma, -1, 1) * lean + rp * 0.35 * Math.sin(time * 2.6 + i * 0.7) + wave * 0.5,
-          clamp(dx / sigma, -1, 1) * lean + rp * 0.25 * Math.cos(time * 2.1 + i * 0.5),
-          prox * layout.fontPx * 0.18 + rp * layout.fontPx * 0.1 + wave * layout.fontPx * 0.08,
-          clamp(dx / sigma, -1, 1) * prox * 0.05,
+          clamp(-dy / sigma, -1, 1) * lean + rp * 0.16 * Math.sin(time * 2.2 + i * 0.7) + wave * 0.2 + 0.035 * Math.sin(time * 0.8 + i * 0.55),
+          clamp(dx / sigma, -1, 1) * lean + rp * 0.12 * Math.cos(time * 1.8 + i * 0.5) + 0.03 * Math.cos(time * 0.65 + i * 0.8),
+          prox * layout.fontPx * 0.1 + rp * layout.fontPx * 0.06 + wave * layout.fontPx * 0.05 + layout.fontPx * 0.012 * Math.sin(time * 1.1 + i * 0.6),
+          clamp(dx / sigma, -1, 1) * prox * 0.03,
         ];
-        // A fast pass flicks letters into a brief spin.
-        const kick = prox * fast * 0.004;
+        // A fast pass nudges letters into a small, quickly settling sway.
+        const kick = prox * fast * 0.0012;
         l.velocity[0] += flickY * kick * dt * 60; l.velocity[1] += flickX * kick * dt * 60;
-        const stiffness = 34, damping = 6.5;
+        const stiffness = 34, damping = 9.5;
         for (let k = 0; k < 4; k++) {
           const accel = -stiffness * (l.pose[k] - poseTarget[k]) - damping * l.velocity[k];
-          l.velocity[k] += accel * dt;
+          l.velocity[k] = clamp(l.velocity[k] + accel * dt, -2.5, 2.5);
           l.pose[k] += l.velocity[k] * dt;
         }
-        l.pose[0] = clamp(l.pose[0], -0.95, 0.95); l.pose[1] = clamp(l.pose[1], -0.95, 0.95);
+        // Never far enough to see the letter's side smear across its face.
+        l.pose[0] = clamp(l.pose[0], -0.3, 0.3); l.pose[1] = clamp(l.pose[1], -0.3, 0.3); l.pose[3] = clamp(l.pose[3], -0.06, 0.06);
       });
       letters.forEach((l, i) => {
         const left = letters[i - 1]?.targets, right = letters[i + 1]?.targets;
-        for (let k = 0; k < 3; k++) l.targets[k] = Math.max(l.targets[k], (((left?.[k] ?? 0) + (right?.[k] ?? 0)) * 0.5) * 0.55);
+        for (const k of [0, 1, 2, 4, 5, 6]) l.targets[k] = Math.max(l.targets[k], (((left?.[k] ?? 0) + (right?.[k] ?? 0)) * 0.5) * 0.55);
         l.engrave = approach(l.engrave, l.targets[0], 2.4, 0.35, dt);
         l.interfere = approach(l.interfere, l.targets[1], 5, 0.9, dt);
         l.ink = approach(l.ink, l.targets[2], 2, 0.3, dt);
         l.geo = approach(l.geo, l.targets[3], 3.2, 1.1, dt);
+        l.marble = approach(l.marble, l.targets[4], 2.4, 0.35, dt);
+        l.riso = approach(l.riso, l.targets[5], 5, 0.9, dt);
+        l.water = approach(l.water, l.targets[6], 2, 0.3, dt);
         stateA.set([l.engrave, l.interfere, l.ink, l.geo], i * 4);
+        stateC.set([l.marble, l.riso, l.water, 0], i * 4);
         stateB.set([l.flow[0], l.flow[1], l.seed, 0], i * 4);
         poses.set([l.pose[0], l.pose[1], l.pose[2] * layout.scale, l.pose[3]], i * 4);
       });
@@ -409,6 +466,7 @@ const ReactiveHeadline = ({ className = "" }) => {
       gl.uniform4fv(U.uPose, poses);
       gl.uniform4fv(U.uA, stateA);
       gl.uniform4fv(U.uB, stateB);
+      gl.uniform4fv(U.uC, stateC);
       gl.uniform2f(U.uRes, canvas.width, canvas.height);
       gl.uniform1f(U.uRange, layout.range);
       gl.uniform1f(U.uPx, layout.scale);
@@ -416,7 +474,7 @@ const ReactiveHeadline = ({ className = "" }) => {
       gl.uniform1f(U.uCell, layout.fontPx * layout.scale * 0.105);
       gl.uniform2f(U.uPhase, phase[0], phase[1]);
       gl.uniform1f(U.uPad, layout.fontPx * layout.scale * 0.12);
-      gl.uniform1f(U.uDepth, layout.fontPx * layout.scale * 0.07);
+      gl.uniform1f(U.uDepth, layout.fontPx * layout.scale * 0.045);
       const rect = canvas.getBoundingClientRect();
       gl.uniform2f(U.uRaly, (ralyScreen.x - rect.left) * layout.scale, (ralyScreen.y - rect.top) * layout.scale);
       gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, letters.length * LAYERS);

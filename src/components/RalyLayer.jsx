@@ -35,7 +35,7 @@ const RalyLayer = () => {
       tapRing: tapRef.current,
       onChange: ({ active }) => { captionText.textContent = active ? "guiding · esc to stop" : "click to interact"; },
     });
-    let autoTimer = 0;
+    let autoTimer = 0, shownPalette = "reef", paletteUntil = 0;
     const startTour = () => { clearTimeout(autoTimer); if (engine && !reduced) tour.start(); };
 
     function follow() {
@@ -52,6 +52,15 @@ const RalyLayer = () => {
       // In the hero it keeps right, clear of the headline.
       const hero = document.getElementById("top");
       if (hero) engine.setHeroBias(Math.min(1, Math.max(0, hero.getBoundingClientRect().bottom / innerHeight - 0.35) / 0.5));
+      // When its palette turns, the caption names it for a few seconds.
+      if (ralyScreen.palette !== shownPalette && !tour.active) {
+        shownPalette = ralyScreen.palette;
+        captionText.textContent = shownPalette;
+        paletteUntil = performance.now() + 4500;
+      } else if (paletteUntil && performance.now() > paletteUntil && !tour.active) {
+        paletteUntil = 0;
+        captionText.textContent = "click to interact";
+      }
       // The caption trails raly's leading edge.
       if (!ralyScreen.visible) { caption.style.opacity = "0"; return; }
       // Just above its outline, toward whichever end leads.
