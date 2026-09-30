@@ -10,13 +10,18 @@ import { createTour } from "../raly/tour";
 // It is also the site's guide: on a first visit, if the visitor lets the hero
 // sit for a few seconds (or arrives with ?tour, or presses "tour"), raly leads
 // them through the sections. Any real scroll, key, click or touch ends it.
+//
+// Click raly and it says something, a line at a time. Click it again quickly
+// and it protests.
+
+const LINES = ["i'm raly", "i'm ticklish", "i change colors", "look at my dots", "what do you think i was inspired by?", "what makes you happy?"];
+const TICKLED = "i'm ticklish, stop!";
 
 const INTERACTIVE = "a, button, input, textarea, select, label, iframe, summary, [role='button'], [data-no-raly]";
 
 const RalyLayer = () => {
   const canvasRef = useRef(null);
-  const captionRef = useRef(null);
-  const captionTextRef = useRef(null);
+  const saysRef = useRef(null);
   const markRef = useRef(null);
   const labelRef = useRef(null);
   const tapRef = useRef(null);
@@ -25,17 +30,21 @@ const RalyLayer = () => {
     let engine = null, frame = 0, disposed = false, pressed = null, hoverQueued = false, lastPointer = null;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const quality = matchMedia("(pointer: coarse)").matches || innerWidth < 900 ? "medium" : "high";
-    const caption = captionRef.current;
+    const bubble = saysRef.current;
     const smooth = { x: 0, y: 0, ready: false };
-    const captionText = captionTextRef.current;
     const tour = createTour({
       getEngine: () => engine,
       mark: markRef.current,
       label: labelRef.current,
       tapRing: tapRef.current,
-      onChange: ({ active }) => { captionText.textContent = active ? "guiding · esc to stop" : "click to interact"; },
     });
-    let autoTimer = 0, shownPalette = "reef", paletteUntil = 0;
+    let autoTimer = 0, line = 0, lastHit = -1e9, sayUntil = 0;
+    function say(text) {
+      bubble.textContent = text;
+      bubble.classList.remove("on"); void bubble.offsetWidth; bubble.classList.add("on");
+      sayUntil = performance.now() + 2400 + text.length * 35;
+      smooth.ready = false;
+    }
     const startTour = () => { clearTimeout(autoTimer); if (engine && !reduced) tour.start(); };
 
     function follow() {
@@ -52,24 +61,14 @@ const RalyLayer = () => {
       // In the hero it keeps right, clear of the headline.
       const hero = document.getElementById("top");
       if (hero) engine.setHeroBias(Math.min(1, Math.max(0, hero.getBoundingClientRect().bottom / innerHeight - 0.35) / 0.5));
-      // When its palette turns, the caption names it for a few seconds.
-      if (ralyScreen.palette !== shownPalette && !tour.active) {
-        shownPalette = ralyScreen.palette;
-        captionText.textContent = shownPalette;
-        paletteUntil = performance.now() + 4500;
-      } else if (paletteUntil && performance.now() > paletteUntil && !tour.active) {
-        paletteUntil = 0;
-        captionText.textContent = "click to interact";
-      }
-      // The caption trails raly's leading edge.
-      if (!ralyScreen.visible) { caption.style.opacity = "0"; return; }
-      // Just above its outline, toward whichever end leads.
-      const tx = Math.min(ralyScreen.right - 170, Math.max(ralyScreen.left, ralyScreen.headX - 40)), ty = ralyScreen.top - 26;
+      // What it says floats just above its head while it swims.
+      if (!sayUntil) return;
+      if (performance.now() > sayUntil || !ralyScreen.visible) { bubble.classList.remove("on"); sayUntil = 0; return; }
+      const tx = ralyScreen.headX - bubble.offsetWidth / 2, ty = ralyScreen.top - bubble.offsetHeight - 14;
       if (!smooth.ready) { smooth.x = tx; smooth.y = ty; smooth.ready = true; }
-      smooth.x += (tx - smooth.x) * 0.08; smooth.y += (ty - smooth.y) * 0.08;
-      const x = Math.min(document.documentElement.clientWidth - caption.offsetWidth - 12, Math.max(12, smooth.x)), y = Math.min(innerHeight - 30, Math.max(76, smooth.y));
-      caption.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-      caption.style.opacity = "1";
+      smooth.x += (tx - smooth.x) * 0.12; smooth.y += (ty - smooth.y) * 0.12;
+      const x = Math.min(document.documentElement.clientWidth - bubble.offsetWidth - 12, Math.max(12, smooth.x)), y = Math.min(innerHeight - bubble.offsetHeight - 12, Math.max(80, smooth.y));
+      bubble.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
     }
 
     import("../raly/engine").then(({ createRaly }) => {
@@ -106,7 +105,11 @@ const RalyLayer = () => {
       const moved = Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y);
       pressed = null;
       if (moved > 8 || isInteractive(event.target)) return;
-      if (engine.touch(event.clientX, event.clientY)) caption.dataset.touched = "true";
+      if (!engine.touch(event.clientX, event.clientY)) return;
+      // A second poke in quick succession tickles.
+      const now = performance.now(), quick = now - lastHit < 900;
+      lastHit = now;
+      say(quick ? TICKLED : LINES[line++ % LINES.length]);
     };
     const onMove = event => {
       lastPointer = event;
@@ -149,9 +152,8 @@ const RalyLayer = () => {
   return (
     <>
       <canvas ref={canvasRef} className="raly-canvas" aria-hidden="true" />
-      <p ref={captionRef} className="raly-caption" aria-hidden="true">
-        <span className="normal-case">raly</span> · <span ref={captionTextRef}>click to interact</span>
-      </p>
+      {/* What raly says when it is clicked. */}
+      <p ref={saysRef} className="raly-says" aria-live="polite" />
       {/* The guide's mark: a hairline drawn around what raly is showing, with a caption. */}
       <div ref={markRef} className="raly-mark" aria-live="polite">
         <svg aria-hidden="true"><rect x="1" y="1" rx="7" pathLength="1" /></svg>
