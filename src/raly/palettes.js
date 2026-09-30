@@ -37,7 +37,7 @@ const smooth = t => t * t * (3 - 2 * t);
 export function createAppearanceCycle(shared, { look } = {}) {
   const colors = Object.fromEntries(Object.entries(PALETTES).map(([name, p]) => [name, p.ramp.map(hex => new THREE.Color(hex))]));
   const asked = look ? APPEARANCES.findIndex(a => a.look === look) : -1;
-  let from = Math.max(0, asked), to = from, t = 1, held = 0;
+  let from = Math.max(0, asked), to = from, t = 1, held = 0, blend = BLEND;
   const paused = asked >= 0;
 
   function setPalette(name, other = name, k = 0) {
@@ -68,14 +68,19 @@ export function createAppearanceCycle(shared, { look } = {}) {
 
   return {
     get name() { const a = APPEARANCES[t < 0.5 ? from : to]; return a.palette ?? a.look; },
-    /** Start moving to the next appearance now. */
-    next() {
-      if (t < 1) return; // let a change finish rather than snapping mid-way
+    /** Move to the next appearance now; `quick` (a click) changes faster and
+     *  finishes any change already under way. */
+    next({ quick = false } = {}) {
+      if (t < 1) {
+        if (!quick) return; // let a timed change finish rather than snapping
+        t = 1; apply();
+      }
       from = to;
       to = (to + 1) % APPEARANCES.length; t = 0; held = 0;
+      blend = quick ? 1.4 : BLEND;
     },
     update(dt) {
-      if (t < 1) { t = Math.min(1, t + dt / BLEND); apply(); return; }
+      if (t < 1) { t = Math.min(1, t + dt / blend); apply(); return; }
       held += dt;
       if (!paused && held > HOLD) this.next();
     },

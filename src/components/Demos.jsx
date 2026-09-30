@@ -158,9 +158,7 @@ const Demos = () => {
     <section className="relative w-full">
       <span className="hash-span" id="demos">&nbsp;</span>
       <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6 pb-24`}>
-        <SectionHead index="01" label="demos" title="Demos">
-          Running here, not screenshotted. One instrument is live at a time; pick another from the list.
-        </SectionHead>
+        <SectionHead index="01" label="demos" title="Demos" />
 
         <div className="grid gap-8 lg:gap-12 items-start lg:grid-cols-[240px_minmax(0,1fr)]">
           <nav aria-label="Demos" className="flex lg:flex-col gap-8 lg:gap-7 lg:sticky lg:top-24 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">

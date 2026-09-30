@@ -12,8 +12,9 @@ import { createBubble } from "../raly/bubble";
 // sit for a few seconds (or arrives with ?tour, or presses "tour"), raly leads
 // them through the sections. Any real scroll, key, click or touch ends it.
 //
-// Click raly and it says something, a line at a time, in a doodled bubble.
-// Click it again quickly and it protests.
+// Click raly and it changes into its next design and says something, a line
+// at a time, in a doodled bubble; click again quickly and it protests. Press
+// and drag to pick it up and carry it anywhere, with a mouse or a finger.
 
 const LINES = [
   "i'm raly",
@@ -34,6 +35,7 @@ const LINES = [
   "are gas prices stable yet",
 ];
 const TICKLED = "i'm ticklish, stop!";
+const CARRIED = ["wheee!", "where are we going?", "carry me with you", "ooh, a ride"];
 
 const INTERACTIVE = "a, button, input, textarea, select, label, iframe, summary, [role='button'], [data-no-raly]";
 
@@ -121,20 +123,49 @@ const RalyLayer = () => {
       clearTimeout(autoTimer);
       if (tour.active) tour.stop();
     };
-    const onDown = event => { interrupt(event); pressed = { x: event.clientX, y: event.clientY }; };
+    const onRaly = (x, y, target) => Boolean(engine) && !isInteractive(target) && engine.hover(x, y);
+    const onDown = event => {
+      interrupt(event);
+      const on = onRaly(event.clientX, event.clientY, event.target);
+      pressed = { x: event.clientX, y: event.clientY, on, dragging: false };
+      // Pressing raly: no text selection starts under it.
+      if (on && event.pointerType === "mouse") event.preventDefault();
+    };
+    const endDrag = () => {
+      engine?.release();
+      document.documentElement.classList.remove("dragging-raly");
+    };
     const onUp = event => {
       if (!engine || !pressed) return;
-      const moved = Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y);
+      const { on, dragging, x, y } = pressed;
       pressed = null;
-      if (moved > 8 || isInteractive(event.target)) return;
+      if (dragging) {
+        endDrag();
+        if (event.pointerType !== "touch") engine.setPointer(event.clientX, event.clientY);
+        return;
+      }
+      // A press that stayed put is a click on raly.
+      if (!on || Math.hypot(event.clientX - x, event.clientY - y) > 8) return;
       if (!engine.touch(event.clientX, event.clientY)) return;
       // A second poke in quick succession tickles.
       const now = performance.now(), quick = now - lastHit < 900;
       lastHit = now;
       say(quick ? TICKLED : LINES[line++ % LINES.length]);
     };
+    const onCancel = () => { if (pressed?.dragging) endDrag(); pressed = null; };
     const onMove = event => {
       lastPointer = event;
+      // Pressed on raly and moved: pick it up and carry it.
+      if (pressed?.on && engine) {
+        if (!pressed.dragging && Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) > 6) {
+          pressed.dragging = engine.grab(pressed.x, pressed.y);
+          if (pressed.dragging) {
+            document.documentElement.classList.add("dragging-raly");
+            if (!sayUntil) say(CARRIED[Math.floor(Math.random() * CARRIED.length)]);
+          }
+        }
+        if (pressed.dragging) { engine.drag(event.clientX, event.clientY); return; }
+      }
       // raly follows the mouse (unless it is guiding); touch is left alone so the page can scroll.
       if (engine && event.pointerType !== "touch" && !tour.active) engine.setPointer(event.clientX, event.clientY);
       if (hoverQueued || event.pointerType === "touch") return;
@@ -146,9 +177,17 @@ const RalyLayer = () => {
         document.documentElement.classList.toggle("over-raly", over);
       });
     };
-    addEventListener("pointerdown", onDown, { passive: true });
+    addEventListener("pointerdown", onDown);
     addEventListener("pointerup", onUp, { passive: true });
+    addEventListener("pointercancel", onCancel, { passive: true });
     addEventListener("pointermove", onMove, { passive: true });
+    // A finger on raly holds the page still so it can be dragged; anywhere
+    // else, touch scrolls as usual.
+    const onTouchStart = event => {
+      const t = event.touches[0];
+      if (event.touches.length === 1 && onRaly(t.clientX, t.clientY, event.target)) event.preventDefault();
+    };
+    addEventListener("touchstart", onTouchStart, { passive: false });
     const onLeave = () => { if (!tour.active) engine?.setPointer(null); };
     document.addEventListener("pointerleave", onLeave);
     const onTourRequest = () => { if (tour.active) tour.stop(); else startTour(); };
@@ -161,6 +200,8 @@ const RalyLayer = () => {
       removeEventListener("pointerdown", onDown);
       removeEventListener("pointerup", onUp);
       removeEventListener("pointermove", onMove);
+      removeEventListener("pointercancel", onCancel);
+      removeEventListener("touchstart", onTouchStart);
       document.removeEventListener("pointerleave", onLeave);
       removeEventListener("raly:tour", onTourRequest);
       for (const type of ["wheel", "touchstart", "keydown"]) removeEventListener(type, interrupt);
