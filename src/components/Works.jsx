@@ -1,72 +1,142 @@
-import { motion } from "framer-motion";
-import { styles } from "../styles";
+import { useEffect, useRef, useState } from "react";
 import { projects } from "../constants/index";
-import ProjectAnim from "./ProjectAnim";
-import SectionHead from "./SectionHead";
+import BlenderPlate from "./BlenderPlate";
+import "./works-plates.css";
 
-// Projects as numbered specimen plates. AutoLabs, the flagship, gets the
-// large plate; the rest follow in reading order.
+const NAV_HEIGHT = 68;
+const cardsPerRow = () => window.innerWidth >= 1024 ? 3 : window.innerWidth >= 640 ? 2 : 1;
+const plateNumber = (number) => String(number).padStart(2, "0");
 
-const rise = {
-  hidden: { opacity: 0, y: 24 },
-  show: (delay) => ({ opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay } }),
-};
-
-const Tags = ({ tags }) => (
-  <div className="flex flex-wrap gap-x-3 gap-y-1">
-    {tags.map((tag) => (
-      <span key={tag.name} className={`font-mono text-[10.5px] uppercase tracking-[0.12em] ${tag.color}`}>{tag.name}</span>
-    ))}
-  </div>
-);
-
-const Plate = ({ project, index, featured = false }) => (
-  <motion.a
-    href={project.source_code_link}
-    target="_blank"
-    rel="noopener noreferrer"
-    variants={rise}
-    initial="hidden"
-    whileInView="show"
-    custom={featured ? 0 : (index % 3) * 0.06}
-    viewport={{ once: true, amount: 0.2 }}
-    className={`plate group block rounded-[6px] overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-0.5 ${featured ? "lg:grid lg:grid-cols-[1.15fr_1fr]" : ""}`}
-  >
-    <div className={`plate-art relative ${featured ? "h-[220px] lg:h-full lg:min-h-[340px] lg:border-b-0 lg:border-r lg:border-hair-soft" : "h-[150px]"}`}>
-      {/* Each project's own animation from the original site, in ink on paper. */}
-      <ProjectAnim artwork={project.artwork} tone="paper" />
-      <span className="absolute top-3 left-4 font-mono text-[10px] tracking-[0.16em] uppercase text-muted">
-        plate {String(index + 1).padStart(2, "0")}
-      </span>
-    </div>
-    <div className={featured ? "p-7 lg:p-10 flex flex-col justify-center" : "p-5"}>
-      {featured && <p className="font-mono text-[10.5px] tracking-[0.16em] uppercase text-coral mb-4">flagship · live</p>}
-      <h3 className={`font-serif text-ink-text leading-[1.12] headline-soft ${featured ? "text-[40px]" : "text-[21px]"}`}>{project.name}</h3>
-      <p className={`mt-3 text-fg-dim leading-relaxed ${featured ? "text-[15.5px] max-w-[52ch]" : "text-[13.5px] line-clamp-4"}`}>{project.description}</p>
-      <div className="mt-4 flex items-end justify-between gap-4">
-        <Tags tags={project.tags} />
-        <span className="font-mono text-[11px] text-muted group-hover:text-coral transition-colors" aria-hidden="true">↗</span>
-      </div>
-    </div>
-  </motion.a>
-);
-
-const Works = () => {
-  const [flagship, ...rest] = projects;
+function Plate({ project, index, activeId, onPlaybackChange }) {
   return (
-    <section className="relative w-full">
-      <span className="hash-span" id="work">&nbsp;</span>
-      <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6 pb-24`}>
-        <SectionHead index="02" label="projects" title="Projects" />
-        <Plate project={flagship} index={0} featured />
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-          {rest.map((project, i) => (
-            <Plate key={project.name} project={project} index={i + 1} />
+    <article className="plate works-plate" data-plate-index={index + 1}>
+      <div className="plate-art works-plate__art">
+        <BlenderPlate
+          id={project.pixelArtwork}
+          title={project.name}
+          active={activeId === project.pixelArtwork}
+          onPlaybackChange={onPlaybackChange}
+        />
+        <span className="works-plate__number" aria-hidden="true">plate {plateNumber(index + 1)}</span>
+        {index === 0 && <span className="works-plate__flagship">flagship</span>}
+      </div>
+      <a
+        href={project.source_code_link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="works-plate__study"
+        aria-label={`Explore ${project.name} (opens in a new tab)`}
+      >
+        <h3 className="headline-soft" title={project.name}>{project.name}</h3>
+        <p className="works-plate__description">{project.description}</p>
+        <div className="works-plate__footer">
+          <div className="works-plate__tags">
+            {project.tags.map((tag) => <span key={tag.name} className={tag.color}>{tag.name}</span>)}
+          </div>
+          <span className="works-plate__arrow" aria-hidden="true">↗</span>
+        </div>
+      </a>
+    </article>
+  );
+}
+
+export default function Works() {
+  const section = useRef(null);
+  const stage = useRef(null);
+  const [columns, setColumns] = useState(cardsPerRow);
+  const [stageHeight, setStageHeight] = useState(() => Math.max(1, window.innerHeight - NAV_HEIGHT));
+  const [row, setRow] = useState(0);
+  const [activeId, setActiveId] = useState(projects[0].pixelArtwork);
+  const rowCount = Math.ceil(projects.length / columns);
+  const currentRow = Math.min(row, rowCount - 1);
+  const first = currentRow * columns;
+  const visibleProjects = projects.slice(first, first + columns);
+
+  useEffect(() => {
+    const resize = () => setColumns(cardsPerRow());
+    const observer = new ResizeObserver(([entry]) => {
+      setStageHeight(Math.max(1, entry.borderBoxSize?.[0]?.blockSize ?? stage.current.getBoundingClientRect().height));
+    });
+    observer.observe(stage.current);
+    window.addEventListener("resize", resize, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const distance = NAV_HEIGHT - section.current.getBoundingClientRect().top;
+      const next = Math.max(0, Math.min(rowCount - 1, Math.floor(distance / stageHeight)));
+      setRow((previous) => previous === next ? previous : next);
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [rowCount, stageHeight]);
+
+  useEffect(() => {
+    setActiveId(projects[first].pixelArtwork);
+  }, [first]);
+
+  const goToRow = (nextRow) => {
+    const top = section.current.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT + nextRow * stageHeight + 1;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top, behavior: reduced ? "instant" : "smooth" });
+  };
+
+  return (
+    <section
+      id="work"
+      ref={section}
+      className="works-scroll"
+      aria-labelledby="works-title"
+      style={{ height: `${(rowCount + 1) * stageHeight}px` }}
+    >
+      <div ref={stage} className="works-stage">
+        <header className="works-stage__header">
+          <div>
+            <p className="works-stage__eyebrow">Selected work · {projects.length} specimens</p>
+            <h2 id="works-title" className="headline-soft">Projects</h2>
+          </div>
+          <p className="works-stage__range" aria-live="polite" aria-atomic="true">
+            <span>plates</span> {plateNumber(first + 1)}{visibleProjects.length > 1 ? `–${plateNumber(first + visibleProjects.length)}` : ""}
+            <span> of {projects.length}</span>
+          </p>
+        </header>
+
+        <div className="works-stage__row" data-row-index={currentRow} key={`${columns}-${currentRow}`} style={{ "--plate-columns": columns }}>
+          {visibleProjects.map((project, index) => (
+            <Plate
+              key={project.pixelArtwork}
+              project={project}
+              index={first + index}
+              activeId={activeId}
+              onPlaybackChange={setActiveId}
+            />
           ))}
         </div>
+
+        <nav className="works-stage__navigation" aria-label="Project rows">
+          <button type="button" disabled={currentRow === 0} onClick={() => goToRow(currentRow - 1)} aria-label="Previous project row">
+            <span aria-hidden="true">←</span> Previous
+          </button>
+          <span className="works-stage__position">{currentRow + 1} / {rowCount}</span>
+          <button type="button" disabled={currentRow === rowCount - 1} onClick={() => goToRow(currentRow + 1)} aria-label="Next project row">
+            Next <span aria-hidden="true">→</span>
+          </button>
+        </nav>
+        <p className="works-stage__hint">Scroll to turn the page. Select play to bring another specimen to life.</p>
       </div>
     </section>
   );
-};
-
-export default Works;
+}
