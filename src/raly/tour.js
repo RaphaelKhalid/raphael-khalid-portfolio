@@ -32,7 +32,7 @@ const STEPS = [
     mark: () => $('iframe[src^="' + WAYMO_ORIGIN + '"]'),
     near: r => [r.left - 40, r.top + 140],
     say: "pressing play: 72 hours of a hijacked fleet",
-    ms: 8200,
+    ms: 12500,
     act: tour => tour.pressWaymo(),
   },
   {
