@@ -36,12 +36,12 @@ const STEPS = [
     act: tour => tour.pressWaymo(),
   },
   {
-    scroll: [".plate", 190],
-    mark: () => $(".plate"),
-    // Waits in the open paper above the plate, right of the section's text.
-    near: r => [r.right - r.width * 0.22, r.top - 90],
+    scroll: ["#plate-wall", 170],
+    mark: () => $('#plate-wall [data-tile="0"] .wall-tile__art'),
+    // raly waits beside AutoLabs, and the plates wake as it arrives.
+    near: r => [r.right + 70, r.top + r.height * 0.55],
     say: "autolabs is where most of my current research lives",
-    ms: 5200,
+    ms: 6500,
   },
   {
     scroll: "#experience",
