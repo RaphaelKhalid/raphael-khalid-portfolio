@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { lookDeclarations, lookFragment } from './looks.js';
 import { RIBBON_NODES, SPINE_SAMPLES } from './anatomy.js';
 
 // raly's shading (from membrane study 08). Every surface uses three materials that share one vertex
@@ -501,7 +502,7 @@ export function createSkinMaterial(shared, surface) {
     Object.assign(shader.uniforms, {
       skinStrength: shared.strength, skinPigment: shared.pigment, uSkinTime: shared.skinTime,
       uMood: shared.mood, uPalette: shared.palette, uPattern: shared.pattern, uBeat: shared.beat,
-      uRamp: shared.ramp, uRampWeight: shared.rampWeight,
+      uRamp: shared.ramp, uRampWeight: shared.rampWeight, uLook: shared.look,
     });
     // The normal is needed before begin_vertex runs; compute placement there.
     shader.vertexShader = shader.vertexShader.replace('#include <beginnormal_vertex>', `
@@ -513,7 +514,9 @@ export function createSkinMaterial(shared, surface) {
       #endif
     `).replace('vec3 transformed = organismPlace(organismNormal);', 'vec3 transformed = organismEarlyPosition;');
 
-    shader.fragmentShader = skinFunctions + shader.fragmentShader;
+    shader.fragmentShader = skinFunctions + lookDeclarations + shader.fragmentShader;
+    // Art styles repaint the finished pixel, after tone mapping.
+    shader.fragmentShader = shader.fragmentShader.replace('#include <encodings_fragment>', lookFragment);
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', pigmentFragment);
     shader.fragmentShader = shader.fragmentShader.replace('#include <roughnessmap_fragment>', `
       #include <roughnessmap_fragment>
@@ -560,7 +563,7 @@ export function createSkinMaterial(shared, surface) {
       #include <output_fragment>
     `);
   };
-  material.customProgramCacheKey = () => `organism-skin-8-${surface.kind === 2 ? 'ribbon' : 'body'}`;
+  material.customProgramCacheKey = () => `organism-skin-9-${surface.kind === 2 ? 'ribbon' : 'body'}`;
   return material;
 }
 
@@ -622,6 +625,7 @@ export function createShared({ spineLength, scale, pattern }) {
     palette: { value: new THREE.Vector2() },
     ramp: { value: [new THREE.Color(), new THREE.Color(), new THREE.Color()] },
     rampWeight: { value: 0 },
+    look: { value: new THREE.Vector3(0, 0, 0) },
     pattern: { value: pattern },
   };
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { setRaly, ralyScreen } from "../raly/store";
 import { createTour } from "../raly/tour";
+import { createBubble } from "../raly/bubble";
 
 // raly's layer: a fixed, transparent canvas across the whole viewport, behind
 // the page's text. raly follows the mouse. The canvas never takes pointer
@@ -11,10 +12,27 @@ import { createTour } from "../raly/tour";
 // sit for a few seconds (or arrives with ?tour, or presses "tour"), raly leads
 // them through the sections. Any real scroll, key, click or touch ends it.
 //
-// Click raly and it says something, a line at a time. Click it again quickly
-// and it protests.
+// Click raly and it says something, a line at a time, in a doodled bubble.
+// Click it again quickly and it protests.
 
-const LINES = ["i'm raly", "i'm ticklish", "i change colors", "look at my dots", "what do you think i was inspired by?", "what makes you happy?"];
+const LINES = [
+  "i'm raly",
+  "i'm ticklish",
+  "i change colors",
+  "look at my dots",
+  "what do you think i was inspired by?",
+  "click on 'listen' top-right to have me react to your mic, make me boogie!",
+  "what makes you happy?",
+  "i wish game of thrones had a better ending",
+  "the best book I read recently was The Karma of Brown Folk by Vijay Prashad",
+  "i once walked 50km around sf",
+  "pink floyd is my favourite band, dark side of the moon my favourite album",
+  "long hair, don't care",
+  "work work work",
+  "sleepy time *yawn*",
+  "my total level in runescape is 2,496",
+  "are gas prices stable yet",
+];
 const TICKLED = "i'm ticklish, stop!";
 
 const INTERACTIVE = "a, button, input, textarea, select, label, iframe, summary, [role='button'], [data-no-raly]";
@@ -30,7 +48,8 @@ const RalyLayer = () => {
     let engine = null, frame = 0, disposed = false, pressed = null, hoverQueued = false, lastPointer = null;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const quality = matchMedia("(pointer: coarse)").matches || innerWidth < 900 ? "medium" : "high";
-    const bubble = saysRef.current;
+    const bubbleEl = saysRef.current;
+    const bubble = createBubble(bubbleEl);
     const smooth = { x: 0, y: 0, ready: false };
     const tour = createTour({
       getEngine: () => engine,
@@ -40,9 +59,8 @@ const RalyLayer = () => {
     });
     let autoTimer = 0, line = 0, lastHit = -1e9, sayUntil = 0;
     function say(text) {
-      bubble.textContent = text;
-      bubble.classList.remove("on"); void bubble.offsetWidth; bubble.classList.add("on");
-      sayUntil = performance.now() + 2400 + text.length * 35;
+      bubble.say(text);
+      sayUntil = performance.now() + 2600 + text.length * 55;
       smooth.ready = false;
     }
     const startTour = () => { clearTimeout(autoTimer); if (engine && !reduced) tour.start(); };
@@ -63,12 +81,16 @@ const RalyLayer = () => {
       if (hero) engine.setHeroBias(Math.min(1, Math.max(0, hero.getBoundingClientRect().bottom / innerHeight - 0.35) / 0.5));
       // What it says floats just above its head while it swims.
       if (!sayUntil) return;
-      if (performance.now() > sayUntil || !ralyScreen.visible) { bubble.classList.remove("on"); sayUntil = 0; return; }
-      const tx = ralyScreen.headX - bubble.offsetWidth / 2, ty = ralyScreen.top - bubble.offsetHeight - 14;
+      const now = performance.now();
+      if (now > sayUntil || !ralyScreen.visible) { bubble.hide(); sayUntil = 0; return; }
+      bubble.frame(now);
+      // The tail sits over raly's head.
+      const w = bubbleEl.offsetWidth, h = bubbleEl.offsetHeight;
+      const tx = ralyScreen.headX - Math.min(64, w * 0.28), ty = ralyScreen.top - h - 30;
       if (!smooth.ready) { smooth.x = tx; smooth.y = ty; smooth.ready = true; }
       smooth.x += (tx - smooth.x) * 0.12; smooth.y += (ty - smooth.y) * 0.12;
-      const x = Math.min(document.documentElement.clientWidth - bubble.offsetWidth - 12, Math.max(12, smooth.x)), y = Math.min(innerHeight - bubble.offsetHeight - 12, Math.max(80, smooth.y));
-      bubble.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+      const x = Math.min(document.documentElement.clientWidth - w - 36, Math.max(12, smooth.x)), y = Math.min(innerHeight - h - 30, Math.max(80, smooth.y));
+      bubbleEl.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
     }
 
     import("../raly/engine").then(({ createRaly }) => {
@@ -153,7 +175,7 @@ const RalyLayer = () => {
     <>
       <canvas ref={canvasRef} className="raly-canvas" aria-hidden="true" />
       {/* What raly says when it is clicked. */}
-      <p ref={saysRef} className="raly-says" aria-live="polite" />
+      <div ref={saysRef} className="raly-says" aria-live="polite" />
       {/* The guide's mark: a hairline drawn around what raly is showing, with a caption. */}
       <div ref={markRef} className="raly-mark" aria-live="polite">
         <svg aria-hidden="true"><rect x="1" y="1" rx="7" pathLength="1" /></svg>
