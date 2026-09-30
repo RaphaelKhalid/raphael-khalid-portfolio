@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { projects } from "../constants/index";
+import { plateQuotes } from "../constants/plateQuotes";
 import { ralyScreen } from "../raly/store";
 import { styles } from "../styles";
 import SectionHead from "./SectionHead";
@@ -279,6 +280,7 @@ function PlateDetail({ index, onClose, onStep }) {
         <div className="wall-detail__text">
           <p className="font-mono text-[10.5px] tracking-[0.16em] uppercase text-muted">plate {String(index + 1).padStart(2, "0")} of {projects.length}</p>
           <h3 id="wall-detail-title" className="headline-soft">{project.name}</h3>
+          {plateQuotes[id] && <p className="wall-detail__quote">“{plateQuotes[id]}”</p>}
           <p className="wall-detail__description">{project.description}</p>
           <div className="wall-detail__tags">
             {project.tags.map(tag => <span key={tag.name} className={tag.color}>{tag.name}</span>)}
@@ -303,6 +305,13 @@ export default function Works() {
   const hovered = useRef(-1);
   const focused = useRef(-1);
   const [open, setOpen] = useState(null);
+  // The hover card: the full name and one quoted sentence, kept on screen.
+  const [card, setCard] = useState(null);
+  const showCard = (i, el) => {
+    const r = el.getBoundingClientRect(), room = 170;
+    setCard({ i, align: r.left < room ? "left" : innerWidth - r.right < room ? "right" : "center" });
+  };
+  const hideCard = i => setCard(c => (c?.i === i ? null : c));
   const live = useLivingWall(wallRef, tileRefs, hovered, focused);
   // The still frames (a 137 KB sheet) also wait until the wall is near.
   const [near, setNear] = useState(false);
@@ -328,11 +337,12 @@ export default function Works() {
               className="wall-tile"
               data-tile={i}
               onClick={() => setOpen(i)}
-              onPointerEnter={() => { hovered.current = i; }}
-              onPointerLeave={() => { if (hovered.current === i) hovered.current = -1; }}
-              onFocus={() => { focused.current = i; }}
-              onBlur={() => { if (focused.current === i) focused.current = -1; }}
+              onPointerEnter={e => { hovered.current = i; if (e.pointerType !== "touch") showCard(i, e.currentTarget); }}
+              onPointerLeave={() => { if (hovered.current === i) hovered.current = -1; hideCard(i); }}
+              onFocus={e => { focused.current = i; showCard(i, e.currentTarget); }}
+              onBlur={() => { if (focused.current === i) focused.current = -1; hideCard(i); }}
               aria-label={`${project.name}: open details`}
+              aria-describedby={card?.i === i ? "wall-card" : undefined}
             >
               <span
                 className="wall-tile__art"
@@ -347,6 +357,12 @@ export default function Works() {
                 {i === 0 && <span className="wall-tile__flag">flagship · </span>}
                 {shortName(project.name)}
               </span>
+              {card?.i === i && (
+                <span id="wall-card" role="tooltip" className={`wall-card wall-card--${card.align}`}>
+                  <span className="wall-card__name">{project.name}</span>
+                  {plateQuotes[project.pixelArtwork] && <span className="wall-card__quote">“{plateQuotes[project.pixelArtwork]}”</span>}
+                </span>
+              )}
             </button>
           ))}
         </div>

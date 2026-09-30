@@ -180,7 +180,7 @@ const projects = [
       { name: "policy", color: "green-text-gradient" },
       { name: "research", color: "pink-text-gradient" },
     ],
-    source_code_link: "https://github.com/RaphaelKhalid",
+    source_code_link: "https://raphaelkhalid.medium.com/a-non-proliferation-treaty-for-ai-c30f5179c4a4",
   },
   {
     name: "Replication Paper: Medical Marijuana Legalization and Motor Vehicle Fatalities",
