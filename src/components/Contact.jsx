@@ -13,9 +13,10 @@ const Field = ({ label, children }) => (
 );
 
 const EMAIL = "raphaelbahadurkhan@gmail.com";
-// FormSubmit relays the note to EMAIL; no account or keys. The first note
-// sends Raphael a one-time "Activate Form" link, and it delivers after that.
-const ENDPOINT = `https://formsubmit.co/ajax/${EMAIL}`;
+// Web3Forms relays the note to EMAIL. The access key only identifies the
+// inbox; it is meant to live in client-side code.
+const ENDPOINT = "https://api.web3forms.com/submit";
+const ACCESS_KEY = "8a7ec705-c812-4ca2-ac4f-1b5fc34afee9";
 
 const inputClass =
   "bg-transparent border-0 border-b border-hair focus:border-ink-text outline-none py-2.5 text-[16px] text-ink-text placeholder:text-muted/70 transition-colors";
@@ -33,16 +34,16 @@ const Contact = () => {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
+          access_key: ACCESS_KEY,
+          subject: `raphaelkhalid.com: a note from ${form.name}`,
+          from_name: "raphaelkhalid.com",
           name: form.name,
           email: form.email,
           message: form.message,
-          _subject: `raphaelkhalid.com: a note from ${form.name}`,
-          _template: "table",
-          _captcha: "false",
         }),
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || String(result.success) !== "true") throw new Error(result.message || `HTTP ${response.status}`);
+      if (!response.ok || result.success !== true) throw new Error(result.message || `HTTP ${response.status}`);
       setStatus("sent");
       setForm({ name: "", email: "", message: "" });
     } catch (error) {
