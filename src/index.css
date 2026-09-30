@@ -162,6 +162,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .raly-says-line-2 { stroke-width: 1.1; opacity: 0.7; }
 .raly-says-spark { fill: #d98c84; }
+/* The tour's captions: the same bubble, larger and above everything else. */
+.raly-says-tour {
+  z-index: 17;
+  max-width: min(440px, calc(100vw - 48px));
+  padding: 14px 24px 16px;
+  font-size: 26px;
+}
+.raly-says-tour .raly-says-line { stroke-width: 2; }
+.raly-says-tour .raly-says-frame { filter: drop-shadow(0 10px 16px rgba(46, 40, 38, 0.18)); }
 .raly-says-word { display: inline-block; white-space: nowrap; }
 .raly-says-char {
   display: inline-block;
@@ -227,20 +236,6 @@ html.print-open .raly-mark { opacity: 0; }
   animation: raly-draw 1100ms var(--e-out) forwards;
 }
 @keyframes raly-draw { to { stroke-dashoffset: 0; } }
-.raly-mark-label {
-  position: absolute;
-  left: 0;
-  max-width: min(460px, calc(100vw - 32px));
-  padding: 5px 9px;
-  background: var(--paper);
-  border: 1px solid var(--hair);
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 10.5px;
-  line-height: 1.5;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
 .raly-tap {
   position: fixed;
   left: 0;
