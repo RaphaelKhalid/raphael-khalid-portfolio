@@ -77,7 +77,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   specimen.surfaces = specimen.surfaces.filter(s => s.role !== 'ribbon');
   const random = createRandom(seed ^ 0x5bd1e995);
   const pattern = createPattern(renderer, specimen.surfaces, { size: quality === 'high' ? 1024 : 512, seed: specimen.patternSeed });
-  let warmupRemaining = pattern.supported ? (quality === 'high' ? 1500 : 1000) : 0;
+  pattern.step(quality === 'high' ? 1500 : 1000, 0);
   const shared = createShared({ spineLength: specimen.spine.length, scale: SCALE, pattern: pattern.texture });
   shared.palette.value.set(specimen.palette.hue, specimen.palette.warmth);
   // It moves through its palettes and art styles; ?look=ink shows and holds one.
@@ -250,7 +250,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   }
   function schedule() {
     cancelAnimationFrame(frameId); state.last = 0;
-    if (compiled && !warmupRemaining && state.running && !document.hidden) frameId = requestAnimationFrame(tick);
+    if (compiled && state.running && !document.hidden) frameId = requestAnimationFrame(tick);
   }
 
   // --- touch ---------------------------------------------------------------
@@ -270,49 +270,19 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   simulate(0);
   // raly's skin shader is large, and on Windows the driver takes seconds to
   // compile it. Compile it in the background (the page stays responsive),
-  // then draw; the canvas fades in once it and the skin pattern are ready.
-  let compiled = false, disposed = false, warmupFrame = 0;
-  function showWhenReady() {
-    if (disposed || !compiled || warmupRemaining || document.hidden) return;
+  // then draw; the canvas fades in once it is ready.
+  let compiled = false, disposed = false;
+  function whenCompiled() {
+    if (disposed) return;
+    compiled = true;
     render();
     canvas.classList.add('is-ready');
     schedule();
   }
-  function whenCompiled() {
-    if (disposed) return;
-    compiled = true;
-    showWhenReady();
-  }
-  // Grow the same seeded pattern while the skin shader compiles, yielding
-  // between small batches so a cold start cannot monopolize the page. The
-  // pass cap also limits GPU work: CPU submission time alone is not a GPU budget.
-  function warmPattern() {
-    warmupFrame = 0;
-    if (disposed || document.hidden) return;
-    const deadline = performance.now() + 2;
-    let passes = 0;
-    while (warmupRemaining > 0 && passes < 16 && performance.now() < deadline) {
-      const count = Math.min(2, warmupRemaining);
-      pattern.step(count, 0);
-      warmupRemaining -= count;
-      passes += count;
-    }
-    if (warmupRemaining) warmupFrame = requestAnimationFrame(warmPattern);
-    else showWhenReady();
-  }
-  function resume() {
-    cancelAnimationFrame(warmupFrame);
-    warmupFrame = 0;
-    schedule();
-    if (disposed || document.hidden) return;
-    if (warmupRemaining) warmupFrame = requestAnimationFrame(warmPattern);
-    else showWhenReady();
-  }
   renderer.compileAsync(scene, camera).then(whenCompiled, whenCompiled);
-  resume();
-  const onResize = () => { resize(); updateBounds(); if (compiled && !warmupRemaining && !state.running) { simulate(0); render(); } };
+  const onResize = () => { resize(); updateBounds(); if (compiled && !state.running) { simulate(0); render(); } };
   addEventListener('resize', onResize);
-  document.addEventListener('visibilitychange', resume);
+  document.addEventListener('visibilitychange', schedule);
 
   return {
     audio,
@@ -376,9 +346,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     dispose() {
       disposed = true;
       state.running = false; cancelAnimationFrame(frameId);
-      cancelAnimationFrame(warmupFrame);
       removeEventListener('resize', onResize);
-      document.removeEventListener('visibilitychange', resume);
+      document.removeEventListener('visibilitychange', schedule);
       audio.disable();
       meshes.forEach(mesh => { mesh.material.dispose(); mesh.customDepthMaterial.dispose(); mesh.geometry.dispose(); });
       shadowPlane.geometry.dispose(); shadowPlane.material.dispose();
