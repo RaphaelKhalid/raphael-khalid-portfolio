@@ -172,6 +172,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .raly-says-tour .raly-says-line { stroke-width: 2; }
 .raly-says-tour .raly-says-frame { filter: drop-shadow(0 10px 16px rgba(46, 40, 38, 0.18)); }
 .raly-says-word { display: inline-block; white-space: nowrap; }
+.raly-says-link {
+  color: var(--cobalt);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.raly-says.on .raly-says-link { pointer-events: auto; }
+.raly-says-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .raly-says-char {
   display: inline-block;
   opacity: 0;
