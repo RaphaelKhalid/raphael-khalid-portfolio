@@ -172,7 +172,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .raly-says-char.in { opacity: 1; scale: 1; }
 
 html.over-raly, html.over-raly body {
-  cursor: pointer;
+  cursor: grab;
+}
+html.dragging-raly, html.dragging-raly * {
+  cursor: grabbing !important;
+  user-select: none;
 }
 
 /* Legibility over raly: a paper halo around the page's text. On bare paper

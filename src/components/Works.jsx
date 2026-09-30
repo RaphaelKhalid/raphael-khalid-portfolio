@@ -57,10 +57,7 @@ const Works = () => {
     <section className="relative w-full">
       <span className="hash-span" id="work">&nbsp;</span>
       <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6 pb-24`}>
-        <SectionHead index="02" label="projects" title="Projects">
-          AutoLabs and a cluster of live AI-safety and interpretability labs lead, then the wider body of work:
-          machine learning, robotics, complex systems and political science.
-        </SectionHead>
+        <SectionHead index="02" label="projects" title="Projects" />
         <Plate project={flagship} index={0} featured />
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
           {rest.map((project, i) => (
