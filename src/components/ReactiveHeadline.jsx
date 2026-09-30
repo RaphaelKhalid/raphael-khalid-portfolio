@@ -273,12 +273,31 @@ const ReactiveHeadline = ({ className = "" }) => {
       gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, vertexSource));
       gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, fragmentSource));
       gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
     } catch (error) {
       console.error(error);
       canvas.style.display = "none";
       return undefined;
     }
+
+    // Link in the background where the browser can (the shader is large, and
+    // asking for its status right away would stall the page while it
+    // compiles). The plain headline shows until the effect is ready.
+    const parallel = gl.getExtension("KHR_parallel_shader_compile");
+    let teardown = () => gl.deleteProgram(program), cancelled = false, pollTimer = 0;
+    const whenLinked = () => {
+      if (cancelled) return;
+      if (parallel && !gl.getProgramParameter(program, parallel.COMPLETION_STATUS_KHR)) { pollTimer = setTimeout(whenLinked, 30); return; }
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error(gl.getProgramInfoLog(program));
+        canvas.style.display = "none";
+        return;
+      }
+      teardown = setup();
+    };
+    whenLinked();
+    return () => { cancelled = true; clearTimeout(pollTimer); teardown(); };
+
+    function setup() {
     gl.useProgram(program);
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -508,6 +527,7 @@ const ReactiveHeadline = ({ className = "" }) => {
       document.removeEventListener("pointerleave", onLeave);
       gl.deleteTexture(texture); gl.deleteBuffer(buffer); gl.deleteProgram(program);
     };
+    }
   }, []);
 
   return (

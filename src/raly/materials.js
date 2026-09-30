@@ -516,7 +516,7 @@ export function createSkinMaterial(shared, surface) {
 
     shader.fragmentShader = skinFunctions + lookDeclarations + shader.fragmentShader;
     // Art styles repaint the finished pixel, after tone mapping.
-    shader.fragmentShader = shader.fragmentShader.replace('#include <encodings_fragment>', lookFragment);
+    shader.fragmentShader = shader.fragmentShader.replace('#include <colorspace_fragment>', lookFragment);
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', pigmentFragment);
     shader.fragmentShader = shader.fragmentShader.replace('#include <roughnessmap_fragment>', `
       #include <roughnessmap_fragment>
@@ -541,13 +541,13 @@ export function createSkinMaterial(shared, surface) {
       vec3 skinGradient = sign(skinDet) * (dFdx(skinHeight) * skinRx + dFdy(skinHeight) * skinRy);
       normal = normalize(abs(skinDet) * normal - skinGradient);
     `);
-    shader.fragmentShader = shader.fragmentShader.replace('#include <output_fragment>', `
+    shader.fragmentShader = shader.fragmentShader.replace('#include <opaque_fragment>', `
       vec3 skinThrough = vec3(0.0);
       #if NUM_DIR_LIGHTS > 0
         for (int skinLight = 0; skinLight < NUM_DIR_LIGHTS; skinLight++) {
           vec3 skinL = directionalLights[skinLight].direction;
           float skinBack = max(0.0, -dot(normal, skinL));
-          float skinForward = pow(max(0.0, dot(geometry.viewDir, -skinL)), 4.0);
+          float skinForward = pow(max(0.0, dot(geometryViewDir, -skinL)), 4.0);
           skinThrough += directionalLights[skinLight].color * (skinBack * 0.5 + skinForward * 0.35);
         }
       #endif
@@ -560,7 +560,7 @@ export function createSkinMaterial(shared, surface) {
       outgoingLight += skinFeedPulse * vec3(2.2, 1.2, 0.3) * 0.5;
       outgoingLight += morphBurn * vec3(3.4, 1.4, 0.35) + morphTip * vec3(2.6, 1.9, 1.1) * (0.7 + 0.3 * sin(uSkinTime * 4.0 + skinArc * 3.0));
       outgoingLight += morphBeat * mix(vec3(0.6, 0.3, 2.2), vec3(2.2, 0.6, 1.4), smoothstep(0.2, 0.6, skinZone)) * 0.7;
-      #include <output_fragment>
+      #include <opaque_fragment>
     `);
   };
   material.customProgramCacheKey = () => `organism-skin-9-${surface.kind === 2 ? 'ribbon' : 'body'}`;

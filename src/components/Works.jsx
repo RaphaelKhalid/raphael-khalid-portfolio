@@ -78,9 +78,9 @@ function compile(gl, type, source) {
   return shader;
 }
 
-function makeVideo(rate) {
+function makeVideo(src, rate) {
   const video = document.createElement("video");
-  Object.assign(video, { src: wallClip, muted: true, loop: true, playsInline: true, preload: "auto", playbackRate: rate, defaultPlaybackRate: rate });
+  Object.assign(video, { src, muted: true, loop: true, playsInline: true, preload: "auto", playbackRate: rate, defaultPlaybackRate: rate });
   video.setAttribute("muted", "");
   video.setAttribute("playsinline", "");
   return video;
@@ -134,15 +134,33 @@ function useLivingWall(wallRef, tileRefs, hovered, focused) {
     gl.uniform1i(U.uCalm, 0);
     gl.uniform1i(U.uAwake, 1);
 
-    // Two copies of the wall: the sleeping plates play at half speed.
-    const videos = [makeVideo(0.5), makeVideo(1)];
+    // The wall video loads only as the wall comes near, once, shared by both
+    // copies (the sleeping plates play at half speed).
+    let videos = [], clipUrl = null, loading = false;
     const fresh = [false, false], ready = [false, false];
-    videos.forEach((video, i) => {
-      const mark = () => { fresh[i] = true; ready[i] = true; if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(mark); };
-      if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(mark);
-      else video.addEventListener("timeupdate", () => { fresh[i] = true; ready[i] = true; });
-      video.addEventListener("loadeddata", () => { fresh[i] = true; ready[i] = true; });
-    });
+    async function loadVideos() {
+      if (loading) return;
+      loading = true;
+      try {
+        clipUrl = URL.createObjectURL(await (await fetch(wallClip)).blob());
+      } catch {
+        clipUrl = wallClip;
+      }
+      if (disposed) return;
+      videos = [makeVideo(clipUrl, 0.5), makeVideo(clipUrl, 1)];
+      videos.forEach((video, i) => {
+        const mark = () => { fresh[i] = true; ready[i] = true; if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(mark); };
+        if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(mark);
+        else video.addEventListener("timeupdate", () => { fresh[i] = true; ready[i] = true; });
+        video.addEventListener("loadeddata", () => { fresh[i] = true; ready[i] = true; });
+        if (visible && !document.hidden) video.play().catch(() => {});
+      });
+    }
+    let disposed = false;
+    const approaching = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { loadVideos(); approaching.disconnect(); }
+    }, { rootMargin: "900px 0px" });
+    approaching.observe(wall);
 
     const count = projects.length;
     const rects = new Float32Array(count * 4), wakeArray = new Float32Array(count);
@@ -227,7 +245,10 @@ function useLivingWall(wallRef, tileRefs, hovered, focused) {
       removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerleave", onLeave);
       document.removeEventListener("visibilitychange", onVisibility);
+      disposed = true;
+      approaching.disconnect();
       videos.forEach(v => { v.pause(); v.removeAttribute("src"); v.load(); });
+      if (clipUrl && clipUrl !== wallClip) URL.revokeObjectURL(clipUrl);
       canvas.remove();
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
@@ -283,6 +304,13 @@ export default function Works() {
   const focused = useRef(-1);
   const [open, setOpen] = useState(null);
   const live = useLivingWall(wallRef, tileRefs, hovered, focused);
+  // The still frames (a 137 KB sheet) also wait until the wall is near.
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const io = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setNear(true); io.disconnect(); } }, { rootMargin: "1200px 0px" });
+    io.observe(wallRef.current);
+    return () => io.disconnect();
+  }, []);
   const step = useCallback(dir => setOpen(i => (i + dir + projects.length) % projects.length), []);
   const close = useCallback(() => setOpen(null), []);
 
@@ -309,7 +337,7 @@ export default function Works() {
               <span
                 className="wall-tile__art"
                 style={{
-                  backgroundImage: `url(${wallPoster})`,
+                  backgroundImage: near ? `url(${wallPoster})` : "none",
                   backgroundPosition: `${(i % GRID[0]) * 100 / (GRID[0] - 1)}% ${Math.floor(i / GRID[0]) * 100 / (GRID[1] - 1)}%`,
                   backgroundSize: `${GRID[0] * 100}% ${GRID[1] * 100}%`,
                 }}
