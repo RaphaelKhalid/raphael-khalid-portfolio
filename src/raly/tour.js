@@ -23,7 +23,7 @@ const STEPS = [
     scroll: ['nav[aria-label="Demos"]', 150],
     mark: () => $('[data-demo="waymo"]'),
     near: r => [r.right + 90, r.top + 10],
-    say: "first, a live one: the waymo emergency response",
+    say: "visualizing an AI loss-of-control scenario",
     ms: 3400,
     act: tour => tour.tap($('[data-demo="waymo"]'), 0.5, 0.5, el => el.getAttribute("aria-pressed") !== "true" && el.click()),
   },
@@ -31,7 +31,7 @@ const STEPS = [
     scroll: [".panel-demo", 70],
     mark: () => $('iframe[src^="' + WAYMO_ORIGIN + '"]'),
     near: r => [r.left - 40, r.top + 140],
-    say: "pressing play: 72 hours of a hijacked fleet",
+    say: "pressing play, see the first few seconds",
     ms: 12500,
     act: tour => tour.pressWaymo(),
   },
@@ -40,21 +40,21 @@ const STEPS = [
     mark: () => $(".plate"),
     // Waits in the open paper above the plate, right of the section's text.
     near: r => [r.right - r.width * 0.22, r.top - 90],
-    say: "projects: autolabs first, then the rest of the work",
+    say: "autolabs is where most of my current research lives",
     ms: 5200,
   },
   {
     scroll: "#experience",
     mark: () => $("#experience")?.parentElement?.querySelector("h2"),
     near: r => [r.right + 160, r.top + 30],
-    say: "experience: where he has worked",
+    say: "where i've worked",
     ms: 4400,
   },
   {
     scroll: "#photographs",
     mark: () => $('[data-photo="2"]'),
     near: r => [r.right + 120, r.top - 30],
-    say: "photography: his pictures",
+    say: "my pictures",
     ms: 6400,
     act: tour => {
       // Bring a print to the middle of the strip, open it, then put it back.
@@ -69,7 +69,8 @@ const STEPS = [
     scroll: "#contact",
     mark: () => $("#contact")?.parentElement?.querySelector("form") || $("#sunlit-floor"),
     near: r => [r.right + 80, r.top + 60],
-    say: "and if you'd like to say hello, it starts here",
+    say: "email me or reach out via LinkedIn!",
+    links: { "LinkedIn!": "https://www.linkedin.com/in/raphael-khalid/" },
     ms: 5200,
   },
 ];
@@ -138,11 +139,20 @@ export function createTour({ getEngine, mark, bubble, bubbleEl, tapRing, onChang
       const el = s.mark();
       const r = el ? bounds(el) : { bottom: 0 };
       placement = r.bottom + 150 < innerHeight ? 'up' : 'down';
-      bubble.say(s.say, { tail: placement });
+      bubble.say(s.say, { tail: placement, links: s.links });
       mark.classList.add("on");
       s.act?.(api);
     });
-    stepTimer = setTimeout(() => active && go(i + 1), settle + s.ms);
+    const advance = () => {
+      if (!active) return;
+      // Let visitors finish using a link before its bubble disappears.
+      if (bubbleEl.querySelector('a:hover, a:focus')) {
+        stepTimer = setTimeout(advance, 250);
+        return;
+      }
+      go(i + 1);
+    };
+    stepTimer = setTimeout(advance, settle + s.ms);
   }
 
   function start() {
