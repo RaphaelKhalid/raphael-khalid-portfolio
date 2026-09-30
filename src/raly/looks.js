@@ -155,6 +155,7 @@ vec3 lookPorcelain(LookSkin k, vec3 n, vec3 v, vec3 l, float boil) {
   color = mix(color, cobalt * strokeTone, band * (1.0 - k.spot * k.spotMask * 0.85));
   // Fronds: leaves painted out from the ridge on both sides.
   float leaves = 0.0;
+  float veinWidth = max(fwidth(k.e) * 3.4, 1e-4) * 1.2; // measured outside the loop
   for (int j = 0; j < 2; j++) {
     float period = j == 0 ? 2.3 : 3.4;
     float reach = j == 0 ? 0.3 : 0.5;
@@ -164,7 +165,7 @@ vec3 lookPorcelain(LookSkin k, vec3 n, vec3 v, vec3 l, float boil) {
     float a = 0.65 * sign(k.s + 1e-4);
     d = mat2(cos(a), -sin(a), sin(a), cos(a)) * d;
     float leaf = 1.0 - smoothstep(0.85, 1.0, length(d / vec2(0.42 * size, 0.15 * size)));
-    float vein = lookLine(d.y, 1.2) * step(abs(d.x), 0.35 * size);
+    float vein = (1.0 - smoothstep(veinWidth * 0.5, veinWidth, abs(d.y))) * step(abs(d.x), 0.35 * size);
     leaves = max(leaves, leaf * (0.6 + 0.4 * smoothstep(-0.4, 0.4, d.x)) * (1.0 - vein * 0.6));
   }
   leaves *= 1.0 - smoothstep(0.5, 0.65, k.e);
@@ -332,7 +333,7 @@ vec3 lookPaint(float look, vec3 natural, LookSkin k, vec3 n, vec3 v, vec3 l, flo
 `;
 
 export const lookFragment = /* glsl */`
-  #include <encodings_fragment>
+  #include <colorspace_fragment>
   if (uLook.x > 0.5 || uLook.y > 0.5) {
     vec3 lookN = normalize(normal); // already facing the viewer on both sides
     vec3 lookV = normalize(vViewPosition);
@@ -342,11 +343,13 @@ export const lookFragment = /* glsl */`
     #endif
     float lookBoil = floor(uSkinTime * 2.5);
     LookSkin lookSkin = LookSkin(skinArc, skinS, skinE, skinZone, skinBroad, skinSpot, skinSpotMask, skinShark, skinP, skinSeed);
-    vec3 lookA = lookPaint(uLook.x, gl_FragColor.rgb, lookSkin, lookN, lookV, lookL, lookBoil);
-    vec3 lookB = uLook.z > 0.001 ? lookPaint(uLook.y, gl_FragColor.rgb, lookSkin, lookN, lookV, lookL, lookBoil) : lookA;
-    // A new look sweeps down the body from head to tail, as if repainted.
+    // A new look sweeps down the body from head to tail, as if repainted:
+    // each pixel takes the old or the new look along a ragged, brushy edge.
+    // (One look per pixel keeps the shader half the size to compile.)
     float lookArc = skinArc / max(uLength, 0.001);
     float lookSweep = smoothstep(lookArc - 0.12, lookArc + 0.12, uLook.z * 1.24 - 0.12);
-    gl_FragColor.rgb = mix(lookA, lookB, lookSweep);
+    float lookEdge = skinNoise(skinP * vec2(14.0, 42.0) + skinSeed) * 0.9 + 0.05;
+    float lookNow = lookSweep > lookEdge ? uLook.y : uLook.x;
+    gl_FragColor.rgb = lookPaint(lookNow, gl_FragColor.rgb, lookSkin, lookN, lookV, lookL, lookBoil);
   }
 `;
