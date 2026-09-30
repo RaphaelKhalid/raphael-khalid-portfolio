@@ -72,6 +72,7 @@ const projects = [
   {
     name: "AutoLabs",
     artwork: "network-pulse",
+    pixelArtwork: "autolabs",
     description:
       "A public laboratory where autonomous agents design, run, and report AI-safety experiments end to end — a spend ledger, frozen protocol hashes, and every public claim checked against the record. The live flagship run trains a Matryoshka sparse autoencoder on Qwen2.5-7B to surface persona-relevant directions that prompting can't reach.",
     tags: [
@@ -84,6 +85,7 @@ const projects = [
   {
     name: "Afterlight",
     artwork: "orbital-rings",
+    pixelArtwork: "afterlight",
     description:
       "An agent-powered lab for reproducible AI-safety research: a harness that lets agents propose, execute, and write up experiments while keeping the receipts — protocols, results, and limitations in the open. Live web front end.",
     tags: [
@@ -96,6 +98,7 @@ const projects = [
   {
     name: "RALYtable — Interpretability for Reasoning Models",
     artwork: "grid-wave",
+    pixelArtwork: "ralytable",
     description:
       "Interpretability tooling aimed at reasoning models: probing and reading the internal state behind a model's chain of thought rather than trusting the words it emits. Live, interactive web app.",
     tags: [
@@ -108,6 +111,7 @@ const projects = [
   {
     name: "Watcher — Monitor-Evasion Benchmark",
     artwork: "particle-storm",
+    pixelArtwork: "watcher",
     description:
       "A benchmark measuring whether a model under oversight learns to evade its monitor — quantifying how monitorability degrades once a model is optimized against a watcher, and what that means for scalable oversight.",
     tags: [
@@ -120,6 +124,7 @@ const projects = [
   {
     name: "RoolyTooly — Self-Improving Code Harness",
     artwork: "network-pulse",
+    pixelArtwork: "roolytooly",
     description:
       "A self-improving inference harness that lifts a model's LiveCodeBench-hard pass rate from 90% to 93% by letting it iterate on its own tool use and test feedback. Live write-up.",
     tags: [
@@ -132,6 +137,7 @@ const projects = [
   {
     name: "Deployment-Layer Refusal Erosion",
     artwork: "refusal-erosion",
+    pixelArtwork: "refusal-erosion",
     description: "An evaluation harness showing that an aligned model's refusals collapse when the same request is routed through an ordinary product system prompt, with no jailbreak. Replicated across three developers' models (Google Gemini, DeepSeek V4 Flash, and an OpenRouter-routed model) at p<0.0001 via an exact McNemar test, and validated against a blind human labeling pass. Ships with a live, interactive demo.",
     tags: [
       { name: "aisafety", color: "blue-text-gradient" },
@@ -143,6 +149,7 @@ const projects = [
   {
     name: "Robotics 101",
     artwork: "orbital-rings",
+    pixelArtwork: "robotics-101",
     description: "A 13-unit full-stack web application built independently to deepen robotics expertise, featuring interactive physics simulations, canvas-based rendering for robot control, and a puzzle-validation engine. Built with Python, TypeScript, Next.js, React, and Tailwind CSS; deployed to production.",
     tags: [
       { name: "nextjs", color: "blue-text-gradient" },
@@ -154,6 +161,7 @@ const projects = [
   {
     name: "Instance Segmentation on Aerial Slum Images",
     artwork: "grid-wave",
+    pixelArtwork: "aerial-segmentation",
     description: "Used QGIS to get satellite images of slums, creating an annotated dataset of 1,022 instances merged with iSAID. Fine-tuned a Faster R-CNN with ResNet-101 backbone and a Cascade R-CNN with ResNeXt-152 backbone using Detectron 2.",
     tags: [
       { name: "slums", color: "blue-text-gradient" },
@@ -165,6 +173,7 @@ const projects = [
   {
     name: "A Non-Proliferation Treaty for AI",
     artwork: "particle-storm",
+    pixelArtwork: "ai-treaty",
     description: "Blog post deep-diving into the Munich and Framework Conventions on AI, performing a literature review of AI governance frameworks, critiquing safety approaches, and proposing solutions towards a unifying framework for AI governance and regulation.",
     tags: [
       { name: "aigovernance", color: "blue-text-gradient" },
@@ -176,6 +185,7 @@ const projects = [
   {
     name: "Replication Paper: Medical Marijuana Legalization and Motor Vehicle Fatalities",
     artwork: "network-pulse",
+    pixelArtwork: "synthetic-control",
     description: "Replication of the paper 'A Replication of \"Marijuana medicalization and motor vehicle fatalities: a synthetic control group approach'.",
     tags: [
       { name: "R", color: "blue-text-gradient" },
@@ -187,6 +197,7 @@ const projects = [
   {
     name: "The effect of parenting styles and exposure to deception under a reward-punishment paradigm on the rate of lying",
     artwork: "ripple-field",
+    pixelArtwork: "parenting-deception",
     description: "The present study investigates how the ability to deceive is influenced by parenting style under a reward-and-punishment paradigm for children aged between 2 and 4 years.",
     tags: [
       { name: "psychology", color: "blue-text-gradient" },
@@ -198,6 +209,7 @@ const projects = [
   {
     name: "Sentiment Analysis of News Subreddit Comments",
     artwork: "fireflies",
+    pixelArtwork: "news-sentiment",
     description: "A brief look into the varying sentiments across r/news and r/worldnews, specifically following October 7th, using VADER and textblob.",
     tags: [
       { name: "politicalscience", color: "blue-text-gradient" },
@@ -209,6 +221,7 @@ const projects = [
   {
     name: "Live Beatbox Classifier",
     artwork: "spectrum",
+    pixelArtwork: "beatbox-classifier",
     description: "A real time beatbox classifier that uses a convolutional neural network to classify beatbox sounds. The model was trained on 5 classes of beatbox sounds, built using tensorflow.",
     tags: [
       { name: "python", color: "blue-text-gradient" },
@@ -220,6 +233,7 @@ const projects = [
   {
     name: "Replicating Google Wavenets",
     artwork: "lissajous-web",
+    pixelArtwork: "wavenet",
     description: "An extension of the beatbox classifier, this project uses a wavenet architecture to generate novel sounds, trained on my own beatbox samples.",
     tags: [
       { name: "python", color: "blue-text-gradient" },
@@ -231,6 +245,7 @@ const projects = [
   {
     name: "Khawaja Sira - A Complexity Approach",
     artwork: "spiral-galaxy",
+    pixelArtwork: "khawaja-sira",
     description: "A research paper on the Khawaja Sira community in Pakistan demonstrating the aggregation of mental models into ideologies, using Ostrom's ADICO syntax for rule categorization, and visualizing causal relations between both.",
     tags: [
       { name: "complexity", color: "blue-text-gradient" },
@@ -242,6 +257,7 @@ const projects = [
   {
     name: "Modeling Complex Systems - Waste Collection",
     artwork: "branching-tree",
+    pixelArtwork: "waste-collection",
     description: "An implementation of a waste-collection system in Python using NetworkX. A Monte Carlo search is compared with other strategies on the metrics of fuel efficiency.",
     tags: [
       { name: "python", color: "blue-text-gradient" },
@@ -253,6 +269,7 @@ const projects = [
   {
     name: "A System Dynamics Approach to Hegemonic Theory",
     artwork: "solar-power",
+    pixelArtwork: "hegemonic-dynamics",
     description: "A research paper developing a quantitative basis supporting the thesis that the balance of power is shifting towards multipolarity, using 3-dimensional phase spaces to predict US and China growth trajectories.",
     tags: [
       { name: "complexity", color: "blue-text-gradient" },
@@ -264,6 +281,7 @@ const projects = [
   {
     name: "Housing Bubble in Turkey",
     artwork: "bubble-drift",
+    pixelArtwork: "turkey-housing",
     description: "This paper presents evidence for a housing bubble in Turkey, supported by novel arguments about the contagion of conformity (simulated with NetLogo), economic analysis of systemic risk, business cycles, and monetary policy.",
     tags: [
       { name: "economics", color: "blue-text-gradient" },
@@ -275,6 +293,7 @@ const projects = [
   {
     name: "Multilayer Networks to Analyze Monopoly Power",
     artwork: "kaleidoscope",
+    pixelArtwork: "multilayer-monopoly",
     description: "This research paper uses multilayer networks to consider Meta's social media monopoly from novel perspectives introduced by network theory.",
     tags: [
       { name: "economics", color: "blue-text-gradient" },
@@ -286,6 +305,7 @@ const projects = [
   {
     name: "Classical Chess Engine",
     artwork: "falling-pieces",
+    pixelArtwork: "chess-engine",
     description: "Inspired by my passion for Chess, this project implements the classical chess engine algorithm: minimax, with subsequent optimizations including alpha-beta pruning and the Negamax algorithm.",
     tags: [
       { name: "python", color: "blue-text-gradient" },
@@ -297,6 +317,7 @@ const projects = [
   {
     name: "Reconciling Disparate Conflicts - Kashmir and Israel-Palestine",
     artwork: "fluid-smoke",
+    pixelArtwork: "comparative-conflicts",
     description: "This research paper compares the Kashmir and Israel-Palestine conflict to garner theoretical similarities and differences across formal and informal rules, governmental agents, and bureaucratic governance factors.",
     tags: [
       { name: "conflict", color: "blue-text-gradient" },
@@ -308,6 +329,7 @@ const projects = [
   {
     name: "Before You Click Send",
     artwork: "envelope",
+    pixelArtwork: "before-send",
     description: "An AI-safety onboarding tool (built at BlueDot Impact's Breaking Barriers hackathon) that catches risky messages before they are sent and coaches safer alternatives. Live, interactive web app.",
     tags: [
       { name: "aisafety", color: "blue-text-gradient" },
@@ -319,6 +341,7 @@ const projects = [
   {
     name: "SelfBalance Lab",
     artwork: "balance",
+    pixelArtwork: "selfbalance",
     description: "An interactive 3D self-balancing robot assembly simulator: drag real components onto a chassis, wire the pins, edit an Arduino PID sketch, and watch a Rapier-physics robot try to balance. Built with Three.js and Rapier; live PID tuning.",
     tags: [
       { name: "threejs", color: "blue-text-gradient" },
