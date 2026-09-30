@@ -232,6 +232,8 @@ uniform float uSeed;
 uniform float uSkinTime;
 uniform vec4 uMood;       // curious, startle, feed, turn (signed)
 uniform vec2 uPalette;    // hue shift (radians / 2pi), warmth
+uniform vec3 uRamp[3];    // palette: spine, mid-body, frilled edge
+uniform float uRampWeight; // 0 keeps the original reef colors
 uniform sampler2D uPattern;
 uniform float uLength;
 uniform float uBeat;
@@ -394,6 +396,16 @@ const pigmentFragment = /* glsl */`
 
   skinColor = skinHue(skinColor, uPalette.x * (1.0 - smoothstep(0.4, 0.8, skinZone)));
   skinColor *= 1.0 + uPalette.y * vec3(0.3, 0.0, -0.3) * smoothstep(0.4, 0.8, skinZone);
+  // Key palettes: recolor by zone while keeping every spot, bar and vein's
+  // lightness, so the pattern reads the same in any palette.
+  if (uRampWeight > 0.001) {
+    vec3 rampColor = mix(uRamp[0], uRamp[1], smoothstep(0.18, 0.5, skinZone));
+    rampColor = mix(rampColor, uRamp[2], smoothstep(0.55, 0.9, skinZone));
+    float rampLuma = dot(skinColor, vec3(0.2126, 0.7152, 0.0722));
+    vec3 recolored = rampColor * (0.28 + 1.15 * rampLuma);
+    recolored = mix(recolored, vec3(0.97, 0.95, 0.92), smoothstep(0.62, 0.95, rampLuma) * 0.55);
+    skinColor = mix(skinColor, recolored, uRampWeight * 0.92);
+  }
 
   float skinGrain = skinNoise(skinP * 160.0 + skinSeed);
   float skinThin = smoothstep(0.55, 0.95, skinZone);
@@ -489,6 +501,7 @@ export function createSkinMaterial(shared, surface) {
     Object.assign(shader.uniforms, {
       skinStrength: shared.strength, skinPigment: shared.pigment, uSkinTime: shared.skinTime,
       uMood: shared.mood, uPalette: shared.palette, uPattern: shared.pattern, uBeat: shared.beat,
+      uRamp: shared.ramp, uRampWeight: shared.rampWeight,
     });
     // The normal is needed before begin_vertex runs; compute placement there.
     shader.vertexShader = shader.vertexShader.replace('#include <beginnormal_vertex>', `
@@ -607,6 +620,8 @@ export function createShared({ spineLength, scale, pattern }) {
     skinTime: { value: 0 },
     mood: { value: new THREE.Vector4() },
     palette: { value: new THREE.Vector2() },
+    ramp: { value: [new THREE.Color(), new THREE.Color(), new THREE.Color()] },
+    rampWeight: { value: 0 },
     pattern: { value: pattern },
   };
 }

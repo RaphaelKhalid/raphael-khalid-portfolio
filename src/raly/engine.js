@@ -6,6 +6,7 @@ import { createSwimmer } from './swimmer.js';
 import { createPattern } from './pattern.js';
 import { createBodyFrames } from './frames.js';
 import { createAudio } from './audio.js';
+import { createPaletteCycle } from './palettes.js';
 import { ralyScreen } from './store.js';
 
 // raly, the site's resident organism (membrane study 08, in site form).
@@ -76,6 +77,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   pattern.step(quality === 'high' ? 1500 : 1000, 0);
   const shared = createShared({ spineLength: specimen.spine.length, scale: SCALE, pattern: pattern.texture });
   shared.palette.value.set(specimen.palette.hue, specimen.palette.warmth);
+  // It moves through five key palettes, starting from the original reef.
+  const palettes = createPaletteCycle(shared);
   shared.morph.value.set(0, 0, 0, 1);
   const swimmer = createSwimmer(specimen, { scale: SCALE, random, faithful: true });
   const organism = new THREE.Group(); organism.scale.setScalar(SCALE); scene.add(organism);
@@ -169,6 +172,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     state.time += dt;
     state.phase = (state.phase + dt * Math.PI * 2 / 12) % (Math.PI * 2);
     sound = audio.update(dt);
+    palettes.update(dt);
+    ralyScreen.palette = palettes.name;
     updateBounds();
     const env = { bounds, food: null, feeding: false, energy: 1 + 0.6 * sound.level };
     const body = swimmer.update(dt, env);
@@ -276,6 +281,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       if (!hit) return false;
       const at = screenToWorld(clientX, clientY);
       if (at) swimmer.poke(at.clone());
+      palettes.next();
       Object.assign(state.touch, { t: hit.t, v: hit.s * 0.5 + 0.5, frames: 24 });
       return true;
     },
