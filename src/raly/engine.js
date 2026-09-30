@@ -173,7 +173,6 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     state.phase = (state.phase + dt * Math.PI * 2 / 12) % (Math.PI * 2);
     sound = audio.update(dt);
     palettes.update(dt);
-    ralyScreen.palette = palettes.name;
     updateBounds();
     const env = { bounds, food: null, feeding: false, energy: 1 + 0.6 * sound.level };
     const body = swimmer.update(dt, env);
