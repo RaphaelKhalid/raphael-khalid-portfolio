@@ -119,33 +119,57 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   pointer-events: none;
 }
 
-/* What raly says when clicked: a small paper note above its head. */
+/* What raly says when clicked: a doodled bubble whose outline boils and whose
+   words scribble in (see src/raly/bubble.js). */
 .raly-says {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 16;
   pointer-events: none;
-  max-width: min(280px, calc(100vw - 24px));
-  padding: 7px 13px 8px;
-  background: var(--raised);
-  border: 1px solid var(--hair);
-  border-radius: 14px;
-  box-shadow: 0 10px 24px -16px rgba(46, 40, 38, 0.45);
-  font-family: "IBM Plex Sans", system-ui, sans-serif;
-  font-size: 15px;
-  line-height: 1.35;
-  color: var(--ink);
+  isolation: isolate;
+  max-width: min(300px, calc(100vw - 40px));
+  padding: 10px 18px 12px;
+  font-family: "Patrick Hand", "Comic Sans MS", cursive;
+  font-size: 20px;
+  line-height: 1.22;
+  color: #3a322e;
   opacity: 0;
-  scale: 0.9;
-  transform-origin: 50% 100%;
-  transition: opacity 260ms var(--e-soft), scale 420ms var(--e-out);
+  scale: 0.45;
+  transform-origin: 22% 115%;
+  transition: opacity 160ms var(--e-soft), scale 200ms ease-in;
   will-change: transform;
 }
 .raly-says.on {
   opacity: 1;
   scale: 1;
+  transition: opacity 120ms var(--e-soft), scale 460ms cubic-bezier(0.3, 1.75, 0.45, 1);
 }
+.raly-says-frame {
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  z-index: -1;
+  overflow: visible;
+}
+.raly-says-fill { fill: var(--raised); }
+.raly-says-line {
+  fill: none;
+  stroke: #5a4f48;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.raly-says-line-2 { stroke-width: 1.1; opacity: 0.7; }
+.raly-says-spark { fill: #d98c84; }
+.raly-says-word { display: inline-block; white-space: nowrap; }
+.raly-says-char {
+  display: inline-block;
+  opacity: 0;
+  scale: 0.6;
+  transition: opacity 90ms linear, scale 160ms cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+.raly-says-char.in { opacity: 1; scale: 1; }
 
 html.over-raly, html.over-raly body {
   cursor: pointer;
