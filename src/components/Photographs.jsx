@@ -104,11 +104,9 @@ const Photographs = () => {
     <section className="relative w-full">
       <span className="hash-span" id="photographs">&nbsp;</span>
       <div className={`${styles.paddingX} max-w-[1440px] mx-auto pt-6 pb-10`}>
-        <SectionHead index="04" label="photographs" title="After hours" aside={
+        <SectionHead index="04" label="photographs" title="Photography" aside={
           <a href={HOST} target="_blank" rel="noreferrer" className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-coral transition-colors">full portfolio ↗</a>
-        }>
-          Night and low light, and the in-between minutes either side of it. Drag the strip, or open a print.
-        </SectionHead>
+        } />
         <div className="flex justify-end gap-5 -mt-4 mb-4">
           <button type="button" onClick={() => nudge(-1)} className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-ink-text" aria-label="Previous photographs">← back</button>
           <button type="button" onClick={() => nudge(1)} className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-ink-text" aria-label="More photographs">more →</button>
