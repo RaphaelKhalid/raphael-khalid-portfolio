@@ -43,7 +43,7 @@ const RalyLayer = () => {
   const canvasRef = useRef(null);
   const saysRef = useRef(null);
   const markRef = useRef(null);
-  const labelRef = useRef(null);
+  const tourSaysRef = useRef(null);
   const tapRef = useRef(null);
 
   useEffect(() => {
@@ -56,7 +56,8 @@ const RalyLayer = () => {
     const tour = createTour({
       getEngine: () => engine,
       mark: markRef.current,
-      label: labelRef.current,
+      bubble: createBubble(tourSaysRef.current),
+      bubbleEl: tourSaysRef.current,
       tapRing: tapRef.current,
     });
     let autoTimer = 0, line = 0, lastHit = -1e9, sayUntil = 0;
@@ -218,10 +219,11 @@ const RalyLayer = () => {
       {/* What raly says when it is clicked. */}
       <div ref={saysRef} className="raly-says" aria-live="polite" />
       {/* The guide's mark: a hairline drawn around what raly is showing, with a caption. */}
-      <div ref={markRef} className="raly-mark" aria-live="polite">
-        <svg aria-hidden="true"><rect x="1" y="1" rx="7" pathLength="1" /></svg>
-        <p className="raly-mark-label"><span className="normal-case text-coral">raly</span> · <span ref={labelRef} /></p>
+      <div ref={markRef} className="raly-mark" aria-hidden="true">
+        <svg><rect x="1" y="1" rx="7" pathLength="1" /></svg>
       </div>
+      {/* The tour's captions, in the same doodled bubble, bigger. */}
+      <div ref={tourSaysRef} className="raly-says raly-says-tour" aria-live="polite" />
       <span ref={tapRef} className="raly-tap" aria-hidden="true" />
     </>
   );
