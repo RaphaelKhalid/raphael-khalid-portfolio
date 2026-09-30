@@ -7,27 +7,28 @@ import SectionHead from "./SectionHead";
 // are served by the photography site itself, so it stays the one source.
 const HOST = "https://raphael-photography.vercel.app";
 
+// Each photo: its file, Raphael's own caption (shown under the print), and a
+// description for screen readers.
 const PHOTOS = [
-  ["0292", "A full moon over the lit span of a bridge at blue hour."],
-  ["0300", "A lone figure on a steep street at dusk."],
-  ["0240", "Fireworks bursting in gold over a waterfront."],
-  ["0416", "A fire truck's red lights streaking down a hill after dark."],
-  ["0468", "City lights scattered across the hills at blue hour."],
-  ["0407", "String lights glowing through dark foliage at night."],
-  ["0446", "A weathered wooden house against a deep blue dusk sky."],
-  ["0406", "Backlit autumn leaves catching a single point of light at dusk."],
-  ["0475", "A stadium floodlight standing alone against the night."],
-  ["0363", "A pyramid tower tapering into a clear sky."],
-  ["0279", "Rail yards seen from above."],
-  ["0307", "Twin church spires rising above the water."],
-  ["0324", "Rows of houses climbing a hill toward the water."],
-  ["0315", "A little free library box beside a weathered garden ornament."],
-  ["0351", "A flock of wild parrots gathered on a bare branch."],
-  ["0662", "Fog rolling low over the Pacific at day's end."],
-  ["0551", "A gull banking low over open water."],
-  ["0253", "A bird resting on a wire against a burning orange sunset."],
-  ["0555", "Waves breaking below coastal cliffs."],
-].map(([id, alt]) => ({ id, alt, src: `${HOST}/img/DSC_${id}-768.webp`, full: `${HOST}/img/DSC_${id}-1280.webp` }));
+  ["0292", "Bay Bridge from Ina Coolbrith Park", "A full moon over the lit span of the Bay Bridge at blue hour."],
+  ["0300", "View Looking Down California Street", "A motorcyclist riding up the cable car tracks of California Street, traffic stretching down the hill behind."],
+  ["0240", "Fireworks Over UPenn", "Fireworks bursting in pale gold against the night sky."],
+  ["0416", "Firetruck somewhere in SF", "A fire truck's red lights streaking down a San Francisco hill after dark."],
+  ["0468", "Corona heights or Tank hill I forgot", "A rocky peak silhouetted against a deep blue night sky above scattered city lights."],
+  ["0407", "Bush", "A dense bush of autumn leaves with a single warm light glowing through it at dusk."],
+  ["0446", "I liked the sharp angles in this one", "The sharp, angled rooflines of a wooden house against a clear blue evening sky."],
+  ["0406", "Same bush from before but zoomed in", "A close-up of the same bush, its dark leaves lit by a single point of light."],
+  ["0475", "This evoked a feeling of deep loneliness when I came across it in the middle of the night", "A lone floodlight glowing in the dark above black trees."],
+  ["0363", "Caught this tiny plane right as it emerged from behind the Transamerica Pyramid", "A small plane emerging from behind the Transamerica Pyramid against a blue sky."],
+  ["0307", "Caught the ferry", "Twin white church spires in front of the bay as a ferry crosses behind them."],
+  ["0324", "Secret garden behind Ina Coolbrith Park", "Rows of houses and gardens climbing a hill toward the water."],
+  ["0315", "Free little library", "A little free library box beside a weathered garden ornament."],
+  ["0351", "Parrots of Nob Hill", "A flock of wild parrots gathered on a bare branch."],
+  ["0662", "Rainbow cloud", "A small rainbow-tinted cloud above the ocean at sunset, a few people on the beach below."],
+  ["0551", "Bird", "A gull flying low over blue water, hills behind it."],
+  ["0253", "Plane leaving JFK", "A plane climbing across a burning orange sunset, past power lines and silhouetted trees."],
+  ["0555", "Surf fishing at high tide on Baker Beach", "Waves breaking below coastal cliffs at high tide."],
+].map(([id, caption, alt]) => ({ id, caption, alt, src: `${HOST}/img/DSC_${id}-768.webp`, full: `${HOST}/img/DSC_${id}-1280.webp` }));
 
 const Print = ({ photo, index, onOpen }) => (
   <figure className="shrink-0 snap-start" data-photo={index}>
@@ -35,7 +36,7 @@ const Print = ({ photo, index, onOpen }) => (
       type="button"
       onClick={() => onOpen(index)}
       className="block bg-raised p-2.5 pb-3 border border-hair shadow-[0_22px_36px_-30px_rgba(46,40,38,0.55)] transition-transform duration-300 ease-out hover:-translate-y-1"
-      aria-label={`Open photograph: ${photo.alt}`}
+      aria-label={`Open photograph: ${photo.caption}`}
     >
       <img
         src={photo.src}
@@ -46,8 +47,9 @@ const Print = ({ photo, index, onOpen }) => (
         className="block h-[260px] sm:h-[340px] w-auto min-w-[160px] bg-[#1f1b19] select-none"
       />
     </button>
-    <figcaption className="mt-3 max-w-[300px] font-mono text-[10px] tracking-[0.12em] uppercase text-muted leading-relaxed">
-      <span className="text-ink-text">fig. {String(index + 1).padStart(2, "0")}</span> · {photo.alt.replace(/\.$/, "")}
+    <figcaption className="mt-3 max-w-[300px] text-[13px] leading-snug text-fg-dim">
+      <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-ink-text mr-2">fig. {String(index + 1).padStart(2, "0")}</span>
+      {photo.caption}
     </figcaption>
   </figure>
 );
@@ -131,8 +133,10 @@ const Photographs = () => {
           onClick={() => setOpen(null)}
         >
           <img src={PHOTOS[open].full} alt={PHOTOS[open].alt} className="max-h-[82vh] max-w-full object-contain shadow-2xl" onClick={e => e.stopPropagation()} />
-          <p className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-[#d9cfc2] text-center">
-            fig. {String(open + 1).padStart(2, "0")} · {PHOTOS[open].alt.replace(/\.$/, "")} <span className="text-[#86796f]">· ← → · esc</span>
+          <p className="text-[14px] text-[#e6dccf] text-center max-w-[70ch]">
+            <span className="font-mono text-[10.5px] tracking-[0.14em] uppercase mr-2">fig. {String(open + 1).padStart(2, "0")}</span>
+            {PHOTOS[open].caption}
+            <span className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-[#86796f] ml-2">← → · esc</span>
           </p>
         </div>
       )}
