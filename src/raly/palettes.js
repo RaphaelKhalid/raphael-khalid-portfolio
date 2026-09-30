@@ -1,49 +1,83 @@
 import * as THREE from 'three';
+import { lookIndex } from './looks.js';
 
-// raly's key palettes. Each maps the skin's zones (spine, mid-body, frilled
-// edge) to three colors; the pattern's lightness is kept, so spots, bars and
-// veins read the same in every palette. Reef is the original skin.
-export const PALETTES = [
-  { name: 'reef', weight: 0, ramp: ['#1f2f9e', '#b3135c', '#f2a33a'] },
-  { name: 'whale shark', weight: 1, ramp: ['#16304f', '#2d6a8a', '#9cc7d3'] },
-  { name: 'ember', weight: 1, ramp: ['#5c0d1c', '#d4402a', '#f4b53f'] },
-  { name: 'lichen', weight: 1, ramp: ['#173f31', '#4f8a3c', '#cfd66b'] },
-  { name: 'nudibranch', weight: 1, ramp: ['#1d0f4a', '#6b2fb8', '#c9a6ff'] },
+// raly's appearances: the natural skin in five key palettes, interleaved with
+// its art styles (see looks.js). Each palette maps the skin's zones (spine,
+// mid-body, frilled edge) to three colors while keeping the pattern's
+// lightness; reef is the original skin. raly holds each appearance for a
+// while, then moves to the next: palettes glide into each other, and a new
+// art style sweeps down the body from head to tail.
+export const PALETTES = {
+  reef: { weight: 0, ramp: ['#1f2f9e', '#b3135c', '#f2a33a'] },
+  'whale shark': { weight: 1, ramp: ['#16304f', '#2d6a8a', '#9cc7d3'] },
+  ember: { weight: 1, ramp: ['#5c0d1c', '#d4402a', '#f4b53f'] },
+  lichen: { weight: 1, ramp: ['#173f31', '#4f8a3c', '#cfd66b'] },
+  nudibranch: { weight: 1, ramp: ['#1d0f4a', '#6b2fb8', '#c9a6ff'] },
+};
+
+export const APPEARANCES = [
+  { look: 'natural', palette: 'reef' },
+  { look: 'ink' },
+  { look: 'natural', palette: 'whale shark' },
+  { look: 'watercolor' },
+  { look: 'natural', palette: 'ember' },
+  { look: 'porcelain' },
+  { look: 'natural', palette: 'lichen' },
+  { look: 'fabric' },
+  { look: 'natural', palette: 'nudibranch' },
+  { look: 'oil' },
+  { look: 'cosmic' },
+  { look: 'cartoon' },
 ];
 
-const HOLD = 32, BLEND = 6;
+const HOLD = 30, BLEND = 5;
 const smooth = t => t * t * (3 - 2 * t);
 
-export function createPaletteCycle(shared, { start = 0 } = {}) {
-  const colors = PALETTES.map(p => p.ramp.map(hex => new THREE.Color(hex)));
-  let from = start % PALETTES.length, to = from, t = 1, held = 0;
+/** Cycles raly's appearance. `look` names one to show and hold (for previews). */
+export function createAppearanceCycle(shared, { look } = {}) {
+  const colors = Object.fromEntries(Object.entries(PALETTES).map(([name, p]) => [name, p.ramp.map(hex => new THREE.Color(hex))]));
+  const asked = look ? APPEARANCES.findIndex(a => a.look === look) : -1;
+  let from = Math.max(0, asked), to = from, t = 1, held = 0;
+  const paused = asked >= 0;
 
-  function apply() {
-    const a = PALETTES[from], b = PALETTES[to], k = smooth(t);
+  function setPalette(name, other = name, k = 0) {
+    const a = PALETTES[name], b = PALETTES[other];
     shared.rampWeight.value = a.weight + (b.weight - a.weight) * k;
-    // Blending into or out of reef keeps the other palette's ramp, so only
-    // its weight fades; between two palettes the colors themselves glide.
     for (let i = 0; i < 3; i++) {
       const out = shared.ramp.value[i];
-      if (a.weight === 0) out.copy(colors[to][i]);
-      else if (b.weight === 0) out.copy(colors[from][i]);
-      else out.copy(colors[from][i]).lerp(colors[to][i], k);
+      // Into or out of reef only the weight fades; between palettes the colors glide.
+      if (a.weight === 0) out.copy(colors[other][i]);
+      else if (b.weight === 0) out.copy(colors[name][i]);
+      else out.copy(colors[name][i]).lerp(colors[other][i], k);
     }
+  }
+
+  function apply() {
+    const a = APPEARANCES[from], b = APPEARANCES[to], k = smooth(t);
+    if (a.look === 'natural' && b.look === 'natural') {
+      setPalette(a.palette, b.palette, k);
+      shared.look.value.set(0, 0, 0);
+      return;
+    }
+    // The natural side (if any) keeps its own palette through the sweep.
+    const natural = a.look === 'natural' ? a : b.look === 'natural' ? b : null;
+    if (natural) setPalette(natural.palette);
+    shared.look.value.set(lookIndex(a.look), lookIndex(b.look), k);
   }
   apply();
 
   return {
-    get name() { return PALETTES[t < 0.5 ? from : to].name; },
-    /** Start blending toward the next palette now. */
+    get name() { const a = APPEARANCES[t < 0.5 ? from : to]; return a.palette ?? a.look; },
+    /** Start moving to the next appearance now. */
     next() {
-      if (t < 1) return; // let a blend finish rather than snapping mid-way
+      if (t < 1) return; // let a change finish rather than snapping mid-way
       from = to;
-      to = (to + 1) % PALETTES.length; t = 0; held = 0;
+      to = (to + 1) % APPEARANCES.length; t = 0; held = 0;
     },
     update(dt) {
       if (t < 1) { t = Math.min(1, t + dt / BLEND); apply(); return; }
       held += dt;
-      if (held > HOLD) this.next();
+      if (!paused && held > HOLD) this.next();
     },
   };
 }

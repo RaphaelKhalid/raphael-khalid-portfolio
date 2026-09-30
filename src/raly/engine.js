@@ -6,7 +6,8 @@ import { createSwimmer } from './swimmer.js';
 import { createPattern } from './pattern.js';
 import { createBodyFrames } from './frames.js';
 import { createAudio } from './audio.js';
-import { createPaletteCycle } from './palettes.js';
+import { createAppearanceCycle } from './palettes.js';
+import { lookIndex } from './looks.js';
 import { ralyScreen } from './store.js';
 
 // raly, the site's resident organism (membrane study 08, in site form).
@@ -77,8 +78,9 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   pattern.step(quality === 'high' ? 1500 : 1000, 0);
   const shared = createShared({ spineLength: specimen.spine.length, scale: SCALE, pattern: pattern.texture });
   shared.palette.value.set(specimen.palette.hue, specimen.palette.warmth);
-  // It moves through five key palettes, starting from the original reef.
-  const palettes = createPaletteCycle(shared);
+  // It moves through its palettes and art styles; ?look=ink shows and holds one.
+  const askedLook = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('look') : null;
+  const palettes = createAppearanceCycle(shared, { look: askedLook });
   shared.morph.value.set(0, 0, 0, 1);
   const swimmer = createSwimmer(specimen, { scale: SCALE, random, faithful: true });
   const organism = new THREE.Group(); organism.scale.setScalar(SCALE); scene.add(organism);
@@ -272,6 +274,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     },
     /** How briskly it follows: 1 normally, higher while it guides the tour. */
     setPace(value) { swimmer.setPace(value); },
+    /** Repaint raly in one of its art styles (see looks.js). */
+    setLook(name) { const i = lookIndex(name); shared.look.value.set(i, i, 0); }, // for previews and tests
     /** True if the point is on raly's body. */
     hover(clientX, clientY) { return Boolean(nearestOnBody(clientX, clientY)); },
     /** A click on the body: it flinches away and pigment blooms where it was touched. */
