@@ -1,5 +1,4 @@
 import { useState } from "react";
-import emailjs from "@emailjs/browser";
 import { styles } from "../styles";
 import SectionHead from "./SectionHead";
 import SunlitFloor from "./SunlitFloor";
@@ -14,6 +13,9 @@ const Field = ({ label, children }) => (
 );
 
 const EMAIL = "raphaelbahadurkhan@gmail.com";
+// FormSubmit relays the note to EMAIL; no account or keys. The first note
+// sends Raphael a one-time "Activate Form" link, and it delivers after that.
+const ENDPOINT = `https://formsubmit.co/ajax/${EMAIL}`;
 
 const inputClass =
   "bg-transparent border-0 border-b border-hair focus:border-ink-text outline-none py-2.5 text-[16px] text-ink-text placeholder:text-muted/70 transition-colors";
@@ -23,21 +25,31 @@ const Contact = () => {
   const [status, setStatus] = useState("idle");
   const change = event => setForm({ ...form, [event.target.name]: event.target.value });
 
-  const submit = event => {
+  const submit = async event => {
     event.preventDefault();
     setStatus("sending");
-    emailjs
-      .send(
-        "service_q66h0cg",
-        "template_pqb7xwz",
-        { from_name: form.name, to_name: "Raphael Khalid", from_email: form.email, to_email: EMAIL, message: form.message },
-        "Sg0gvTnXP8iUMIKvv"
-      )
-      .then(
-        () => { setStatus("sent"); setForm({ name: "", email: "", message: "" }); },
-        // Keep what they wrote, so the direct-email fallback can carry it.
-        error => { console.error(error); setStatus("failed"); }
-      );
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          _subject: `raphaelkhalid.com: a note from ${form.name}`,
+          _template: "table",
+          _captcha: "false",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || String(result.success) !== "true") throw new Error(result.message || `HTTP ${response.status}`);
+      setStatus("sent");
+      setForm({ name: "", email: "", message: "" });
+    } catch (error) {
+      // Keep what they wrote, so the direct-email fallback can carry it.
+      console.error(error);
+      setStatus("failed");
+    }
   };
 
   return (
