@@ -205,11 +205,11 @@ html.dragging-raly, html.dragging-raly * {
    its skin, while raly stays visible between and around the lines. A solid
    paper outline is painted under each glyph (exact color, so it never tints
    the page), softened by two light shadows. */
-main :where(p, h2, h3, h4, li, figcaption, dt, dd, label, a, span):not(.headline-type, .headline-type *, .plate *, .panel-demo *, .lab *, [role="dialog"] *) {
+main :where(p, h2, h3, h4, li, figcaption, dt, dd, label, a, span):not(.headline-type, .headline-type *, .plate *, .panel-demo *, .lab *, [role="dialog"] *, .wall-card, .wall-card *) {
   text-shadow: 0 0 6px rgba(244, 235, 223, 0.9), 0 0 14px rgba(244, 235, 223, 0.7);
 }
 @supports (paint-order: stroke fill) {
-  main :where(p, h2, h3, h4, li, figcaption, dt, dd, label, a, span):not(.headline-type, .headline-type *, .plate *, .panel-demo *, .lab *, [role="dialog"] *) {
+  main :where(p, h2, h3, h4, li, figcaption, dt, dd, label, a, span):not(.headline-type, .headline-type *, .plate *, .panel-demo *, .lab *, [role="dialog"] *, .wall-card, .wall-card *) {
     -webkit-text-stroke: 4px var(--paper);
     paint-order: stroke fill;
   }
