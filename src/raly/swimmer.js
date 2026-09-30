@@ -49,6 +49,8 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
   // sudden cursor jumps become long curves rather than snaps.
   const followPoint = new Vector3();
   let followReady = false, pace = 1;
+  // Held: someone is carrying it. It stops swimming and keeps its shape.
+  let held = false;
   let pointerPresent = false, pointerTime = -Infinity, pointerSeen = -Infinity, pointerSpeed = 0, pointerSample = -Infinity;
   let startleUntil = -Infinity, startleCooldown = -Infinity, orbitSign = 1;
   const flee = new Vector3();
@@ -262,8 +264,9 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
 
   function update(dt, env) {
     elapsed += dt;
-    if (inspecting) {
+    if (inspecting || held) {
       speed *= Math.exp(-dt * 3);
+      omega.multiplyScalar(Math.exp(-dt * 4));
       buildBody();
     } else {
       let remaining = Math.min(dt, 0.1);
@@ -339,6 +342,16 @@ export function createSwimmer(specimen, { scale, random = Math.random, faithful 
       }
     },
     /** Moves the whole body (head and wake) by `shift`, unchanged otherwise. */
+    /** Picked up (true) or let go (false). */
+    setHeld(value) {
+      held = value;
+      if (!value) { followReady = false; nextWaypoint = elapsed + 2; waypoint.copy(head).addScaledVector(heading, 2); }
+    },
+    /** Move the whole body by a world offset, keeping its shape (while held). */
+    carry(shift) {
+      head.add(shift);
+      trail.forEach(point => point.add(shift));
+    },
     teleport(shift, bounds) {
       head.add(shift);
       trail.forEach(point => point.add(shift));

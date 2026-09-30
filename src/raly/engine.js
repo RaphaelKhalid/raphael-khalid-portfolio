@@ -134,6 +134,18 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   // Portals: once the whole body is past a side, it reappears past the other;
   // past the top, it comes back in from the left or right, 50/50.
   const portalShift = new THREE.Vector3(), portalPoint = new THREE.Vector3(), portalDirection = new THREE.Vector3();
+  // Being carried: the grabbed point eases toward the cursor, bringing the
+  // whole body along without changing its shape.
+  // The cursor is projected onto a screen-facing plane through the grabbed
+  // point, so that point stays under the cursor at any depth.
+  const grab = { active: false, at: new THREE.Vector3(), target: new THREE.Vector3(), step: new THREE.Vector3(), plane: new THREE.Plane(), facing: new THREE.Vector3() };
+  function carry(dt) {
+    if (!grab.active) return;
+    grab.step.subVectors(grab.target, grab.at).multiplyScalar(1 - Math.exp(-dt * 16));
+    grab.at.add(grab.step);
+    swimmer.carry(grab.step);
+  }
+
   function portal() {
     if (!ralyScreen.visible && ralyScreen.right === -1e4) return false;
     const margin = 40, worldPerPx = (2 * bounds.halfWidth) / view.width;
@@ -178,7 +190,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     updateBounds();
     const env = { bounds, food: null, feeding: false, energy: 1 + 0.6 * sound.level };
     const body = swimmer.update(dt, env);
-    if (!reducedMotion && portal()) swimmer.update(0, env);
+    carry(dt);
+    if (!reducedMotion && !grab.active && portal()) swimmer.update(0, env);
     shared.spinePos.value.set(body.spinePos);
     shared.spineQuat.value.set(body.spineQuat);
     organism.position.copy(body.position); organism.quaternion.copy(body.quaternion);
@@ -279,14 +292,39 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     /** True if the point is on raly's body. */
     hover(clientX, clientY) { return Boolean(nearestOnBody(clientX, clientY)); },
     /** A click on the body: it flinches away and pigment blooms where it was touched. */
+    /** A click on the body: pigment blooms where it was touched and raly
+     *  changes into its next appearance. It does not flee. */
     touch(clientX, clientY) {
       const hit = nearestOnBody(clientX, clientY);
       if (!hit) return false;
-      const at = screenToWorld(clientX, clientY);
-      if (at) swimmer.poke(at.clone());
-      palettes.next();
+      palettes.next({ quick: true });
       Object.assign(state.touch, { t: hit.t, v: hit.s * 0.5 + 0.5, frames: 24 });
       return true;
+    },
+    /** Pick raly up at a point on its body; false if the point misses it. */
+    grab(clientX, clientY) {
+      const hit = nearestOnBody(clientX, clientY);
+      if (!hit) return false;
+      frames.pointOn(hit.t, hit.s, grab.at);
+      camera.getWorldDirection(grab.facing);
+      grab.plane.setFromNormalAndCoplanarPoint(grab.facing, grab.at);
+      grab.target.copy(grab.at); grab.active = true;
+      swimmer.setHeld(true);
+      return true;
+    },
+    /** Carry it: the grabbed point follows the cursor. */
+    drag(clientX, clientY) {
+      if (!grab.active) return;
+      ndc.set(clientX / view.width * 2 - 1, 1 - clientY / view.height * 2);
+      raycaster.setFromCamera(ndc, camera);
+      const at = raycaster.ray.intersectPlane(grab.plane, hitPoint);
+      if (at) grab.target.copy(at);
+    },
+    /** Let go: it swims on from where it was left. */
+    release() {
+      if (!grab.active) return;
+      grab.active = false;
+      swimmer.setHeld(false);
     },
     /** For tests and captures. */
     advance(seconds, step = 1 / 60) { for (let t = 0; t < seconds; t += step) simulate(step); render(); },
