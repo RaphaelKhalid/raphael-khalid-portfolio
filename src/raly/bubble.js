@@ -15,7 +15,7 @@ function rng(seed) {
 
 // Points around a rounded rectangle with a tail at the bottom left, each
 // nudged a little, joined with a smooth closed curve.
-function wobblyBubble(w, h, seed, { amp = 1.6, grow = 0 } = {}) {
+function wobblyBubble(w, h, seed, { amp = 1.6, grow = 0, flip = false } = {}) {
   const r = Math.min(18, h * 0.42), rand = rng(seed);
   const x0 = -grow, y0 = -grow, x1 = w + grow, y1 = h + grow;
   const tailX = Math.min(64, w * 0.28);
@@ -36,6 +36,8 @@ function wobblyBubble(w, h, seed, { amp = 1.6, grow = 0 } = {}) {
   edge(x0 + tailX - 2, y1, x0 + r, y1, 2);
   arc(x0 + r, y1 - r, Math.PI * 0.5, Math.PI);
   edge(x0, y1 - r, x0, y0 + r, 2);
+  // Tail up instead: the same bubble, mirrored top to bottom.
+  if (flip) for (const p of pts) p[1] = h - p[1];
   // Catmull-Rom through the points, as cubic Béziers.
   let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
   for (let i = 0; i < pts.length; i++) {
@@ -66,14 +68,14 @@ export function createBubble(root) {
   text.className = 'raly-says-text';
   root.replaceChildren(svg, text);
 
-  let chars = [], size = [0, 0], boilFrame = -1, shownAt = 0, visible = false;
+  let chars = [], size = [0, 0], boilFrame = -1, shownAt = 0, visible = false, flip = false;
 
   function drawFrame(frame) {
     const [w, h] = size;
     const seed = 1 + (frame % 4) * 977;
-    fill.setAttribute('d', wobblyBubble(w, h, seed, { amp: 1.2 }));
-    lineA.setAttribute('d', wobblyBubble(w, h, seed + 11, { amp: 1.6 }));
-    lineB.setAttribute('d', wobblyBubble(w, h, seed + 53, { amp: 2.1, grow: 2.5 }));
+    fill.setAttribute('d', wobblyBubble(w, h, seed, { amp: 1.2, flip }));
+    lineA.setAttribute('d', wobblyBubble(w, h, seed + 11, { amp: 1.6, flip }));
+    lineB.setAttribute('d', wobblyBubble(w, h, seed + 53, { amp: 2.1, grow: 2.5, flip }));
     const twinkle = 0.8 + 0.25 * Math.sin(frame * 1.7);
     sparks.setAttribute('d', sparkle(w + 20, 2, 7 * twinkle) + sparkle(w + 11, 17, 4.2 * (1.9 - twinkle)));
     // Letters jitter with the same boil.
@@ -83,7 +85,10 @@ export function createBubble(root) {
 
   return {
     get visible() { return visible; },
-    say(message) {
+    /** Show a message; `tail` is 'down' (bubble above its subject) or 'up'. */
+    say(message, { tail = 'down' } = {}) {
+      flip = tail === 'up';
+      root.style.transformOrigin = flip ? '22% -15%' : '';
       text.textContent = '';
       chars = [];
       // Letters are grouped by word so lines only wrap between words.

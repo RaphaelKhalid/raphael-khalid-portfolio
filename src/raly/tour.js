@@ -74,10 +74,12 @@ const STEPS = [
   },
 ];
 
-export function createTour({ getEngine, mark, label, tapRing, onChange }) {
+// Captions appear in raly's own doodled speech bubble (bubble.js), beside
+// the marked thing with the tail pointing at it.
+export function createTour({ getEngine, mark, bubble, bubbleEl, tapRing, onChange }) {
   let active = false, step = -1, stepTimer = 0, timers = [];
   const guide = { x: innerWidth * 0.7, y: innerHeight * 0.5, ready: false };
-  const labelBox = label.parentElement;
+  let placement = 'up';
 
   // Headings are block-wide; the mark hugs their text instead.
   function bounds(el) {
@@ -127,12 +129,16 @@ export function createTour({ getEngine, mark, label, tapRing, onChange }) {
     if (i >= STEPS.length) return stop(true);
     const s = STEPS[i];
     mark.classList.remove("on");
-    label.textContent = "";
+    bubble.hide();
     onChange?.({ active: true, step: i, total: STEPS.length });
     const settle = s.scroll ? 1100 : 250;
     if (s.scroll) scrollToSection(s.scroll);
     later(settle, () => {
-      label.textContent = s.say;
+      // Below the marked thing if there is room, otherwise above it.
+      const el = s.mark();
+      const r = el ? bounds(el) : { bottom: 0 };
+      placement = r.bottom + 150 < innerHeight ? 'up' : 'down';
+      bubble.say(s.say, { tail: placement });
       mark.classList.add("on");
       s.act?.(api);
     });
@@ -152,6 +158,7 @@ export function createTour({ getEngine, mark, label, tapRing, onChange }) {
     active = false;
     clearTimeout(stepTimer); timers.forEach(clearTimeout); timers = [];
     mark.classList.remove("on");
+    bubble.hide();
     document.documentElement.classList.remove("raly-touring");
     getEngine()?.setPace(1);
     getEngine()?.setPointer(null);
@@ -172,10 +179,14 @@ export function createTour({ getEngine, mark, label, tapRing, onChange }) {
     mark.style.transform = `translate3d(${r.left - pad}px, ${r.top - pad}px, 0)`;
     mark.style.width = `${r.width + pad * 2}px`;
     mark.style.height = `${r.height + pad * 2}px`;
-    // The caption sits under the mark, or above it near the bottom of the view.
-    const below = r.bottom + pad + 34 < innerHeight;
-    labelBox.style.top = below ? "calc(100% + 10px)" : "auto";
-    labelBox.style.bottom = below ? "auto" : "calc(100% + 10px)";
+    // The bubble sits under the mark (tail up) or over it (tail down).
+    if (bubble.visible) {
+      bubble.frame(performance.now());
+      const w = bubbleEl.offsetWidth, h = bubbleEl.offsetHeight;
+      const bx = clamp(r.left + 4, 12, innerWidth - w - 40);
+      const by = clamp(placement === 'up' ? r.bottom + pad + 26 : r.top - pad - h - 26, 80, innerHeight - h - 28);
+      bubbleEl.style.transform = `translate3d(${bx.toFixed(1)}px, ${by.toFixed(1)}px, 0)`;
+    }
     const [nx, ny] = s.near(r);
     const tx = clamp(nx, 60, innerWidth - 60), ty = clamp(ny, 110, innerHeight - 60);
     if (!guide.ready) { guide.x = tx; guide.y = ty; guide.ready = true; }
