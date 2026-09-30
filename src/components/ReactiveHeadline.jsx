@@ -249,7 +249,8 @@ function compile(gl, type, source) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
+  // Querying COMPILE_STATUS here can block on the driver. Check the linked
+  // program only after the parallel-completion poll below has finished.
   return shader;
 }
 
