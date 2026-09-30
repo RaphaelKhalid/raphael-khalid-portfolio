@@ -67,6 +67,7 @@ export function createBubble(root) {
   const text = document.createElement('span');
   text.className = 'raly-says-text';
   root.replaceChildren(svg, text);
+  root.inert = true;
 
   let chars = [], size = [0, 0], boilFrame = -1, shownAt = 0, visible = false, flip = false;
 
@@ -86,7 +87,7 @@ export function createBubble(root) {
   return {
     get visible() { return visible; },
     /** Show a message; `tail` is 'down' (bubble above its subject) or 'up'. */
-    say(message, { tail = 'down' } = {}) {
+    say(message, { tail = 'down', links = {} } = {}) {
       flip = tail === 'up';
       root.style.transformOrigin = flip ? '22% -15%' : '';
       text.textContent = '';
@@ -94,8 +95,16 @@ export function createBubble(root) {
       // Letters are grouped by word so lines only wrap between words.
       message.split(' ').forEach((word, w) => {
         if (w) text.append(' ');
-        const group = document.createElement('span');
+        const href = links[word];
+        const group = document.createElement(href ? 'a' : 'span');
         group.className = 'raly-says-word';
+        if (href) {
+          group.classList.add('raly-says-link');
+          group.href = href;
+          group.target = '_blank';
+          group.rel = 'noopener noreferrer';
+          group.setAttribute('aria-label', word);
+        }
         for (const ch of word) {
           const el = document.createElement('span');
           el.textContent = ch;
@@ -109,9 +118,10 @@ export function createBubble(root) {
       svg.setAttribute('width', size[0] + 40); svg.setAttribute('height', size[1] + 30);
       svg.setAttribute('viewBox', `-8 -8 ${size[0] + 40} ${size[1] + 30}`);
       boilFrame = -1; shownAt = performance.now(); visible = true;
+      root.inert = false;
       root.classList.remove('on'); void root.offsetWidth; root.classList.add('on');
     },
-    hide() { visible = false; root.classList.remove('on'); },
+    hide() { visible = false; root.inert = true; root.classList.remove('on'); },
     /** Call every animation frame while visible. */
     frame(now) {
       if (!visible) return;

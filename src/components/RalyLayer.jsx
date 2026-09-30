@@ -121,6 +121,15 @@ const RalyLayer = () => {
     // Real input hands the page back: it ends the tour, or cancels one waiting to start.
     const interrupt = event => {
       if (!event.isTrusted) return;
+      const tourLink = event.target instanceof Element && event.target.closest('.raly-says-tour.on a');
+      // Keep native link activation and Tab navigation available during the tour.
+      if (tour.active && (
+        (tourLink && ['pointerdown', 'touchstart'].includes(event.type)) ||
+        (event.type === 'keydown' && (
+          (tourLink && event.key === 'Enter') ||
+          (event.key === 'Tab' && tourSaysRef.current.querySelector('a'))
+        ))
+      )) return;
       clearTimeout(autoTimer);
       if (tour.active) tour.stop();
     };
