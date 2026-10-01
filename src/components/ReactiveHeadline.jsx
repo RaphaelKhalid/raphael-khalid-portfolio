@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { onRaly, ralyScreen } from "../raly/store";
+import { SPECTRUM_BANDS } from "../raly/audio";
 import { onTheme } from "../utils/theme";
 
 // "running experiments", set as a row of printed letters with real thickness.
@@ -108,7 +109,7 @@ const ReactiveHeadline = ({ className = "" }) => {
             seed: old?.seed ?? Math.random(),
             engrave: 0, interfere: 0, ink: 0, geo: 0, marble: 0, riso: 0, water: 0, pressure: 0, geoTimer: 0, flow: [0, 0],
             pose: old?.pose ?? [0, 0, 0, 0], velocity: old?.velocity ?? [0, 0, 0, 0],
-            hop: 0, hopVel: 0, cue: -1, side: 1, sway: 0,
+            hop: 0, flick: 0, flickDir: 1,
           });
         }
       });
@@ -162,7 +163,7 @@ const ReactiveHeadline = ({ className = "" }) => {
     let lastRaly = null, frame = 0, last = 0, time = 0, visible = true;
     // Music raly hears (the nav's "listen") makes the words dance; night mode
     // flips their ink.
-    let audio = null, groove = 0, lastBeats = 0, beats = 0;
+    let audio = null, groove = 0, seen = null, kickHit = 0, snareHit = 0, snareSide = 1;
     const offRaly = onRaly(engine => { audio = engine?.audio?.state ?? null; });
     const offTheme = onTheme(dark => worker.postMessage({ type: 'theme', dark }));
     const approach = (value, target, rise, fall, dt) => value + (target - value) * (1 - Math.exp(-dt * (target > value ? rise : fall)));
@@ -190,16 +191,32 @@ const ReactiveHeadline = ({ className = "" }) => {
       const sigma = layout.fontPx * 0.9, ralySigma = layout.fontPx * 1.1;
       const ralyWeight = innerWidth < 760 ? 0.45 : 1;
 
-      // Dancing: each beat sends a hop rippling through the words, left to
-      // right; odd and even letters sway opposite ways and swap on the next
-      // beat; everything scales with how loud the music is, and settles in silence.
+      // Dancing, like a music visualizer: each part of the sound drives its
+      // own channel, with no delay.
+      //   spectrum  the words are an equalizer: "running" holds the bass and
+      //             low mids, "experiments" the mids up to treble; each letter
+      //             rises with its own band, frame by frame
+      //   kick      the whole word punches down and squashes, together
+      //   snare     odd and even letters snap apart sideways, and back
+      //   hi-hat    a couple of letters flick
+      //   tone      sustained synths and voice colour the letters whose band
+      //             is singing: a watercolour wash when it is warm and low,
+      //             marbling when it is bright
       const music = audio?.enabled ? audio : null;
-      groove = approach(groove, music ? Math.min(1, music.level * 1.6) : 0, 4, 0.8, dt);
-      if (music && music.beats !== lastBeats) {
-        lastBeats = music.beats; beats++;
-        letters.forEach((l, i) => { l.cue = i * 0.028; });
+      groove = approach(groove, music ? 1 : 0, 3, 1, dt);
+      if (music && !seen) seen = { kicks: music.kicks, snares: music.snares, hats: music.hats };
+      if (!music) seen = null;
+      if (music && music.kicks !== seen.kicks) { seen.kicks = music.kicks; kickHit = 1; }
+      if (music && music.snares !== seen.snares) { seen.snares = music.snares; snareHit = 1; snareSide = -snareSide; }
+      if (music && music.hats !== seen.hats && letters.length) {
+        seen.hats = music.hats;
+        for (let n = 0; n < 2; n++) {
+          const l = letters[Math.floor(Math.random() * letters.length)];
+          l.flick = 1; l.flickDir = Math.random() < 0.5 ? -1 : 1;
+        }
       }
-      const bass = music?.bass ?? 0, f = layout.fontPx;
+      kickHit *= Math.exp(-dt * 10); snareHit *= Math.exp(-dt * 8);
+      const f = layout.fontPx, tone = (music?.tone ?? 0) * groove, bright = music?.brightness ?? 0.5;
 
       letters.forEach((l, i) => {
         const dx = px - l.cx, dy = py - l.cy;
@@ -212,6 +229,10 @@ const ReactiveHeadline = ({ className = "" }) => {
         targets[attentionStyle] = Math.max(targets[attentionStyle], prox * slow);
         targets[quickStyle] = Math.max(targets[quickStyle], prox * fast);
         targets[style] = Math.max(targets[style], 0.7 * wave);
+        const band = music ? music.spectrum[letters.length > 1 ? Math.round(i * (SPECTRUM_BANDS - 1) / (letters.length - 1)) : 0] : 0;
+        const colour = Math.min(1, tone * (0.35 + 0.65 * band) * 1.3);
+        targets[6] = Math.max(targets[6], colour * (1 - bright));
+        targets[4] = Math.max(targets[4], colour * bright);
         l.pressure = Math.max(0, l.pressure + dt * ((rp > 0.7 ? 0.7 : 0) + (prox * slow > 0.8 ? 0.22 : 0) - 0.12));
         if (geometricAllowed && l.pressure > 1 && l.geoTimer <= 0) {
           l.geoTimer = 2.8 + Math.random() * 1.8; l.pressure = 0;
@@ -235,9 +256,6 @@ const ReactiveHeadline = ({ className = "" }) => {
           prox * layout.fontPx * 0.1 + rp * layout.fontPx * 0.06 + wave * layout.fontPx * 0.05 + layout.fontPx * 0.012 * Math.sin(time * 1.1 + i * 0.6),
           clamp(dx / sigma, -1, 1) * prox * 0.03,
         ];
-        // The dance rocks each letter into its sway, flat to the page: turning
-        // it in depth would show its stacked layers.
-        poseTarget[3] += l.sway * 0.06;
         // A fast pass nudges letters into a small, quickly settling sway.
         const kick = prox * fast * 0.0012;
         l.velocity[0] += flickY * kick * dt * 60; l.velocity[1] += flickX * kick * dt * 60;
@@ -250,18 +268,16 @@ const ReactiveHeadline = ({ className = "" }) => {
         // Never far enough to see the letter's side smear across its face.
         l.pose[0] = clamp(l.pose[0], -0.3, 0.3); l.pose[1] = clamp(l.pose[1], -0.3, 0.3); l.pose[3] = clamp(l.pose[3], -0.06, 0.06);
 
-        // The hop: a kick on the beat (harder with more bass), then a bouncy
-        // spring back down with a little rebound.
-        if (l.cue >= 0) {
-          l.cue -= dt;
-          if (l.cue < 0) { l.hopVel += f * (1.6 + 1.2 * bass) * groove; l.side = (beats + i) % 2 ? 1 : -1; }
-        }
-        l.hopVel += (-90 * l.hop - 9 * l.hopVel) * dt;
-        l.hop = clamp(l.hop + l.hopVel * dt, -0.04 * f, 0.22 * f);
-        l.sway = approach(l.sway, l.side * groove, 6, 3, dt);
-        // Stretch on the way up, squash on landing.
-        const squash = clamp(-l.hopVel / (f * 14), -0.12, 0.12);
-        dance.set([l.hop * layout.scale, squash, l.sway * f * 0.07 * layout.scale, 0], i * 4);
+        // The dance is applied straight to the drawn letter, not through the
+        // pose springs, so it lands on the sound rather than after it.
+        l.hop = approach(l.hop, band * 0.2 * f * groove, 30, 12, dt);
+        l.flick *= Math.exp(-dt * 14);
+        const parity = i % 2 ? 1 : -1;
+        const hop = l.hop - kickHit * 0.035 * f * groove;
+        const squash = (kickHit * 0.14 - band * 0.05) * groove;
+        const step = snareHit * snareSide * parity * 0.06 * f * groove;
+        const spin = (snareHit * snareSide * parity * 0.07 + l.flick * l.flickDir * 0.12) * groove;
+        dance.set([hop * layout.scale, squash, step * layout.scale, spin], i * 4);
       });
       letters.forEach((l, i) => {
         const left = letters[i - 1]?.targets, right = letters[i + 1]?.targets;
