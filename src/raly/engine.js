@@ -217,9 +217,9 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   let sound = audio.state;
   function updateGenome(t, mood) {
     shared.genome.value.set(
-      1 + 0.16 * wave(t / 37) + 0.06 * mood.curious - 0.14 * mood.startle + 0.12 * sound.bass,
+      1 + 0.16 * wave(t / 37) + 0.06 * mood.curious - 0.14 * mood.startle + 0.2 * sound.bass,
       0.14 + 0.2 * (0.5 + 0.5 * wave(t / 53, 2.1)),
-      Math.max(0.4, 1 + 0.3 * wave(t / 29, 4.2) + 0.25 * mood.curious + 0.45 * sound.bass),
+      Math.max(0.4, 1 + 0.3 * wave(t / 29, 4.2) + 0.25 * mood.curious + 0.75 * sound.bass),
       1 + 0.28 * wave(t / 44, 1.2) - 0.1 * mood.startle,
     );
   }
@@ -233,7 +233,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     formation.value.z = reducedMotion ? 0 : state.time;
     if (compiled) formation.value.y = reducedMotion ? 1 : Math.min(1, (state.time - skinAt) / 0.8);
     updateBounds();
-    const env = { bounds, food: null, feeding: false, energy: 1 + 0.6 * sound.level };
+    const env = { bounds, food: null, feeding: false, energy: 1 + 1.0 * sound.level };
     const body = swimmer.update(dt, env);
     carry(dt);
     if (!reducedMotion && !grab.active && portal()) swimmer.update(0, env);
@@ -245,7 +245,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     shared.effort.value += (body.effort - shared.effort.value) * (1 - Math.exp(-dt * 2.5));
     const m = body.mood;
     shared.mood.value.set(m.curious, m.startle, m.feed, m.turn);
-    shared.skinTime.value += dt * (1 + 1.2 * m.curious + 2.5 * m.startle + 1.5 * sound.mid);
+    shared.skinTime.value += dt * (1 + 1.2 * m.curious + 2.5 * m.startle + 2.5 * sound.mid);
     updateGenome(state.time, m);
     if (released && state.time > stylesAt) prepareLooks(palettes.upcoming);
     if (compiled && state.touch.frames > 0) {

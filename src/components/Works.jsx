@@ -6,6 +6,7 @@ import { styles } from "../styles";
 import SectionHead from "./SectionHead";
 import wallClip from "../assets/plates/wall.mp4";
 import wallPoster from "../assets/plates/wall-poster.webp";
+import { linkProgram, whenIdle } from "../utils/webgl";
 import "./works-wall.css";
 
 // Projects as a sleeping wall: every plate is on screen at once, all of them
@@ -71,14 +72,6 @@ void main() {
   outColor = vec4(color * alpha, alpha);
 }`;
 
-function compile(gl, type, source) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader));
-  return shader;
-}
-
 function makeVideo(src, rate) {
   const video = document.createElement("video");
   Object.assign(video, { src, muted: true, loop: true, playsInline: true, preload: "auto", playbackRate: rate, defaultPlaybackRate: rate });
@@ -95,164 +88,172 @@ function useLivingWall(wallRef, tileRefs, hovered, focused) {
   useEffect(() => {
     const wall = wallRef.current;
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.connection?.saveData;
+    if (still) return undefined;
+    // The wall is far below the hero: build it in an idle moment, off the
+    // critical first second, and never wait on the shader link.
     const canvas = document.createElement("canvas");
-    const gl = !still && canvas.getContext("webgl2", { alpha: true, premultipliedAlpha: true, antialias: false });
-    if (!gl) return undefined;
-    let program;
-    try {
-      program = gl.createProgram();
-      gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, VERTEX));
-      gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, FRAGMENT));
-      gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
-    } catch (error) {
-      console.warn("plate wall: falling back to stills", error);
-      return undefined;
-    }
-    canvas.className = "wall-canvas";
-    canvas.setAttribute("aria-hidden", "true");
-    wall.append(canvas);
-
-    gl.useProgram(program);
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]), gl.STATIC_DRAW);
-    const corner = gl.getAttribLocation(program, "aCorner");
-    gl.enableVertexAttribArray(corner);
-    gl.vertexAttribPointer(corner, 2, gl.FLOAT, false, 0, 0);
-    const U = Object.fromEntries(["uRect", "uWake", "uRes", "uCalm", "uAwake"].map(n => [n, gl.getUniformLocation(program, n)]));
-    const textures = [0, 1].map(unit => {
-      const t = gl.createTexture();
-      gl.activeTexture(gl.TEXTURE0 + unit);
-      gl.bindTexture(gl.TEXTURE_2D, t);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([244, 235, 223, 255]));
-      return t;
+    let stop = null, cancelled = false, gl = null;
+    const cancelIdle = whenIdle(() => {
+      gl = canvas.getContext("webgl2", { alpha: true, premultipliedAlpha: true, antialias: false });
+      if (!gl) return;
+      linkProgram(gl, VERTEX, FRAGMENT).then(program => {
+        if (!cancelled) stop = start(gl, program);
+      }, error => {
+        if (!cancelled) console.warn("plate wall: falling back to stills", error);
+      });
     });
-    gl.uniform1i(U.uCalm, 0);
-    gl.uniform1i(U.uAwake, 1);
+    return () => {
+      cancelled = true;
+      cancelIdle();
+      stop?.();
+      gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    };
 
-    // The wall video loads only as the wall comes near, once, shared by both
-    // copies (the sleeping plates play at half speed).
-    let videos = [], clipUrl = null, loading = false;
-    const fresh = [false, false], ready = [false, false];
-    async function loadVideos() {
-      if (loading) return;
-      loading = true;
-      try {
-        clipUrl = URL.createObjectURL(await (await fetch(wallClip)).blob());
-      } catch {
-        clipUrl = wallClip;
-      }
-      if (disposed) return;
-      videos = [makeVideo(clipUrl, 0.5), makeVideo(clipUrl, 1)];
-      videos.forEach((video, i) => {
-        const mark = () => { fresh[i] = true; ready[i] = true; if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(mark); };
-        if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(mark);
-        else video.addEventListener("timeupdate", () => { fresh[i] = true; ready[i] = true; });
-        video.addEventListener("loadeddata", () => { fresh[i] = true; ready[i] = true; });
-        if (visible && !document.hidden) video.play().catch(() => {});
-      });
-    }
-    let disposed = false;
-    const approaching = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { loadVideos(); approaching.disconnect(); }
-    }, { rootMargin: "900px 0px" });
-    approaching.observe(wall);
+    function start(gl, program) {
+      canvas.className = "wall-canvas";
+      canvas.setAttribute("aria-hidden", "true");
+      wall.append(canvas);
 
-    const count = projects.length;
-    const rects = new Float32Array(count * 4), wakeArray = new Float32Array(count);
-    const wake = new Float32Array(count), centers = [];
-    let size = [1, 1], tile = 100, dpr = 1;
-    function measure() {
-      dpr = Math.min(devicePixelRatio || 1, 2);
-      const box = wall.getBoundingClientRect();
-      size = [Math.max(1, Math.round(box.width * dpr)), Math.max(1, Math.round(box.height * dpr))];
-      canvas.width = size[0]; canvas.height = size[1];
-      tileRefs.current.forEach((el, i) => {
-        const art = el?.querySelector(".wall-tile__art");
-        if (!art) return;
-        const r = art.getBoundingClientRect();
-        rects.set([(r.left - box.left) * dpr, (r.top - box.top) * dpr, r.width * dpr, r.height * dpr], i * 4);
-        centers[i] = [r.left - box.left + r.width / 2, r.top - box.top + r.height / 2];
-        tile = r.width;
-      });
-      gl.viewport(0, 0, size[0], size[1]);
-    }
-    const resizer = new ResizeObserver(measure);
-    resizer.observe(wall);
-    measure();
-
-    let visible = false, frame = 0, last = 0, isLive = false, idle = { tile: -1, until: 0, next: 0 };
-    const seen = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      videos.forEach(v => (visible && !document.hidden ? v.play().catch(() => {}) : v.pause()));
-      if (visible && !frame) frame = requestAnimationFrame(loop);
-    }, { rootMargin: "120px" });
-    seen.observe(wall);
-    const onVisibility = () => videos.forEach(v => (visible && !document.hidden ? v.play().catch(() => {}) : v.pause()));
-    document.addEventListener("visibilitychange", onVisibility);
-    const onMove = e => { pointer.current = { x: e.clientX, y: e.clientY }; };
-    const onLeave = () => { pointer.current = { x: -1e4, y: -1e4 }; };
-    addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("pointerleave", onLeave);
-
-    function loop(now) {
-      frame = 0;
-      if (!visible) return;
-      frame = requestAnimationFrame(loop);
-      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
-      last = now;
-      const box = wall.getBoundingClientRect();
-      const px = pointer.current.x - box.left, py = pointer.current.y - box.top;
-      const rx = ralyScreen.visible ? ralyScreen.x - box.left : -1e4, ry = ralyScreen.visible ? ralyScreen.y - box.top : -1e4;
-      // With nothing near, a plate wakes now and then on its own.
-      let busiest = 0;
-      const targets = centers.map(([cx, cy], i) => {
-        const dc = Math.hypot(px - cx, py - cy) / tile, dr = Math.hypot(rx - cx, ry - cy) / (tile * 1.7);
-        const t = Math.max(Math.exp(-dc * dc * 1.3) * 0.95, Math.exp(-dr * dr), i === hovered.current || i === focused.current ? 1 : 0);
-        busiest = Math.max(busiest, t);
+      gl.useProgram(program);
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]), gl.STATIC_DRAW);
+      const corner = gl.getAttribLocation(program, "aCorner");
+      gl.enableVertexAttribArray(corner);
+      gl.vertexAttribPointer(corner, 2, gl.FLOAT, false, 0, 0);
+      const U = Object.fromEntries(["uRect", "uWake", "uRes", "uCalm", "uAwake"].map(n => [n, gl.getUniformLocation(program, n)]));
+      const textures = [0, 1].map(unit => {
+        const t = gl.createTexture();
+        gl.activeTexture(gl.TEXTURE0 + unit);
+        gl.bindTexture(gl.TEXTURE_2D, t);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([244, 235, 223, 255]));
         return t;
       });
-      if (busiest < 0.35 && now > idle.next) { idle = { tile: Math.floor(Math.random() * count), until: now + 2600, next: now + 3400 }; }
-      if (now < idle.until && busiest < 0.35) targets[idle.tile] = Math.max(targets[idle.tile], 0.85);
-      for (let i = 0; i < count; i++) {
-        const target = targets[i] ?? 0, rate = target > wake[i] ? 5 : 1.4;
-        wake[i] += (target - wake[i]) * (1 - Math.exp(-dt * rate));
-        wakeArray[i] = wake[i];
+      gl.uniform1i(U.uCalm, 0);
+      gl.uniform1i(U.uAwake, 1);
+
+      // The wall video loads only as the wall comes near, once, shared by both
+      // copies (the sleeping plates play at half speed).
+      let videos = [], clipUrl = null, loading = false;
+      const fresh = [false, false], ready = [false, false];
+      async function loadVideos() {
+        if (loading) return;
+        loading = true;
+        try {
+          clipUrl = URL.createObjectURL(await (await fetch(wallClip)).blob());
+        } catch {
+          clipUrl = wallClip;
+        }
+        if (disposed) return;
+        videos = [makeVideo(clipUrl, 0.5), makeVideo(clipUrl, 1)];
+        videos.forEach((video, i) => {
+          const mark = () => { fresh[i] = true; ready[i] = true; if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(mark); };
+          if (video.requestVideoFrameCallback) video.requestVideoFrameCallback(mark);
+          else video.addEventListener("timeupdate", () => { fresh[i] = true; ready[i] = true; });
+          video.addEventListener("loadeddata", () => { fresh[i] = true; ready[i] = true; });
+          if (visible && !document.hidden) video.play().catch(() => {});
+        });
       }
-      videos.forEach((video, i) => {
-        if (!fresh[i] || video.readyState < 2) return;
-        fresh[i] = false;
-        gl.activeTexture(gl.TEXTURE0 + i);
-        gl.bindTexture(gl.TEXTURE_2D, textures[i]);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
-      });
-      if (!ready[0] || !ready[1]) return;
-      if (!isLive) { isLive = true; setLive(true); }
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.uniform4fv(U.uRect, rects);
-      gl.uniform1fv(U.uWake, wakeArray);
-      gl.uniform2f(U.uRes, size[0], size[1]);
-      gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, count);
+      let disposed = false;
+      const approaching = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) { loadVideos(); approaching.disconnect(); }
+      }, { rootMargin: "900px 0px" });
+      approaching.observe(wall);
+
+      const count = projects.length;
+      const rects = new Float32Array(count * 4), wakeArray = new Float32Array(count);
+      const wake = new Float32Array(count), centers = [];
+      let size = [1, 1], tile = 100, dpr = 1;
+      function measure() {
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        const box = wall.getBoundingClientRect();
+        size = [Math.max(1, Math.round(box.width * dpr)), Math.max(1, Math.round(box.height * dpr))];
+        canvas.width = size[0]; canvas.height = size[1];
+        tileRefs.current.forEach((el, i) => {
+          const art = el?.querySelector(".wall-tile__art");
+          if (!art) return;
+          const r = art.getBoundingClientRect();
+          rects.set([(r.left - box.left) * dpr, (r.top - box.top) * dpr, r.width * dpr, r.height * dpr], i * 4);
+          centers[i] = [r.left - box.left + r.width / 2, r.top - box.top + r.height / 2];
+          tile = r.width;
+        });
+        gl.viewport(0, 0, size[0], size[1]);
+      }
+      const resizer = new ResizeObserver(measure);
+      resizer.observe(wall);
+      measure();
+
+      let visible = false, frame = 0, last = 0, isLive = false, idle = { tile: -1, until: 0, next: 0 };
+      const seen = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        videos.forEach(v => (visible && !document.hidden ? v.play().catch(() => {}) : v.pause()));
+        if (visible && !frame) frame = requestAnimationFrame(loop);
+      }, { rootMargin: "120px" });
+      seen.observe(wall);
+      const onVisibility = () => videos.forEach(v => (visible && !document.hidden ? v.play().catch(() => {}) : v.pause()));
+      document.addEventListener("visibilitychange", onVisibility);
+      const onMove = e => { pointer.current = { x: e.clientX, y: e.clientY }; };
+      const onLeave = () => { pointer.current = { x: -1e4, y: -1e4 }; };
+      addEventListener("pointermove", onMove, { passive: true });
+      document.addEventListener("pointerleave", onLeave);
+
+      function loop(now) {
+        frame = 0;
+        if (!visible) return;
+        frame = requestAnimationFrame(loop);
+        const dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
+        last = now;
+        const box = wall.getBoundingClientRect();
+        const px = pointer.current.x - box.left, py = pointer.current.y - box.top;
+        const rx = ralyScreen.visible ? ralyScreen.x - box.left : -1e4, ry = ralyScreen.visible ? ralyScreen.y - box.top : -1e4;
+        // With nothing near, a plate wakes now and then on its own.
+        let busiest = 0;
+        const targets = centers.map(([cx, cy], i) => {
+          const dc = Math.hypot(px - cx, py - cy) / tile, dr = Math.hypot(rx - cx, ry - cy) / (tile * 1.7);
+          const t = Math.max(Math.exp(-dc * dc * 1.3) * 0.95, Math.exp(-dr * dr), i === hovered.current || i === focused.current ? 1 : 0);
+          busiest = Math.max(busiest, t);
+          return t;
+        });
+        if (busiest < 0.35 && now > idle.next) { idle = { tile: Math.floor(Math.random() * count), until: now + 2600, next: now + 3400 }; }
+        if (now < idle.until && busiest < 0.35) targets[idle.tile] = Math.max(targets[idle.tile], 0.85);
+        for (let i = 0; i < count; i++) {
+          const target = targets[i] ?? 0, rate = target > wake[i] ? 5 : 1.4;
+          wake[i] += (target - wake[i]) * (1 - Math.exp(-dt * rate));
+          wakeArray[i] = wake[i];
+        }
+        videos.forEach((video, i) => {
+          if (!fresh[i] || video.readyState < 2) return;
+          fresh[i] = false;
+          gl.activeTexture(gl.TEXTURE0 + i);
+          gl.bindTexture(gl.TEXTURE_2D, textures[i]);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
+        });
+        if (!ready[0] || !ready[1]) return;
+        if (!isLive) { isLive = true; setLive(true); }
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.uniform4fv(U.uRect, rects);
+        gl.uniform1fv(U.uWake, wakeArray);
+        gl.uniform2f(U.uRes, size[0], size[1]);
+        gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, count);
+      }
+      return () => {
+        cancelAnimationFrame(frame);
+        seen.disconnect(); resizer.disconnect();
+        removeEventListener("pointermove", onMove);
+        document.removeEventListener("pointerleave", onLeave);
+        document.removeEventListener("visibilitychange", onVisibility);
+        disposed = true;
+        approaching.disconnect();
+        videos.forEach(v => { v.pause(); v.removeAttribute("src"); v.load(); });
+        if (clipUrl && clipUrl !== wallClip) URL.revokeObjectURL(clipUrl);
+        canvas.remove();
+      };
     }
-    return () => {
-      cancelAnimationFrame(frame);
-      seen.disconnect(); resizer.disconnect();
-      removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerleave", onLeave);
-      document.removeEventListener("visibilitychange", onVisibility);
-      disposed = true;
-      approaching.disconnect();
-      videos.forEach(v => { v.pause(); v.removeAttribute("src"); v.load(); });
-      if (clipUrl && clipUrl !== wallClip) URL.revokeObjectURL(clipUrl);
-      canvas.remove();
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
-    };
   }, [wallRef, tileRefs, hovered, focused]);
 
   return live;
