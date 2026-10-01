@@ -73,6 +73,10 @@ void main() {
   float away = max(distance(calm, PAPER), distance(awake, PAPER));
   float alpha = smoothstep(0.035, 0.1, away);
   vec3 color = mix(asleep, awake, smoothstep(0.0, 1.0, vWake));
+  // Lift night-mode midtones without changing the silhouette or transparency.
+  // Apply after the wake blend so hover keeps the same gentle exposure lift.
+  vec3 nightColor = pow(clamp(color, 0.0, 1.0), vec3(0.82));
+  color = mix(color, nightColor, uDark);
   outColor = vec4(color * alpha, alpha);
 }`;
 
