@@ -6,7 +6,7 @@ precision highp float;
 in vec2 aCorner;
 uniform vec4 uBox[${MAX_LETTERS}];
 uniform vec4 uPose[${MAX_LETTERS}];   // tilt x, tilt y, lift (px), spin z
-uniform vec4 uDance[${MAX_LETTERS}];  // hop (px), squash, step aside (px), unused
+uniform vec4 uDance[${MAX_LETTERS}];  // hop (px), squash, step aside (px), spin
 uniform vec2 uRes;
 uniform float uPad;
 uniform float uDepth;
@@ -28,7 +28,7 @@ void main() {
   float foot = (uBox[letter].w - uBox[letter].y) * 0.5;
   v.y = (v.y - foot) * (1.0 - dance.y) + foot;
   v.x *= 1.0 + dance.y * 0.6;
-  float cz = cos(pose.w), sz = sin(pose.w);
+  float cz = cos(pose.w + dance.w), sz = sin(pose.w + dance.w);
   v.xy = mat2(cz, -sz, sz, cz) * v.xy;
   float cx = cos(pose.x), sx = sin(pose.x);
   v = vec3(v.x, cx * v.y - sx * v.z, sx * v.y + cx * v.z);
