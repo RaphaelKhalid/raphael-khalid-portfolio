@@ -106,22 +106,17 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   const organism = new THREE.Group(); organism.scale.setScalar(SCALE); scene.add(organism);
   const skinGroup = new THREE.Group();
   let meshes = [];
-  const skinVariants = new Map();
-  // Art styles compile one transition ahead, never all at once: each variant
-  // is a large program, and compiling them back to back kept the GPU busy
-  // (and the page stuttering) for the first ~20 s.
-  let preparing = null, stylesAt = Infinity;
-  const wantedLooks = () => [...new Set([shared.look.value.x, shared.look.value.y].map(Math.round))].sort((a, b) => a - b);
+  // One skin program carries every art style. It is large and compiles once,
+  // while the line drawing stands in; after that a click changes style with
+  // no compiling at all. (Compiling a style per click froze the page.)
   function prepareSkin() {
-    const activeLooks = wantedLooks();
     meshes = specimen.surfaces.map(surface => {
-      const mesh = new THREE.Mesh(surface.geometry, createSkinMaterial(shared, surface, { formation, looks: activeLooks, membraneOnly: true }));
+      const mesh = new THREE.Mesh(surface.geometry, createSkinMaterial(shared, surface, { formation, membraneOnly: true }));
       mesh.customDepthMaterial = createDepthMaterial(shared, surface, { membraneOnly: true });
       mesh.castShadow = true; mesh.frustumCulled = false;
       skinGroup.add(mesh);
       return mesh;
     });
-    skinVariants.set(activeLooks.join(','), meshes.map(mesh => mesh.material));
   }
   const drawings = specimen.surfaces.map(surface => {
     const mesh = new THREE.Mesh(surface.geometry, createFormationMaterial(shared, surface, formation));
@@ -247,7 +242,6 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     shared.mood.value.set(m.curious, m.startle, m.feed, m.turn);
     shared.skinTime.value += dt * (1 + 1.2 * m.curious + 2.5 * m.startle + 2.5 * sound.mid);
     updateGenome(state.time, m);
-    if (released && state.time > stylesAt) prepareLooks(palettes.upcoming);
     if (compiled && state.touch.frames > 0) {
       pattern.inject(specimen.surfaces[0], state.touch.t, state.touch.v + 0.06 * Math.sin(state.touch.frames * 0.7), 0.9);
       state.touch.frames--;
@@ -301,7 +295,6 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     if (formation.value.y === 1 && !released) {
       released = true;
       drawings.forEach(mesh => { mesh.visible = false; });
-      stylesAt = state.time + 4;
     }
     publish();
   }
@@ -348,60 +341,9 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     runtime.status('is-ready');
     schedule();
   }
-  function cachedSkin(looks) {
-    for (const [key, materials] of skinVariants) {
-      if (looks.every(index => key.split(',').includes(String(index)))) return materials;
-    }
-    return null;
-  }
-  function activateSkinLooks(looks) {
-    if (!detailed) return previewReady;
-    if (!compiled) return false;
-    const materials = cachedSkin(looks);
-    // A click asked for a style that is not ready: prepare it now, change once it is.
-    if (!materials) { prepareLooks(looks); return false; }
-    meshes.forEach((mesh, i) => { mesh.material = materials[i]; });
-    return true;
-  }
-  function warmSkin(materials) {
-    const previous = meshes.map(mesh => mesh.material);
-    const scissor = renderer.getScissor(new THREE.Vector4());
-    const scissorTest = renderer.getScissorTest(), shadows = renderer.shadowMap.autoUpdate;
-    try {
-      meshes.forEach((mesh, i) => { mesh.material = materials[i]; });
-      // Exercise the real canvas draw path, including uniforms and vertex bindings.
-      // A render target has different shader settings; compileAsync alone misses
-      // first-draw work. Restore and repaint before this frame can be presented.
-      renderer.setScissor(0, 0, 1, 1); renderer.setScissorTest(true);
-      renderer.shadowMap.autoUpdate = false;
-      renderer.render(scene, camera);
-    } finally {
-      meshes.forEach((mesh, i) => { mesh.material = previous[i]; });
-      renderer.setScissor(scissor); renderer.setScissorTest(scissorTest);
-      renderer.shadowMap.autoUpdate = shadows;
-      renderer.render(scene, camera);
-    }
-  }
-  function prepareLooks(wanted) {
-    if (!detailed || !compiled || preparing || disposed) return;
-    const looks = [...new Set(wanted)].sort((a, b) => a - b);
-    if (cachedSkin(looks)) return;
-    preparing = (async () => {
-      const group = new THREE.Group();
-      const materials = specimen.surfaces.map(surface => {
-        const material = createSkinMaterial(shared, surface, { formation, looks, membraneOnly: true });
-        group.add(new THREE.Mesh(surface.geometry, material));
-        return material;
-      });
-      await compileScene(group, scene);
-      if (disposed) return;
-      warmSkin(materials);
-      // Offered to transitions only once compiled and drawn.
-      skinVariants.set(looks.join(','), materials);
-    })().catch(error => {
-      // Keep the current appearance; the next request tries again.
-      if (!disposed) console.warn('raly could not prepare its paint style', error);
-    }).finally(() => { preparing = null; });
+  // Style changes wait for the skin; a click while it loads plays once it is ready.
+  function activateSkinLooks() {
+    return detailed ? compiled : previewReady;
   }
   function compileScene(group, targetScene = null) {
     try { compilation = renderer.compileAsync(group, camera, targetScene); }
@@ -520,7 +462,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       // until the outstanding poll settles, even when the component unmounts.
       const release = () => {
         meshes.forEach(mesh => mesh.customDepthMaterial.dispose());
-        for (const materials of skinVariants.values()) materials.forEach(material => material.dispose());
+        meshes.forEach(mesh => mesh.material.dispose());
         drawings.forEach(mesh => mesh.material.dispose());
         specimen.surfaces.forEach(surface => surface.geometry.dispose());
         shadowPlane.geometry.dispose(); shadowPlane.material.dispose();
