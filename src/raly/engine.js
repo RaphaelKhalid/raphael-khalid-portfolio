@@ -6,7 +6,7 @@ import { createSwimmer } from './swimmer.js';
 import { createPattern } from './pattern.js';
 import { createBodyFrames } from './frames.js';
 import { createAudio } from './audio.js';
-import { createAppearanceCycle } from './palettes.js';
+import { APPEARANCES, createAppearanceCycle } from './palettes.js';
 import { lookIndex } from './looks.js';
 import { ralyScreen } from './store.js';
 
@@ -100,17 +100,17 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   shared.palette.value.set(specimen.palette.hue, specimen.palette.warmth);
   // It moves through its palettes and art styles; ?look=ink shows and holds one.
   const askedLook = new URLSearchParams(runtime.search).get('look');
-  const palettes = createAppearanceCycle(shared, { look: askedLook });
+  const palettes = createAppearanceCycle(shared, { look: askedLook, canTransition: activateSkinLooks });
   shared.morph.value.set(0, 0, 0, 1);
   const swimmer = createSwimmer(specimen, { scale: SCALE, random, faithful: true });
   const organism = new THREE.Group(); organism.scale.setScalar(SCALE); scene.add(organism);
   const skinGroup = new THREE.Group();
   let meshes = [];
-  const skinVariants = new Map(), failedLooks = new Set();
-  let activeLooks = [], lookPending = false;
+  const skinVariants = new Map();
+  let stylesReady = false, warmingStyles = false;
   const wantedLooks = () => [...new Set([shared.look.value.x, shared.look.value.y].map(Math.round))].sort((a, b) => a - b);
   function prepareSkin() {
-    activeLooks = wantedLooks();
+    const activeLooks = wantedLooks();
     meshes = specimen.surfaces.map(surface => {
       const mesh = new THREE.Mesh(surface.geometry, createSkinMaterial(shared, surface, { formation, looks: activeLooks, membraneOnly: true }));
       mesh.customDepthMaterial = createDepthMaterial(shared, surface, { membraneOnly: true });
@@ -221,8 +221,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     state.time += dt;
     state.phase = (state.phase + dt * Math.PI * 2 / 12) % (Math.PI * 2);
     sound = audio.update(dt);
-    if (previewReady && !lookPending) palettes.update(dt);
-    if (compiled) updateSkinLook();
+    if (previewReady) palettes.update(dt);
     formation.value.x = reducedMotion ? 1 : Math.min(1, state.time / 2.4);
     formation.value.z = reducedMotion ? 0 : state.time;
     if (compiled) formation.value.y = reducedMotion ? 1 : Math.min(1, (state.time - skinAt) / 0.8);
@@ -294,6 +293,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     if (formation.value.y === 1 && !released) {
       released = true;
       drawings.forEach(mesh => { mesh.visible = false; });
+      if (!warmingStyles) { warmingStyles = true; preloadSkinStyles(); }
     }
     publish();
   }
@@ -340,32 +340,67 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     runtime.status('is-ready');
     schedule();
   }
-  function updateSkinLook() {
-    const wanted = wantedLooks(), key = wanted.join(',');
-    if (lookPending || wanted.every(index => activeLooks.includes(index)) || failedLooks.has(key)) return;
-    const apply = materials => {
-      meshes.forEach((mesh, i) => { mesh.material = materials[i]; });
-      activeLooks = wanted;
-    };
-    // Reuse a compiled transition that already supports both requested looks.
-    for (const [cachedKey, materials] of skinVariants) {
-      if (wanted.every(index => cachedKey.split(',').includes(String(index)))) { apply(materials); return; }
+  function cachedSkin(looks) {
+    for (const [key, materials] of skinVariants) {
+      if (looks.every(index => key.split(',').includes(String(index)))) return materials;
     }
-    lookPending = true;
-    const group = new THREE.Group();
-    const materials = specimen.surfaces.map(surface => {
-      const material = createSkinMaterial(shared, surface, { formation, looks: wanted, membraneOnly: true });
-      group.add(new THREE.Mesh(surface.geometry, material));
-      return material;
-    });
-    compileScene(group, scene).then(() => {
-      if (disposed) { materials.forEach(material => material.dispose()); return; }
-      skinVariants.set(key, materials); apply(materials); lookPending = false;
-    }, error => {
-      materials.forEach(material => material.dispose());
-      failedLooks.add(key); lookPending = false;
-      if (!disposed) console.warn('raly could not prepare this paint style', error);
-    });
+    return null;
+  }
+  function activateSkinLooks(looks) {
+    if (!detailed) return previewReady;
+    if (!stylesReady) return false;
+    const materials = cachedSkin(looks);
+    if (!materials) return false;
+    meshes.forEach((mesh, i) => { mesh.material = materials[i]; });
+    return true;
+  }
+  function warmSkin(materials) {
+    const previous = meshes.map(mesh => mesh.material);
+    const scissor = renderer.getScissor(new THREE.Vector4());
+    const scissorTest = renderer.getScissorTest(), shadows = renderer.shadowMap.autoUpdate;
+    try {
+      meshes.forEach((mesh, i) => { mesh.material = materials[i]; });
+      // Exercise the real canvas draw path, including uniforms and vertex bindings.
+      // A render target has different shader settings; compileAsync alone misses
+      // first-draw work. Restore and repaint before this frame can be presented.
+      renderer.setScissor(0, 0, 1, 1); renderer.setScissorTest(true);
+      renderer.shadowMap.autoUpdate = false;
+      renderer.render(scene, camera);
+    } finally {
+      meshes.forEach((mesh, i) => { mesh.material = previous[i]; });
+      renderer.setScissor(scissor); renderer.setScissorTest(scissorTest);
+      renderer.shadowMap.autoUpdate = shadows;
+      renderer.render(scene, camera);
+    }
+  }
+  async function preloadSkinStyles() {
+    // Prepare every adjacent appearance pair once, away from the click handler.
+    // Clicks remain queued until ALL styles have compiled and drawn successfully.
+    try {
+      for (let i = 0; i < APPEARANCES.length; i++) {
+        const looks = [...new Set([APPEARANCES[i], APPEARANCES[(i + 1) % APPEARANCES.length]].map(a => lookIndex(a.look)))].sort((a, b) => a - b);
+        if (cachedSkin(looks)) continue;
+        await new Promise(resolve => setTimeout(resolve, 80));
+        if (disposed) return;
+        const group = new THREE.Group();
+        const materials = specimen.surfaces.map(surface => {
+          const material = createSkinMaterial(shared, surface, { formation, looks, membraneOnly: true });
+          group.add(new THREE.Mesh(surface.geometry, material));
+          return material;
+        });
+        skinVariants.set(looks.join(','), materials);
+        await compileScene(group, scene);
+        if (disposed) return;
+        warmSkin(materials);
+      }
+      if (disposed) return;
+      stylesReady = true;
+      runtime.status('is-styles-ready');
+    } catch (error) {
+      // Preserve the current appearance if preparation fails; never start a
+      // partial sweep or retry compilation in response to another click.
+      if (!disposed) console.warn('raly could not prepare its paint styles', error);
+    }
   }
   function compileScene(group, targetScene = null) {
     try { compilation = renderer.compileAsync(group, camera, targetScene); }
@@ -432,7 +467,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     /** How briskly it follows: 1 normally, higher while it guides the tour. */
     setPace(value) { swimmer.setPace(value); },
     /** Repaint raly in one of its art styles (see looks.js). */
-    setLook(name) { const i = lookIndex(name); shared.look.value.set(i, i, 0); }, // for previews and tests
+    setLook(name) { const i = lookIndex(name); if (activateSkinLooks([i])) shared.look.value.set(i, i, 0); }, // for previews and tests
     /** True if the point is on raly's body. */
     hover(clientX, clientY) { return Boolean(nearestOnBody(clientX, clientY)); },
     /** A click on the body: it flinches away and pigment blooms where it was touched. */
@@ -442,7 +477,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       const hit = nearestOnBody(clientX, clientY);
       if (!hit) return false;
       palettes.next({ quick: true });
-      Object.assign(state.touch, { t: hit.t, v: hit.s * 0.5 + 0.5, frames: 24 });
+      if (!detailed || stylesReady) Object.assign(state.touch, { t: hit.t, v: hit.s * 0.5 + 0.5, frames: 24 });
       return true;
     },
     /** Pick raly up at a point on its body; false if the point misses it. */

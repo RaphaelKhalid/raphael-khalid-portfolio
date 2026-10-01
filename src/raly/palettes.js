@@ -34,11 +34,12 @@ const HOLD = 30, BLEND = 5;
 const smooth = t => t * t * (3 - 2 * t);
 
 /** Cycles raly's appearance. `look` names one to show and hold (for previews). */
-export function createAppearanceCycle(shared, { look } = {}) {
+export function createAppearanceCycle(shared, { look, canTransition = () => true } = {}) {
   const colors = Object.fromEntries(Object.entries(PALETTES).map(([name, p]) => [name, p.ramp.map(hex => new THREE.Color(hex))]));
   const asked = look ? APPEARANCES.findIndex(a => a.look === look) : -1;
   let from = Math.max(0, asked), to = from, t = 1, held = 0, blend = BLEND;
   const paused = asked >= 0;
+  let requested = false, quickRequested = false;
 
   function setPalette(name, other = name, k = 0) {
     const a = PALETTES[name], b = PALETTES[other];
@@ -68,21 +69,25 @@ export function createAppearanceCycle(shared, { look } = {}) {
 
   return {
     get name() { const a = APPEARANCES[t < 0.5 ? from : to]; return a.palette ?? a.look; },
-    /** Move to the next appearance now; `quick` (a click) changes faster and
-     *  finishes any change already under way. */
+    /** Coalesce clicks while loading; never cut an in-progress sweep short. */
     next({ quick = false } = {}) {
-      if (t < 1) {
-        if (!quick) return; // let a timed change finish rather than snapping
-        t = 1; apply();
-      }
-      from = to;
-      to = (to + 1) % APPEARANCES.length; t = 0; held = 0;
-      blend = quick ? 1.4 : BLEND;
+      if (t < 1) return false;
+      requested = true;
+      quickRequested ||= quick;
+      return true;
     },
     update(dt) {
       if (t < 1) { t = Math.min(1, t + dt / blend); apply(); return; }
       held += dt;
-      if (!paused && held > HOLD) this.next();
+      if (!requested && (paused || held <= HOLD)) return;
+      const next = (to + 1) % APPEARANCES.length;
+      const looks = [lookIndex(APPEARANCES[to].look), lookIndex(APPEARANCES[next].look)];
+      // Keep every visible uniform unchanged until the whole transition is ready.
+      if (!canTransition(looks)) return;
+      from = to; to = next; t = 0; held = 0;
+      blend = quickRequested ? 1.4 : BLEND;
+      requested = quickRequested = false;
+      apply();
     },
   };
 }
