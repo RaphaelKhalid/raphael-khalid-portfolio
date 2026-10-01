@@ -69,6 +69,8 @@ export function createAppearanceCycle(shared, { look, canTransition = () => true
 
   return {
     get name() { const a = APPEARANCES[t < 0.5 ? from : to]; return a.palette ?? a.look; },
+    /** The art styles the next transition will show, so they can be prepared ahead. */
+    get upcoming() { return [lookIndex(APPEARANCES[to].look), lookIndex(APPEARANCES[(to + 1) % APPEARANCES.length].look)]; },
     /** Coalesce clicks while loading; never cut an in-progress sweep short. */
     next({ quick = false } = {}) {
       if (t < 1) return false;

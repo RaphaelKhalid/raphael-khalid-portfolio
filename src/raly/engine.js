@@ -6,7 +6,7 @@ import { createSwimmer } from './swimmer.js';
 import { createPattern } from './pattern.js';
 import { createBodyFrames } from './frames.js';
 import { createAudio } from './audio.js';
-import { APPEARANCES, createAppearanceCycle } from './palettes.js';
+import { createAppearanceCycle } from './palettes.js';
 import { lookIndex } from './looks.js';
 import { ralyScreen } from './store.js';
 
@@ -107,7 +107,10 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   const skinGroup = new THREE.Group();
   let meshes = [];
   const skinVariants = new Map();
-  let stylesReady = false, warmingStyles = false;
+  // Art styles compile one transition ahead, never all at once: each variant
+  // is a large program, and compiling them back to back kept the GPU busy
+  // (and the page stuttering) for the first ~20 s.
+  let preparing = null, stylesAt = Infinity;
   const wantedLooks = () => [...new Set([shared.look.value.x, shared.look.value.y].map(Math.round))].sort((a, b) => a - b);
   function prepareSkin() {
     const activeLooks = wantedLooks();
@@ -140,7 +143,9 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     return raycaster.ray.intersectPlane(plane, out);
   }
   function resize() {
-    view.width = runtime.viewport.width; view.height = runtime.viewport.height;
+    // A hidden or not-yet-laid-out page can report a zero viewport; that would
+    // put the camera at infinity and leave the swimmer stepping NaNs forever.
+    view.width = Math.max(320, runtime.viewport.width); view.height = Math.max(320, runtime.viewport.height);
     renderer.setSize(view.width, view.height, false);
     const aspect = view.width / view.height;
     camera.aspect = aspect;
@@ -148,6 +153,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     camera.position.copy(HOME).sub(LOOK).setLength(distance).add(LOOK);
     camera.lookAt(LOOK);
     camera.updateProjectionMatrix();
+    // screenToWorld can run before the first render has updated the camera.
+    camera.updateMatrixWorld();
     bounds.halfHeight = distance * Math.tan(THREE.MathUtils.degToRad(FOV / 2));
     bounds.halfWidth = bounds.halfHeight * aspect;
   }
@@ -199,9 +206,9 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   }
 
   function restInHero() {
-    const center = view.width < 700
-      ? screenToWorld(view.width * 0.64, view.height * 0.27).clone()
-      : new THREE.Vector3(bounds.halfWidth * 0.45, 0.4, 0);
+    // If the ray ever misses the plane, fall back to the desktop resting place.
+    const narrow = view.width < 700 && screenToWorld(view.width * 0.64, view.height * 0.27);
+    const center = narrow ? narrow.clone() : new THREE.Vector3(bounds.halfWidth * 0.45, 0.4, 0);
     swimmer.setInspect(true, { center });
   }
 
@@ -240,6 +247,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     shared.mood.value.set(m.curious, m.startle, m.feed, m.turn);
     shared.skinTime.value += dt * (1 + 1.2 * m.curious + 2.5 * m.startle + 1.5 * sound.mid);
     updateGenome(state.time, m);
+    if (released && state.time > stylesAt) prepareLooks(palettes.upcoming);
     if (compiled && state.touch.frames > 0) {
       pattern.inject(specimen.surfaces[0], state.touch.t, state.touch.v + 0.06 * Math.sin(state.touch.frames * 0.7), 0.9);
       state.touch.frames--;
@@ -293,7 +301,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     if (formation.value.y === 1 && !released) {
       released = true;
       drawings.forEach(mesh => { mesh.visible = false; });
-      if (!warmingStyles) { warmingStyles = true; preloadSkinStyles(); }
+      stylesAt = state.time + 4;
     }
     publish();
   }
@@ -348,9 +356,10 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   }
   function activateSkinLooks(looks) {
     if (!detailed) return previewReady;
-    if (!stylesReady) return false;
+    if (!compiled) return false;
     const materials = cachedSkin(looks);
-    if (!materials) return false;
+    // A click asked for a style that is not ready: prepare it now, change once it is.
+    if (!materials) { prepareLooks(looks); return false; }
     meshes.forEach((mesh, i) => { mesh.material = materials[i]; });
     return true;
   }
@@ -373,34 +382,26 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       renderer.render(scene, camera);
     }
   }
-  async function preloadSkinStyles() {
-    // Prepare every adjacent appearance pair once, away from the click handler.
-    // Clicks remain queued until ALL styles have compiled and drawn successfully.
-    try {
-      for (let i = 0; i < APPEARANCES.length; i++) {
-        const looks = [...new Set([APPEARANCES[i], APPEARANCES[(i + 1) % APPEARANCES.length]].map(a => lookIndex(a.look)))].sort((a, b) => a - b);
-        if (cachedSkin(looks)) continue;
-        await new Promise(resolve => setTimeout(resolve, 80));
-        if (disposed) return;
-        const group = new THREE.Group();
-        const materials = specimen.surfaces.map(surface => {
-          const material = createSkinMaterial(shared, surface, { formation, looks, membraneOnly: true });
-          group.add(new THREE.Mesh(surface.geometry, material));
-          return material;
-        });
-        skinVariants.set(looks.join(','), materials);
-        await compileScene(group, scene);
-        if (disposed) return;
-        warmSkin(materials);
-      }
+  function prepareLooks(wanted) {
+    if (!detailed || !compiled || preparing || disposed) return;
+    const looks = [...new Set(wanted)].sort((a, b) => a - b);
+    if (cachedSkin(looks)) return;
+    preparing = (async () => {
+      const group = new THREE.Group();
+      const materials = specimen.surfaces.map(surface => {
+        const material = createSkinMaterial(shared, surface, { formation, looks, membraneOnly: true });
+        group.add(new THREE.Mesh(surface.geometry, material));
+        return material;
+      });
+      await compileScene(group, scene);
       if (disposed) return;
-      stylesReady = true;
-      runtime.status('is-styles-ready');
-    } catch (error) {
-      // Preserve the current appearance if preparation fails; never start a
-      // partial sweep or retry compilation in response to another click.
-      if (!disposed) console.warn('raly could not prepare its paint styles', error);
-    }
+      warmSkin(materials);
+      // Offered to transitions only once compiled and drawn.
+      skinVariants.set(looks.join(','), materials);
+    })().catch(error => {
+      // Keep the current appearance; the next request tries again.
+      if (!disposed) console.warn('raly could not prepare its paint style', error);
+    }).finally(() => { preparing = null; });
   }
   function compileScene(group, targetScene = null) {
     try { compilation = renderer.compileAsync(group, camera, targetScene); }
@@ -477,7 +478,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       const hit = nearestOnBody(clientX, clientY);
       if (!hit) return false;
       palettes.next({ quick: true });
-      if (!detailed || stylesReady) Object.assign(state.touch, { t: hit.t, v: hit.s * 0.5 + 0.5, frames: 24 });
+      if (!detailed || compiled) Object.assign(state.touch, { t: hit.t, v: hit.s * 0.5 + 0.5, frames: 24 });
       return true;
     },
     /** Pick raly up at a point on its body; false if the point misses it. */

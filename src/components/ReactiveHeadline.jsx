@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { ralyScreen } from "../raly/store";
-import { createHeadlineLoading } from "../utils/headlineLoading";
 
 // "running experiments", set as a row of printed letters with real thickness.
 // Every letter is its own small 3D body on a spring: it leans away from a
@@ -36,7 +35,6 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const ReactiveHeadline = ({ className = "" }) => {
   const wrapRef = useRef(null);
   const textRef = useRef(null);
-  const loadingRef = useRef(null);
 
   useEffect(() => {
     const wrap = wrapRef.current, text = textRef.current;
@@ -45,9 +43,8 @@ const ReactiveHeadline = ({ className = "" }) => {
     canvas.setAttribute('aria-hidden', 'true');
     wrap.append(canvas);
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const loading = createHeadlineLoading(text, loadingRef.current);
     if (reduced || !canvas.transferControlToOffscreen || typeof Worker === 'undefined') {
-      canvas.remove(); return () => loading.dispose();
+      canvas.remove(); return;
     }
     let worker, cancelled = false, inFlight = false, failed = false;
     const fallback = () => { failed = true; worker?.terminate(); canvas.remove(); text.style.color = ''; clearTimeout(deadline); };
@@ -62,7 +59,7 @@ const ReactiveHeadline = ({ className = "" }) => {
       worker.onerror = event => { event.preventDefault(); fallback(); };
       const offscreen = canvas.transferControlToOffscreen();
       worker.postMessage({ type: 'init', canvas: offscreen }, [offscreen]);
-    } catch { fallback(); return () => loading.dispose(); }
+    } catch { fallback(); return; }
 
     let letters = [];
     let layout = { pad: 0, scale: 1, fontPx: 100, range: 18 };
@@ -266,7 +263,7 @@ const ReactiveHeadline = ({ className = "" }) => {
       observer.disconnect(); io.disconnect();
       removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerleave", onLeave);
-      cancelled = true; clearTimeout(deadline); worker.terminate(); canvas.remove(); text.style.color = ""; loading.dispose();
+      cancelled = true; clearTimeout(deadline); worker.terminate(); canvas.remove(); text.style.color = "";
     };
   }, []);
 
@@ -277,7 +274,6 @@ const ReactiveHeadline = ({ className = "" }) => {
           <span key={line} data-line className="block w-fit">{line}</span>
         ))}
       </h1>
-      <div ref={loadingRef} aria-hidden="true" className="headline-loading headline-type absolute inset-0 pointer-events-none z-[3]" />
     </div>
   );
 };
