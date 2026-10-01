@@ -99,17 +99,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   color: var(--ink);
 }
 
-.headline-canvas { transition: opacity 280ms ease; }
-.headline-resolving > h1, .headline-resolving > .headline-canvas { opacity: 0; }
-.headline-loading { overflow: visible; }
-.headline-loading__letter {
-  position: absolute;
-  display: block;
-  text-align: left;
-  white-space: pre;
-  transition: color 120ms ease, opacity 180ms ease, transform 100ms ease;
-}
-
 /* Tag colours, from the specimen's skin. */
 .blue-text-gradient { color: var(--cobalt); }
 .green-text-gradient { color: #2f6f63; }
