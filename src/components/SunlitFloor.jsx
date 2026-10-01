@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { linkProgram, whenIdle } from "../utils/webgl";
 
 // The sunlit floor at the bottom of the page: slow caustic light on paper, as
 // if the page were the floor of a shallow pool. raly treats the top of this
@@ -44,46 +45,52 @@ const SunlitFloor = ({ className = "" }) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const gl = canvas.getContext("webgl2", { premultipliedAlpha: true, antialias: false });
-    if (!gl) return undefined;
-    const make = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
-    const program = gl.createProgram();
-    gl.attachShader(program, make(gl.VERTEX_SHADER, vertex));
-    gl.attachShader(program, make(gl.FRAGMENT_SHADER, fragment));
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { console.warn(gl.getProgramInfoLog(program)); return undefined; }
-    gl.useProgram(program);
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(program, "aPos");
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const uRes = gl.getUniformLocation(program, "uRes"), uTime = gl.getUniformLocation(program, "uTime");
-    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    // It sits at the bottom of the page: build it in an idle moment and never
+    // wait on the shader link.
+    let stop = null, cancelled = false;
+    const cancelIdle = whenIdle(() => {
+      const gl = canvas.getContext("webgl2", { premultipliedAlpha: true, antialias: false });
+      if (!gl) return;
+      linkProgram(gl, vertex, fragment).then(program => {
+        if (!cancelled) stop = run(gl, program);
+      }, error => { if (!cancelled) console.warn(error); });
+    });
+    return () => { cancelled = true; cancelIdle(); stop?.(); };
 
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let frame = 0, visible = false, start = performance.now();
-    const resize = () => {
-      const scale = Math.min(devicePixelRatio || 1, 1.25);
-      canvas.width = Math.round(canvas.clientWidth * scale);
-      canvas.height = Math.round(canvas.clientHeight * scale);
-      gl.viewport(0, 0, canvas.width, canvas.height);
-    };
-    const draw = now => {
-      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform1f(uTime, (now - start) / 1000);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-    const tick = now => { frame = requestAnimationFrame(tick); if (visible && !document.hidden) draw(now); };
-    const ro = new ResizeObserver(() => { resize(); draw(performance.now()); });
-    ro.observe(canvas);
-    const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
-    io.observe(canvas);
-    resize();
-    if (reduced) draw(start + 4000); else frame = requestAnimationFrame(tick);
-    return () => { cancelAnimationFrame(frame); ro.disconnect(); io.disconnect(); gl.deleteProgram(program); gl.deleteBuffer(buffer); };
+    function run(gl, program) {
+      gl.useProgram(program);
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(program, "aPos");
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      const uRes = gl.getUniformLocation(program, "uRes"), uTime = gl.getUniformLocation(program, "uTime");
+      gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let frame = 0, visible = false, start = performance.now();
+      const resize = () => {
+        const scale = Math.min(devicePixelRatio || 1, 1.25);
+        canvas.width = Math.round(canvas.clientWidth * scale);
+        canvas.height = Math.round(canvas.clientHeight * scale);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      };
+      const draw = now => {
+        gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform1f(uTime, (now - start) / 1000);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      };
+      const tick = now => { frame = requestAnimationFrame(tick); if (visible && !document.hidden) draw(now); };
+      const ro = new ResizeObserver(() => { resize(); draw(performance.now()); });
+      ro.observe(canvas);
+      const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
+      io.observe(canvas);
+      resize();
+      if (reduced) draw(start + 4000); else frame = requestAnimationFrame(tick);
+      return () => { cancelAnimationFrame(frame); ro.disconnect(); io.disconnect(); gl.deleteProgram(program); gl.deleteBuffer(buffer); };
+    }
   }, []);
 
   return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
