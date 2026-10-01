@@ -106,14 +106,19 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   const organism = new THREE.Group(); organism.scale.setScalar(SCALE); scene.add(organism);
   const skinGroup = new THREE.Group();
   let meshes = [];
+  const skinVariants = new Map(), failedLooks = new Set();
+  let activeLooks = [], lookPending = false;
+  const wantedLooks = () => [...new Set([shared.look.value.x, shared.look.value.y].map(Math.round))].sort((a, b) => a - b);
   function prepareSkin() {
+    activeLooks = wantedLooks();
     meshes = specimen.surfaces.map(surface => {
-      const mesh = new THREE.Mesh(surface.geometry, createSkinMaterial(shared, surface, { formation }));
-      mesh.customDepthMaterial = createDepthMaterial(shared, surface);
+      const mesh = new THREE.Mesh(surface.geometry, createSkinMaterial(shared, surface, { formation, looks: activeLooks, membraneOnly: true }));
+      mesh.customDepthMaterial = createDepthMaterial(shared, surface, { membraneOnly: true });
       mesh.castShadow = true; mesh.frustumCulled = false;
       skinGroup.add(mesh);
       return mesh;
     });
+    skinVariants.set(activeLooks.join(','), meshes.map(mesh => mesh.material));
   }
   const drawings = specimen.surfaces.map(surface => {
     const mesh = new THREE.Mesh(surface.geometry, createFormationMaterial(shared, surface, formation));
@@ -216,7 +221,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     state.time += dt;
     state.phase = (state.phase + dt * Math.PI * 2 / 12) % (Math.PI * 2);
     sound = audio.update(dt);
-    if (released) palettes.update(dt);
+    if (previewReady && !lookPending) palettes.update(dt);
+    if (compiled) updateSkinLook();
     formation.value.x = reducedMotion ? 1 : Math.min(1, state.time / 2.4);
     formation.value.z = reducedMotion ? 0 : state.time;
     if (compiled) formation.value.y = reducedMotion ? 1 : Math.min(1, (state.time - skinAt) / 0.8);
@@ -288,8 +294,6 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     if (formation.value.y === 1 && !released) {
       released = true;
       drawings.forEach(mesh => { mesh.visible = false; });
-      if (!reducedMotion) swimmer.setInspect(false);
-      onReady?.();
     }
     publish();
   }
@@ -321,11 +325,11 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   }
 
   resize(); updateBounds();
-  // Begin in the hero as a drawing, so there is a body to watch taking shape.
+  // Place the body in the hero, then release it as soon as the first skin paints.
   restInHero();
   simulate(0);
   // The physical skin compiles in the worker while the page owns the SVG.
-  // Keep the inspection pose through the entire material reveal.
+  // Both materials share the live pose; detail never gates swimming or input.
   function whenCompiled() {
     if (disposed) return;
     compiled = true;
@@ -336,6 +340,33 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     runtime.status('is-ready');
     schedule();
   }
+  function updateSkinLook() {
+    const wanted = wantedLooks(), key = wanted.join(',');
+    if (lookPending || wanted.every(index => activeLooks.includes(index)) || failedLooks.has(key)) return;
+    const apply = materials => {
+      meshes.forEach((mesh, i) => { mesh.material = materials[i]; });
+      activeLooks = wanted;
+    };
+    // Reuse a compiled transition that already supports both requested looks.
+    for (const [cachedKey, materials] of skinVariants) {
+      if (wanted.every(index => cachedKey.split(',').includes(String(index)))) { apply(materials); return; }
+    }
+    lookPending = true;
+    const group = new THREE.Group();
+    const materials = specimen.surfaces.map(surface => {
+      const material = createSkinMaterial(shared, surface, { formation, looks: wanted, membraneOnly: true });
+      group.add(new THREE.Mesh(surface.geometry, material));
+      return material;
+    });
+    compileScene(group, scene).then(() => {
+      if (disposed) { materials.forEach(material => material.dispose()); return; }
+      skinVariants.set(key, materials); apply(materials); lookPending = false;
+    }, error => {
+      materials.forEach(material => material.dispose());
+      failedLooks.add(key); lookPending = false;
+      if (!disposed) console.warn('raly could not prepare this paint style', error);
+    });
+  }
   function compileScene(group, targetScene = null) {
     try { compilation = renderer.compileAsync(group, camera, targetScene); }
     catch (error) { compilation = Promise.reject(error); }
@@ -344,14 +375,16 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   compileScene(scene).then(() => {
     if (disposed) return;
     previewReady = true;
+    if (!reducedMotion) swimmer.setInspect(false);
     render();
     runtime.status('is-forming');
+    runtime.status('is-active');
+    onReady?.();
     schedule();
     // The simple body is visible before allocating the environment, pattern,
     // or physical skin. The rich path runs only in the rendering worker.
     if (!detailed) {
-      if (!reducedMotion) swimmer.setInspect(false);
-      runtime.status('is-ready'); onReady?.(); return;
+      runtime.status('is-ready'); return;
     }
     compileFrame = requestAnimationFrame(() => {
       compileFrame = requestAnimationFrame(async () => {
@@ -369,14 +402,14 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
           await compileScene(skinGroup, scene);
           whenCompiled();
         } catch (error) {
-          if (!disposed) { console.warn('raly skin could not finish; keeping the drawing', error); runtime.status('is-fallback'); onReady?.(); }
+          if (!disposed) { console.warn('raly skin could not finish; keeping the drawing', error); runtime.status('is-fallback'); }
         }
       });
     });
   }, error => { if (!disposed) console.warn('raly drawing could not start', error); });
   const onResize = () => {
     resize(); updateBounds();
-    if (!compiled || reducedMotion) restInHero();
+    if (!previewReady || reducedMotion) restInHero();
     if (previewReady && !state.running) { simulate(0); render(); }
   };
   const unsubscribe = runtime.subscribe(onResize, schedule);
@@ -450,7 +483,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       // Three's async compiler polls its material programs. Keep those alive
       // until the outstanding poll settles, even when the component unmounts.
       const release = () => {
-        meshes.forEach(mesh => { mesh.material.dispose(); mesh.customDepthMaterial.dispose(); });
+        meshes.forEach(mesh => mesh.customDepthMaterial.dispose());
+        for (const materials of skinVariants.values()) materials.forEach(material => material.dispose());
         drawings.forEach(mesh => mesh.material.dispose());
         specimen.surfaces.forEach(surface => surface.geometry.dispose());
         shadowPlane.geometry.dispose(); shadowPlane.material.dispose();
