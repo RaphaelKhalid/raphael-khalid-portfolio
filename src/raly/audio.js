@@ -37,9 +37,9 @@ export function createAudio() {
   const edges = Array.from({ length: SPECTRUM_BANDS + 1 }, (_, i) => LOW_HZ * (HIGH_HZ / LOW_HZ) ** (i / SPECTRUM_BANDS));
   // Each percussive voice: its own flux average and refractory time.
   const hits = {
-    kick: { average: 0.02, wait: 0, gap: 0.2 },
-    snare: { average: 0.02, wait: 0, gap: 0.12 },
-    hat: { average: 0.02, wait: 0, gap: 0.06 },
+    kick: { average: 0.02, wait: 0, gap: 0.3 },
+    snare: { average: 0.02, wait: 0, gap: 0.2 },
+    hat: { average: 0.02, wait: 0, gap: 0.1 },
   };
 
   function band(fromHz, toHz) {
@@ -139,7 +139,7 @@ export function createAudio() {
       for (let i = 0; i < SPECTRUM_BANDS; i++) {
         const [value] = track(`band${i}`, band(edges[i], edges[i + 1]), dt, 0.25, 0.07);
         const v = value ** 0.8 * present;
-        state.spectrum[i] += (v - state.spectrum[i]) * (1 - Math.exp(-dt * (v > state.spectrum[i] ? 40 : 7)));
+        state.spectrum[i] += (v - state.spectrum[i]) * (1 - Math.exp(-dt * (v > state.spectrum[i] ? 20 : 5)));
         energy += state.spectrum[i]; weighted += state.spectrum[i] * i;
       }
 
@@ -161,12 +161,12 @@ export function createAudio() {
       // alike): a kick lifts the low end more than the snare's body; a snare
       // lifts its body more than the kick band and its crack more than the air
       // above; a hi-hat is mostly air.
-      if (hit('kick', kickFlux, 0.06, state.bass > 0.25 && kickJump > bodyJump, dt)) {
+      if (hit('kick', kickFlux, 0.12, state.bass > 0.25 && kickJump > bodyJump, dt)) {
         state.kicks++; state.beats++; state.onset = true;
         pulse = Math.min(1, 0.65 + 0.35 * state.bass);
       }
-      if (hit('snare', crackFlux, 0.07, crack > 0.25 && body > 0.1 && bodyJump > kickJump && crackJump > hatJump * 0.9, dt)) state.snares++;
-      if (hit('hat', hatFlux, 0.06, high > 0.2 && hatJump > crackJump * 0.9, dt)) state.hats++;
+      if (hit('snare', crackFlux, 0.1, crack > 0.25 && body > 0.1 && bodyJump > kickJump && crackJump > hatJump * 0.9, dt)) state.snares++;
+      if (hit('hat', hatFlux, 0.08, high > 0.2 && hatJump > crackJump * 0.9, dt)) state.hats++;
 
       // Sustained, pitched sound: the mids that stay up between hits. Slow on
       // purpose, so a synth pad or a voice reads as colour rather than motion.
