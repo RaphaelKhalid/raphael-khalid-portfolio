@@ -411,3 +411,18 @@ html.print-open .raly-mark { opacity: 0; }
     transition-duration: 0.001ms !important;
   }
 }
+
+/* This drawing belongs to the DOM, never to the compiling WebGL context. */
+.raly-formation { position: fixed; z-index: 0; pointer-events: none; inset: 27% 8% auto auto; width: 34%; transition: opacity 650ms ease; }
+.raly-formation svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.raly-formation path { stroke: #6b7896; stroke-width: 1.2; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; animation: raly-trace 2.4s ease forwards, raly-breathe 2.8s ease-in-out infinite; animation-delay: calc(var(--line) * 110ms); }
+.raly-formation path:nth-child(2n) { stroke: #b77965; }
+.raly-formation.is-projected { inset: 0; width: 100%; height: 100%; }
+.raly-formation.is-finished { opacity: 0; }
+.raly-formation.is-finished path { animation: none; stroke-dashoffset: 0; opacity: .6; }
+.raly-layer:not(.is-ready) .raly-formation-note { opacity: .7; }
+.raly-layer.is-fallback .raly-formation-note { opacity: 0; }
+@keyframes raly-trace { to { stroke-dashoffset: 0; } }
+@keyframes raly-breathe { 0%, 100% { opacity: .35; } 50% { opacity: .9; } }
+@media (max-width: 700px) { .raly-formation:not(.is-projected) { top: 17%; right: 12%; width: 50%; } }
+@media (prefers-reduced-motion: reduce) { .raly-formation path { animation: none; stroke-dashoffset: 0; opacity: .6; } }

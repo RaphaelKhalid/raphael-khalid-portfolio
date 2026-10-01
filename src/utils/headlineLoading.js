@@ -11,10 +11,10 @@ const STYLES = [
 export function createHeadlineLoading(text, overlay) {
   const wrap = text.parentElement;
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    return { finish() {}, dispose() {} };
+    return { dispose() {} };
   }
-  let disposed = false, done = false, finishAt = null, locked = 0, finishFrom = 0;
-  const started = performance.now(), glyphs = [];
+  let disposed = false, done = false, locked = 0, elapsed = 0, last = 0, frame = 0;
+  const glyphs = [];
   for (const line of text.querySelectorAll('[data-line]')) {
     [...line.textContent].forEach((letter, index) => {
       const el = document.createElement('span');
@@ -45,13 +45,14 @@ export function createHeadlineLoading(text, overlay) {
   const observer = new ResizeObserver(measure);
   observer.observe(text);
   document.fonts.ready.then(measure);
-  function tick() {
-    if (disposed || done || document.hidden) return;
-    const now = performance.now();
-    locked = finishAt === null
-      ? Math.min(glyphs.length - 3, Math.floor((now - started) / 180))
-      : Math.min(glyphs.length, finishFrom + Math.floor((now - finishAt) / 26));
-    const beat = Math.floor((now - started) / 160);
+  function tick(now) {
+    if (disposed || done) return;
+    frame = requestAnimationFrame(tick);
+    if (document.hidden) { last = 0; return; }
+    elapsed += last ? Math.min(40, now - last) : 0;
+    last = now;
+    locked = Math.min(glyphs.length, Math.floor(elapsed / 125));
+    const beat = Math.floor(elapsed / 110);
     glyphs.forEach(({ el }, i) => {
       const changing = i >= locked && i < locked + 3;
       const variant = STYLES[(beat + i * 3) % STYLES.length];
@@ -64,19 +65,17 @@ export function createHeadlineLoading(text, overlay) {
     });
     if (locked === glyphs.length) {
       done = true;
-      clearInterval(timer);
+      cancelAnimationFrame(frame);
       observer.disconnect();
       wrap.classList.remove('headline-resolving');
       overlay.replaceChildren();
     }
   }
-  const timer = setInterval(tick, 80);
-  tick();
+  frame = requestAnimationFrame(tick);
   return {
-    finish() { if (finishAt !== null) return; finishFrom = locked; finishAt = performance.now(); },
     dispose() {
       disposed = true;
-      clearInterval(timer);
+      cancelAnimationFrame(frame);
       observer.disconnect();
       overlay.replaceChildren();
       wrap.classList.remove('headline-resolving');

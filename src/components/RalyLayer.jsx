@@ -41,6 +41,7 @@ const INTERACTIVE = "a, button, input, textarea, select, label, iframe, summary,
 
 const RalyLayer = () => {
   const canvasRef = useRef(null);
+  const formationRef = useRef(null);
   const saysRef = useRef(null);
   const markRef = useRef(null);
   const tourSaysRef = useRef(null);
@@ -96,10 +97,10 @@ const RalyLayer = () => {
       bubbleEl.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
     }
 
-    import("../raly/engine").then(({ createRaly }) => {
+    import("../raly/client").then(async ({ createRalyClient }) => {
       if (disposed) return;
       try {
-        engine = createRaly(canvasRef.current, { reducedMotion: reduced, quality, onReady: () => {
+        engine = await createRalyClient(canvasRef.current, formationRef.current, { reducedMotion: reduced, quality, onReady: () => {
           if (disposed || interrupted) return;
           // Give the visitor time with the completed organism before its tour.
           let toured = false;
@@ -113,6 +114,7 @@ const RalyLayer = () => {
         console.warn("raly could not start here", error);
         return;
       }
+      if (disposed) { engine.dispose(); return; }
       setRaly(engine);
       engine.start();
       window.raly = engine;
@@ -228,8 +230,17 @@ const RalyLayer = () => {
 
   return (
     <>
-      <canvas ref={canvasRef} className="raly-canvas" aria-hidden="true" />
-      <span className="raly-formation-note" aria-hidden="true">a little life, taking shape</span>
+      <div ref={canvasRef} className="raly-layer" aria-hidden="true">
+        <div ref={formationRef} className="raly-formation">
+          <svg viewBox="0 0 600 300" fill="none">
+            {[-1, -0.65, -0.3, 0, 0.3, 0.65, 1].map((side, i) => (
+              <path key={side} pathLength="1" style={{ '--line': i }}
+                d={`M40,150 C120,${150 + side * 130} 210,${150 + side * 100} 310,${150 + side * 40} S460,${150 + side * 75} 550,150`} />
+            ))}
+          </svg>
+        </div>
+        <span className="raly-formation-note">a little life, taking shape</span>
+      </div>
       {/* What raly says when it is clicked. */}
       <div ref={saysRef} className="raly-says" aria-live="polite" />
       {/* The guide's mark: a hairline drawn around what raly is showing, with a caption. */}

@@ -585,7 +585,7 @@ export function createFormationMaterial(shared, surface, formation) {
   const uniforms = surfaceUniforms(shared, surface);
   const material = new THREE.MeshBasicMaterial({
     color: '#34528a', side: THREE.DoubleSide, transparent: true,
-    depthWrite: false, toneMapped: false,
+    depthWrite: false, toneMapped: false, forceSinglePass: true,
   });
   material.onBeforeCompile = shader => {
     installMotion(shader, uniforms, '');
@@ -593,7 +593,7 @@ export function createFormationMaterial(shared, surface, formation) {
     shader.fragmentShader = `uniform vec3 uFormation; uniform float uLength; varying vec4 vSurf;\n` + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `
       float arc = vSurf.x / max(uLength, 0.001), across = abs(vSurf.y);
-      float reach = 0.08 + 1.05 * smoothstep(0.0, 1.0, uFormation.x);
+      float reach = 0.25 + 0.88 * smoothstep(0.0, 1.0, uFormation.x);
       float growing = 1.0 - smoothstep(reach - 0.12, reach, across);
       vec2 grid = vec2(arc * 44.0, vSurf.y * 24.0);
       vec2 edge = abs(fract(grid - 0.5) - 0.5) / max(fwidth(grid), vec2(0.001));
@@ -601,8 +601,8 @@ export function createFormationMaterial(shared, surface, formation) {
       float points = 1.0 - smoothstep(0.7, 1.9, length(edge));
       float scan = exp(-pow((arc - fract(uFormation.z * 0.16)) * 14.0, 2.0));
       diffuseColor.rgb = mix(vec3(0.055, 0.085, 0.23), vec3(0.52, 0.16, 0.08), across);
-      diffuseColor.a = growing * (points * 0.68 + lines * (0.1 + 0.25 * uFormation.x)
-        + scan * lines * 0.18 + 0.025 * uFormation.x) * (1.0 - uFormation.y);
+      diffuseColor.a = (0.07 + growing * (points * 0.55 + lines * (0.15 + 0.2 * uFormation.x)
+        + scan * lines * 0.18 + 0.08 * uFormation.x)) * (1.0 - uFormation.y);
       if (diffuseColor.a < 0.008) discard;
     `);
   };
