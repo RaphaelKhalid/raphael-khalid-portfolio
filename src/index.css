@@ -130,7 +130,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   pointer-events: none;
   /* Fades in once its shaders have compiled (see engine.js). */
   opacity: 0;
-  transition: opacity 900ms var(--e-soft);
+  transition: opacity 180ms var(--e-soft);
 }
 .raly-canvas.is-forming, .raly-canvas.is-ready { opacity: 1; }
 .raly-formation-note {

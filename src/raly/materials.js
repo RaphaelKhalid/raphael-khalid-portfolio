@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { lookDeclarations, lookFragment } from './looks.js';
+import { lookShader } from './looks.js';
 import { RIBBON_NODES, SPINE_SAMPLES } from './anatomy.js';
 
 // raly's shading (from membrane study 08). Every surface uses three materials that share one vertex
@@ -36,6 +36,9 @@ vec2 morphHash2(vec2 p) {
   return fract((p3.xx + p3.yz) * p3.zy);
 }
 vec3 morphWeights(float arcN, float s) {
+#ifdef ORGANISM_MEMBRANE
+  return vec3(1.0, 0.0, 0.0);
+#else
   float e = abs(s);
   float wobble = 0.08 * sin(arcN * 11.0 + s * 3.0 + uSeed * 3.0) + 0.05 * sin(arcN * 27.0 - s * 7.0 + uSeed);
   float x = uMorph.x + uMorph.y * (arcN * 1.4 + e * 0.3) + wobble * uMorph.z;
@@ -45,9 +48,13 @@ vec3 morphWeights(float arcN, float s) {
     w[i] = 1.0 - smoothstep(0.3, 0.7, d);
   }
   return w / max(w.x + w.y + w.z, 1e-3);
+#endif
 }
 // Antler: x > 0 inside bone (in tine widths), y = how close to a tine tip.
 vec2 morphAntler(float arc, float s, float w) {
+#ifdef ORGANISM_MEMBRANE
+  return vec2(0.0);
+#else
   float e = abs(s);
   float spacing = uKind > 1.5 ? 0.6 : (uKind > 0.5 ? 0.95 : 1.3);
   float best = -20.0, tip = 0.0;
@@ -77,9 +84,13 @@ vec2 morphAntler(float arc, float s, float w) {
   float webEdge = 0.32 + 0.1 * sin(arc * 2.3 + uSeed);
   float web = min((webEdge - e) * 6.0, -pore * 7.0 + (e < 0.16 ? 3.0 : 0.0));
   return vec2(max(best, web), tip);
+#endif
 }
 // Pangolin: x plate height (0 in a crevice), y seam darkness, z plate id.
 vec3 morphScales(float arc, float s, float w) {
+#ifdef ORGANISM_MEMBRANE
+  return vec3(0.0);
+#else
   float size = uKind > 1.5 ? 0.16 : 0.33;
   vec2 q = vec2(arc, s * w) / size;
   float row = floor(q.x);
@@ -103,6 +114,7 @@ vec3 morphScales(float arc, float s, float w) {
     }
   }
   return plate;
+#endif
 }
 // Positive: keep this fragment. The antler threshold rises with its weight,
 // so tissue burns away from between the tines inward.
@@ -485,7 +497,7 @@ float cutNoise(vec2 p) {
 const cutout = '';
 
 /** The lit skin. `shared` holds uniform objects; see createShared(). */
-export function createSkinMaterial(shared, surface, { formation } = {}) {
+export function createSkinMaterial(shared, surface, { formation, looks, membraneOnly = false } = {}) {
   const uniforms = surfaceUniforms(shared, surface);
   const material = new THREE.MeshPhysicalMaterial({
     name: `Living skin: ${surface.name}`,
@@ -495,7 +507,9 @@ export function createSkinMaterial(shared, surface, { formation } = {}) {
     sheen: 0.08, sheenColor: new THREE.Color('#ffb48a'), sheenRoughness: 0.5,
     envMapIntensity: 0.42,
   });
+  const paint = lookShader(looks);
   material.defines = surface.kind === 2 ? { ORGANISM_RIBBON: '' } : {};
+  if (membraneOnly) material.defines.ORGANISM_MEMBRANE = '';
   material.extensions = { derivatives: true };
   material.onBeforeCompile = shader => {
     installMotion(shader, uniforms, '');
@@ -514,9 +528,9 @@ export function createSkinMaterial(shared, surface, { formation } = {}) {
       #endif
     `).replace('vec3 transformed = organismPlace(organismNormal);', 'vec3 transformed = organismEarlyPosition;');
 
-    shader.fragmentShader = skinFunctions + lookDeclarations + shader.fragmentShader;
+    shader.fragmentShader = skinFunctions + paint.declarations + shader.fragmentShader;
     // Art styles repaint the finished pixel, after tone mapping.
-    shader.fragmentShader = shader.fragmentShader.replace('#include <colorspace_fragment>', lookFragment);
+    if (paint.fragment) shader.fragmentShader = shader.fragmentShader.replace('#include <colorspace_fragment>', paint.fragment);
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', pigmentFragment);
     if (formation) {
       shader.uniforms.uFormation = formation;
@@ -576,50 +590,76 @@ export function createSkinMaterial(shared, surface, { formation } = {}) {
       #include <opaque_fragment>
     `);
   };
-  material.customProgramCacheKey = () => `organism-skin-10-${surface.kind === 2 ? 'ribbon' : 'body'}-${formation ? 'forming' : 'complete'}`;
+  material.customProgramCacheKey = () => `organism-skin-12-${membraneOnly ? 'membrane' : 'morph'}-${looks?.join('-') ?? 'all'}-${surface.kind === 2 ? 'ribbon' : 'body'}-${formation ? 'forming' : 'complete'}`;
   return material;
 }
 
-/** A light contour study of the actual body, shown while its skin compiles. */
+/** An immediately usable skin: no lighting, environment or pattern prepass. */
 export function createFormationMaterial(shared, surface, formation) {
   const uniforms = surfaceUniforms(shared, surface);
   const material = new THREE.MeshBasicMaterial({
-    color: '#34528a', side: THREE.DoubleSide, transparent: true,
-    depthWrite: false, toneMapped: false, forceSinglePass: true,
+    side: THREE.DoubleSide, transparent: true, depthWrite: false,
+    toneMapped: false, forceSinglePass: true,
   });
+  material.defines = { ORGANISM_MEMBRANE: '' };
   material.onBeforeCompile = shader => {
-    installMotion(shader, uniforms, '');
-    Object.assign(shader.uniforms, { uFormation: formation, uLength: uniforms.uLength });
-    shader.fragmentShader = `uniform vec3 uFormation; uniform float uLength; varying vec4 vSurf;\n` + shader.fragmentShader;
+    installMotion(shader, uniforms, 'vQuickNormal = normalize(normalMatrix * organismNormal);');
+    shader.vertexShader = 'varying vec3 vQuickNormal;\n' + shader.vertexShader;
+    Object.assign(shader.uniforms, { uFormation: formation, uLength: uniforms.uLength,
+      uSeed: uniforms.uSeed, uRamp: shared.ramp, uRampWeight: shared.rampWeight,
+      uLook: shared.look, uBeat: shared.beat });
+    shader.fragmentShader = `
+      uniform vec3 uFormation, uRamp[3], uLook;
+      uniform float uLength, uSeed, uRampWeight, uBeat;
+      varying vec4 vSurf;
+      varying vec3 vQuickNormal;
+      float quickHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7)) + uSeed) * 43758.5453); }
+    ` + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `
       float arc = vSurf.x / max(uLength, 0.001), across = abs(vSurf.y);
-      float reach = 0.25 + 0.88 * smoothstep(0.0, 1.0, uFormation.x);
-      float growing = 1.0 - smoothstep(reach - 0.12, reach, across);
-      vec2 grid = vec2(arc * 44.0, vSurf.y * 24.0);
-      vec2 edge = abs(fract(grid - 0.5) - 0.5) / max(fwidth(grid), vec2(0.001));
-      float lines = 1.0 - smoothstep(0.45, 1.2, min(edge.x, edge.y));
-      float points = 1.0 - smoothstep(0.7, 1.9, length(edge));
-      float scan = exp(-pow((arc - fract(uFormation.z * 0.16)) * 14.0, 2.0));
-      diffuseColor.rgb = mix(vec3(0.055, 0.085, 0.23), vec3(0.52, 0.16, 0.08), across);
-      diffuseColor.a = (0.07 + growing * (points * 0.55 + lines * (0.15 + 0.2 * uFormation.x)
-        + scan * lines * 0.18 + 0.08 * uFormation.x)) * (1.0 - uFormation.y);
-      if (diffuseColor.a < 0.008) discard;
+      float zone = clamp(across + 0.035 * sin(arc * 34.0 + uFormation.z * 1.1), 0.0, 1.0);
+      vec3 color = mix(vec3(0.015, 0.035, 0.25), vec3(0.24, 0.025, 0.42), smoothstep(0.1, 0.35, zone));
+      color = mix(color, vec3(0.75, 0.025, 0.20), smoothstep(0.3, 0.5, zone));
+      color = mix(color, vec3(1.0, 0.40, 0.10), smoothstep(0.48, 0.74, zone));
+      color = mix(color, vec3(1.0, 0.66, 0.40), smoothstep(0.8, 1.0, zone));
+      vec3 ramp = mix(uRamp[0], uRamp[1], smoothstep(0.0, 0.45, zone));
+      ramp = mix(ramp, uRamp[2], smoothstep(0.4, 1.0, zone));
+      color = mix(color, ramp, uRampWeight);
+      vec2 grid = vec2(arc * 30.0, vSurf.y * 13.0);
+      vec2 cell = floor(grid), q = fract(grid) - 0.5;
+      q += vec2(quickHash(cell), quickHash(cell + 7.0)) * 0.22 - 0.11;
+      float spot = 1.0 - smoothstep(0.12, 0.22, length(q));
+      color = mix(color, zone < 0.24 ? vec3(0.72, 0.91, 1.0) : vec3(0.06, 0.025, 0.13), spot * 0.78);
+      float light = 0.62 + 0.38 * abs(dot(normalize(vQuickNormal), normalize(vec3(-0.3, 0.7, 0.65))));
+      color *= light;
+      float ridge = exp(-pow(vSurf.y * 14.0, 2.0));
+      color += ridge * vec3(0.10, 0.25, 0.35) + uBeat * vec3(0.15, 0.05, 0.08);
+      float look = mix(uLook.x, uLook.y, step(arc, uLook.z));
+      if (look > 0.5 && look < 1.5) color = mix(vec3(0.94, 0.89, 0.82), vec3(0.035), max(spot, 1.0 - smoothstep(0.1, 0.5, zone)));
+      diffuseColor.rgb = color;
+      diffuseColor.a = 1.0;
+      // Complement the detailed skin's reveal, using the same pose and mask.
+      if (uFormation.y > 0.0) {
+        float reveal = smoothstep(arc - 0.08, arc + 0.08, uFormation.y * 1.2 - 0.1);
+        if (fract(gl_FragCoord.x * 0.754877666 + gl_FragCoord.y * 0.569840296) <= reveal) discard;
+      }
     `);
   };
-  material.customProgramCacheKey = () => 'organism-formation-1';
+  material.customProgramCacheKey = () => 'organism-immediate-skin-2';
   return material;
 }
 
-export function createDepthMaterial(shared, surface) {
+export function createDepthMaterial(shared, surface, { membraneOnly = false } = {}) {
   const uniforms = surfaceUniforms(shared, surface);
   const material = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, side: THREE.DoubleSide });
   material.defines = surface.kind === 2 ? { ORGANISM_RIBBON: '' } : {};
+  if (membraneOnly) material.defines.ORGANISM_MEMBRANE = '';
   material.onBeforeCompile = shader => {
     installMotion(shader, uniforms, '');
     shader.fragmentShader = cutoutDeclarations + shader.fragmentShader.replace('void main() {', `void main() {
       ${cutout}`);
   };
-  material.customProgramCacheKey = () => `organism-depth-8-${surface.kind === 2 ? 'ribbon' : 'body'}`;
+  material.customProgramCacheKey = () => `organism-depth-9-${membraneOnly ? 'membrane' : 'morph'}-${surface.kind === 2 ? 'ribbon' : 'body'}`;
   return material;
 }
 

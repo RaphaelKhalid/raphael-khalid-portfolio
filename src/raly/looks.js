@@ -353,3 +353,19 @@ export const lookFragment = /* glsl */`
     gl_FragColor.rgb = lookPaint(lookNow, gl_FragColor.rgb, lookSkin, lookN, lookV, lookL, lookBoil);
   }
 `;
+
+// Compile only the styles visible in a transition. A runtime dispatch across
+// every medium makes the driver optimize all seven large paint functions.
+export function lookShader(looks) {
+  if (!looks) return { declarations: lookDeclarations, fragment: lookFragment };
+  const selected = [...new Set(looks)].filter(index => index > 0 && index < LOOKS.length);
+  if (!selected.length) return { declarations: '', fragment: null };
+  const functions = ['', 'lookInk', 'lookWatercolor', 'lookPorcelain', 'lookFabric', 'lookOil', 'lookCosmic', 'lookCartoon'];
+  const paint = selected.map(index =>
+    `if (abs(lookNow - ${index}.0) < 0.5) gl_FragColor.rgb = ${functions[index]}(lookSkin, lookN, lookV, lookL, lookBoil);`
+  ).join('\n');
+  return {
+    declarations: lookDeclarations.slice(0, lookDeclarations.indexOf('vec3 lookPaint(')),
+    fragment: lookFragment.replace('gl_FragColor.rgb = lookPaint(lookNow, gl_FragColor.rgb, lookSkin, lookN, lookV, lookL, lookBoil);', paint),
+  };
+}
