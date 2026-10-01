@@ -6,34 +6,77 @@
    The field journal: warm paper, ink, hairlines, and one living specimen.
    ========================================================================== */
 :root {
-  --paper: #f4ebdf;
-  --raised: #faf5ee;
-  --ink: #2e2826;
-  --ink-dim: #5e534c;
-  --muted: #86796f;
-  --hair: #d9cfc2;
-  --hair-soft: #e6dccf;
-  --cobalt: #1f2f9e;
-  --magenta: #b3135c;
-  --coral: #e0552f;
-  --gold: #c98a22;
+  /* Colour channels, so Tailwind's opacity modifiers work on the theme
+     (tailwind.config.js), and so night mode only has to swap these. */
+  --paper-rgb: 244 235 223;
+  --raised-rgb: 250 245 238;
+  --ink-rgb: 46 40 38;
+  --ink-dim-rgb: 94 83 76;
+  --muted-rgb: 134 121 111;
+  --hair-rgb: 217 207 194;
+  --hair-soft-rgb: 230 220 207;
+  --cobalt-rgb: 31 47 158;
+  --magenta-rgb: 179 19 92;
+  --coral-rgb: 224 85 47;
+  --gold-rgb: 201 138 34;
+  --panel-2-rgb: 246 238 227;
+  --panel-3-rgb: 239 229 216;
+  --amber-rgb: 196 80 43;
+  --amber-lo-rgb: 217 162 140;
+  --green-rgb: 63 122 85;
+  --shadow-rgb: 46 40 38;
+
+  --paper: rgb(var(--paper-rgb));
+  --raised: rgb(var(--raised-rgb));
+  --ink: rgb(var(--ink-rgb));
+  --ink-dim: rgb(var(--ink-dim-rgb));
+  --muted: rgb(var(--muted-rgb));
+  --hair: rgb(var(--hair-rgb));
+  --hair-soft: rgb(var(--hair-soft-rgb));
+  --cobalt: rgb(var(--cobalt-rgb));
+  --magenta: rgb(var(--magenta-rgb));
+  --coral: rgb(var(--coral-rgb));
+  --gold: rgb(var(--gold-rgb));
 
   /* Old token names used by the demo labs, remapped to the journal. */
   --panel: var(--raised);
-  --panel-2: #f6eee3;
-  --panel-3: #efe5d8;
+  --panel-2: rgb(var(--panel-2-rgb));
+  --panel-3: rgb(var(--panel-3-rgb));
   --line: var(--hair);
   --line-soft: var(--hair-soft);
   --fg: var(--ink);
   --fg-dim: var(--ink-dim);
   --fg-faint: var(--muted);
-  --amber: #c4502b;
+  --amber: rgb(var(--amber-rgb));
   --cyan: var(--cobalt);
   --rose: var(--magenta);
-  --green: #3f7a55;
+  --green: rgb(var(--green-rgb));
 
   --e-out: cubic-bezier(0.16, 1, 0.3, 1);
   --e-soft: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Night: deep, still water under warm paper-coloured type, for sitting with
+   raly and the music. Accents are lifted so they read on the dark. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper-rgb: 14 19 27;
+  --raised-rgb: 21 27 37;
+  --ink-rgb: 232 224 212;
+  --ink-dim-rgb: 184 174 162;
+  --muted-rgb: 138 132 124;
+  --hair-rgb: 46 54 66;
+  --hair-soft-rgb: 33 40 51;
+  --cobalt-rgb: 143 163 255;
+  --magenta-rgb: 255 122 178;
+  --coral-rgb: 255 140 102;
+  --gold-rgb: 232 184 96;
+  --panel-2-rgb: 18 24 33;
+  --panel-3-rgb: 26 33 44;
+  --amber-rgb: 255 140 102;
+  --amber-lo-rgb: 140 90 75;
+  --green-rgb: 127 199 154;
+  --shadow-rgb: 0 0 0;
 }
 
 * {
@@ -102,6 +145,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 /* Tag colours, from the specimen's skin. */
 .blue-text-gradient { color: var(--cobalt); }
 .green-text-gradient { color: #2f6f63; }
+:root[data-theme="dark"] .green-text-gradient { color: #7fc7b4; }
 .pink-text-gradient { color: var(--magenta); }
 .orange-text-gradient { color: var(--coral); }
 
@@ -156,7 +200,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   font-family: "Patrick Hand", "Comic Sans MS", cursive;
   font-size: 20px;
   line-height: 1.22;
-  color: #3a322e;
+  color: var(--ink);
   opacity: 0;
   scale: 0.45;
   transform-origin: 22% 115%;
@@ -178,7 +222,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .raly-says-fill { fill: var(--raised); }
 .raly-says-line {
   fill: none;
-  stroke: #5a4f48;
+  stroke: var(--ink-dim);
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -193,7 +237,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   font-size: 26px;
 }
 .raly-says-tour .raly-says-line { stroke-width: 2; }
-.raly-says-tour .raly-says-frame { filter: drop-shadow(0 10px 16px rgba(46, 40, 38, 0.18)); }
+.raly-says-tour .raly-says-frame { filter: drop-shadow(0 10px 16px rgb(var(--shadow-rgb) / 0.18)); }
 .raly-says-word { display: inline-block; white-space: nowrap; }
 .raly-says-link {
   color: var(--cobalt);
@@ -225,7 +269,7 @@ html.dragging-raly, html.dragging-raly * {
    paper outline is painted under each glyph (exact color, so it never tints
    the page), softened by two light shadows. */
 main :where(p, h2, h3, h4, li, figcaption, dt, dd, label, a, span):not(.headline-type, .headline-type *, .plate *, .panel-demo *, .lab *, [role="dialog"] *, .wall-card, .wall-card *) {
-  text-shadow: 0 0 6px rgba(244, 235, 223, 0.9), 0 0 14px rgba(244, 235, 223, 0.7);
+  text-shadow: 0 0 6px rgb(var(--paper-rgb) / 0.9), 0 0 14px rgb(var(--paper-rgb) / 0.7);
 }
 @supports (paint-order: stroke fill) {
   main :where(p, h2, h3, h4, li, figcaption, dt, dd, label, a, span):not(.headline-type, .headline-type *, .plate *, .panel-demo *, .lab *, [role="dialog"] *, .wall-card, .wall-card *) {
@@ -291,11 +335,11 @@ html.print-open .raly-mark { opacity: 0; }
 .plate {
   background: var(--raised);
   border: 1px solid var(--hair);
-  box-shadow: 0 1px 0 rgba(46, 40, 38, 0.03), 0 24px 40px -34px rgba(46, 40, 38, 0.35);
+  box-shadow: 0 1px 0 rgb(var(--shadow-rgb) / 0.03), 0 24px 40px -34px rgb(var(--shadow-rgb) / 0.35);
 }
 
 .plate-art {
-  background: linear-gradient(180deg, #fbf7f1, #f7efe4);
+  background: linear-gradient(180deg, rgb(var(--raised-rgb)), rgb(var(--panel-2-rgb)));
   border-bottom: 1px solid var(--hair-soft);
 }
 

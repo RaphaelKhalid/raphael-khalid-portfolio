@@ -14,7 +14,8 @@
 const clamp01 = v => Math.max(0, Math.min(1, v));
 
 export function createAudio() {
-  const state = { enabled: false, level: 0, bass: 0, mid: 0, high: 0, beat: 0, onset: false, error: '' };
+  // `beats` counts onsets, so a reader on another frame clock never misses one.
+  const state = { enabled: false, level: 0, bass: 0, mid: 0, high: 0, beat: 0, beats: 0, onset: false, error: '' };
   let context = null, analyser = null, stream = null, data = null;
   const peaks = {}, floors = {}, smoothed = {};
   let primed = false, settling = 0;
@@ -104,7 +105,7 @@ export function createAudio() {
       fluxAverage += (flux - fluxAverage) * (1 - Math.exp(-dt * 1.5));
       refractory -= dt;
       if (settling <= 0 && flux > fluxAverage * 1.6 + 0.06 && state.bass > 0.25 && refractory <= 0) {
-        state.onset = true; pulse = Math.min(1, 0.65 + 0.35 * state.bass); refractory = 0.22;
+        state.onset = true; state.beats++; pulse = Math.min(1, 0.65 + 0.35 * state.bass); refractory = 0.22;
       }
       return state;
     },

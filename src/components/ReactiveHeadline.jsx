@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { ralyScreen } from "../raly/store";
+import { onRaly, ralyScreen } from "../raly/store";
+import { onTheme } from "../utils/theme";
 
 // "running experiments", set as a row of printed letters with real thickness.
 // Every letter is its own small 3D body on a spring: it leans away from a
@@ -63,7 +64,7 @@ const ReactiveHeadline = ({ className = "" }) => {
 
     let letters = [];
     let layout = { pad: 0, scale: 1, fontPx: 100, range: 18 };
-    const boxes = new Float32Array(MAX_LETTERS * 4), poses = new Float32Array(MAX_LETTERS * 4);
+    const boxes = new Float32Array(MAX_LETTERS * 4), poses = new Float32Array(MAX_LETTERS * 4), dance = new Float32Array(MAX_LETTERS * 4);
     const stateA = new Float32Array(MAX_LETTERS * 4), stateB = new Float32Array(MAX_LETTERS * 4), stateC = new Float32Array(MAX_LETTERS * 4);
 
     function build() {
@@ -87,11 +88,6 @@ const ReactiveHeadline = ({ className = "" }) => {
       const pixelWidth = Math.round(width * scale), pixelHeight = Math.round(height * scale);
       canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
       canvas.style.left = `${-pad}px`; canvas.style.top = `${-pad}px`;
-      off.width = pixelWidth; off.height = pixelHeight;
-      ctx.font = font;
-      if ("letterSpacing" in ctx) ctx.letterSpacing = spacing;
-      ctx.fillStyle = "#000";
-      ctx.textBaseline = "alphabetic";
       const previous = letters;
       letters = [];
       text.querySelectorAll("[data-line]").forEach(lineEl => {
@@ -102,23 +98,47 @@ const ReactiveHeadline = ({ className = "" }) => {
         const descent = metrics.fontBoundingBoxDescent ?? fontPx * scale * 0.2;
         const x0 = (r.left - rect.left + pad) * scale;
         const baseline = (r.top - rect.top + pad) * scale + (r.height * scale - (ascent + descent)) / 2 + ascent;
-        ctx.fillText(word, x0, baseline);
         for (let i = 0; i < word.length && letters.length < MAX_LETTERS; i++) {
           const start = ctx.measureText(word.slice(0, i)).width, end = ctx.measureText(word.slice(0, i + 1)).width;
           const old = previous[letters.length];
           letters.push({
+            char: word[i], x: x0 + start, baseline,
             box: [x0 + start, baseline - ascent * 0.92, x0 + end, baseline + descent * 0.9],
             cx: (x0 + (start + end) / 2) / scale - pad, cy: (baseline - ascent * 0.4) / scale - pad,
             seed: old?.seed ?? Math.random(),
             engrave: 0, interfere: 0, ink: 0, geo: 0, marble: 0, riso: 0, water: 0, pressure: 0, geoTimer: 0, flow: [0, 0],
             pose: old?.pose ?? [0, 0, 0, 0], velocity: old?.velocity ?? [0, 0, 0, 0],
+            hop: 0, hopVel: 0, cue: -1, side: 1, sway: 0,
           });
         }
       });
       letters.forEach((l, i) => boxes.set(l.box, i * 4));
+      // The distance field is an atlas with every letter in its own cell, a
+      // margin wider than anything the shader samples around it. A shared
+      // field would let a letter that hops or turns carry slivers of its
+      // neighbours along.
       const range = Math.round(18 * scale);
+      const margin = Math.ceil(fontPx * scale * 0.14 + range + 4);
+      let cellX = 0, cellY = 0, rowHeight = 0, atlasWidth = 0;
+      const offsets = new Float32Array(MAX_LETTERS * 4);
+      const cells = letters.map(l => {
+        const w = Math.ceil(l.box[2] - l.box[0]) + margin * 2, h = Math.ceil(l.box[3] - l.box[1]) + margin * 2;
+        if (cellX + w > 4096) { cellX = 0; cellY += rowHeight; rowHeight = 0; }
+        const cell = [cellX, cellY];
+        cellX += w; rowHeight = Math.max(rowHeight, h); atlasWidth = Math.max(atlasWidth, cellX);
+        return cell;
+      });
+      off.width = atlasWidth; off.height = cellY + rowHeight;
+      ctx.font = font;
+      ctx.fillStyle = "#000";
+      ctx.textBaseline = "alphabetic";
+      letters.forEach((l, i) => {
+        const ox = cells[i][0] + margin - l.box[0], oy = cells[i][1] + margin - l.box[1];
+        ctx.fillText(l.char, l.x + ox, l.baseline + oy);
+        offsets.set([ox, oy, 0, 0], i * 4);
+      });
       const alpha = ctx.getImageData(0, 0, off.width, off.height).data;
-      worker.postMessage({ type: 'build', alpha, width: pixelWidth, height: pixelHeight, range }, [alpha.buffer]);
+      worker.postMessage({ type: 'build', alpha, width: off.width, height: off.height, canvasWidth: pixelWidth, canvasHeight: pixelHeight, offsets, range }, [alpha.buffer]);
       layout = { pad, scale, fontPx, range };
 
     }
@@ -140,6 +160,11 @@ const ReactiveHeadline = ({ className = "" }) => {
 
     const phase = [0, 0];
     let lastRaly = null, frame = 0, last = 0, time = 0, visible = true;
+    // Music raly hears (the nav's "listen") makes the words dance; night mode
+    // flips their ink.
+    let audio = null, groove = 0, lastBeats = 0, beats = 0;
+    const offRaly = onRaly(engine => { audio = engine?.audio?.state ?? null; });
+    const offTheme = onTheme(dark => worker.postMessage({ type: 'theme', dark }));
     const approach = (value, target, rise, fall, dt) => value + (target - value) * (1 - Math.exp(-dt * (target > value ? rise : fall)));
 
     function step(dt) {
@@ -164,6 +189,17 @@ const ReactiveHeadline = ({ className = "" }) => {
       const crest = (cycle % 1) * (letters.length + 8) - 4;
       const sigma = layout.fontPx * 0.9, ralySigma = layout.fontPx * 1.1;
       const ralyWeight = innerWidth < 760 ? 0.45 : 1;
+
+      // Dancing: each beat sends a hop rippling through the words, left to
+      // right; odd and even letters sway opposite ways and swap on the next
+      // beat; everything scales with how loud the music is, and settles in silence.
+      const music = audio?.enabled ? audio : null;
+      groove = approach(groove, music ? Math.min(1, music.level * 1.6) : 0, 4, 0.8, dt);
+      if (music && music.beats !== lastBeats) {
+        lastBeats = music.beats; beats++;
+        letters.forEach((l, i) => { l.cue = i * 0.028; });
+      }
+      const bass = music?.bass ?? 0, f = layout.fontPx;
 
       letters.forEach((l, i) => {
         const dx = px - l.cx, dy = py - l.cy;
@@ -199,6 +235,9 @@ const ReactiveHeadline = ({ className = "" }) => {
           prox * layout.fontPx * 0.1 + rp * layout.fontPx * 0.06 + wave * layout.fontPx * 0.05 + layout.fontPx * 0.012 * Math.sin(time * 1.1 + i * 0.6),
           clamp(dx / sigma, -1, 1) * prox * 0.03,
         ];
+        // The dance rocks each letter into its sway, flat to the page: turning
+        // it in depth would show its stacked layers.
+        poseTarget[3] += l.sway * 0.06;
         // A fast pass nudges letters into a small, quickly settling sway.
         const kick = prox * fast * 0.0012;
         l.velocity[0] += flickY * kick * dt * 60; l.velocity[1] += flickX * kick * dt * 60;
@@ -210,6 +249,19 @@ const ReactiveHeadline = ({ className = "" }) => {
         }
         // Never far enough to see the letter's side smear across its face.
         l.pose[0] = clamp(l.pose[0], -0.3, 0.3); l.pose[1] = clamp(l.pose[1], -0.3, 0.3); l.pose[3] = clamp(l.pose[3], -0.06, 0.06);
+
+        // The hop: a kick on the beat (harder with more bass), then a bouncy
+        // spring back down with a little rebound.
+        if (l.cue >= 0) {
+          l.cue -= dt;
+          if (l.cue < 0) { l.hopVel += f * (1.6 + 1.2 * bass) * groove; l.side = (beats + i) % 2 ? 1 : -1; }
+        }
+        l.hopVel += (-90 * l.hop - 9 * l.hopVel) * dt;
+        l.hop = clamp(l.hop + l.hopVel * dt, -0.04 * f, 0.22 * f);
+        l.sway = approach(l.sway, l.side * groove, 6, 3, dt);
+        // Stretch on the way up, squash on landing.
+        const squash = clamp(-l.hopVel / (f * 14), -0.12, 0.12);
+        dance.set([l.hop * layout.scale, squash, l.sway * f * 0.07 * layout.scale, 0], i * 4);
       });
       letters.forEach((l, i) => {
         const left = letters[i - 1]?.targets, right = letters[i + 1]?.targets;
@@ -232,7 +284,7 @@ const ReactiveHeadline = ({ className = "" }) => {
       if (inFlight || !canvas.isConnected) return;
       const rect = canvas.getBoundingClientRect();
       inFlight = true;
-      worker.postMessage({ type: 'frame', boxes, poses, stateA, stateB, stateC, layout, time, phase,
+      worker.postMessage({ type: 'frame', boxes, poses, dance, stateA, stateB, stateC, layout, time, phase,
         raly: [(ralyScreen.x - rect.left) * layout.scale, (ralyScreen.y - rect.top) * layout.scale], count: letters.length });
     }
 
@@ -263,6 +315,7 @@ const ReactiveHeadline = ({ className = "" }) => {
       observer.disconnect(); io.disconnect();
       removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerleave", onLeave);
+      offRaly(); offTheme();
       cancelled = true; clearTimeout(deadline); worker.terminate(); canvas.remove(); text.style.color = "";
     };
   }, []);

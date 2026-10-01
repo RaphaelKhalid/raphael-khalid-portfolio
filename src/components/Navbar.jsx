@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { navLinks } from "../constants";
 import { onRaly } from "../raly/store";
 import { styles } from "../styles";
+import { isDark, onTheme, setTheme } from "../utils/theme";
 
-// A quiet top bar: the wordmark, the places to go, raly's tour and its music switch.
+// A quiet top bar: the wordmark, the places to go, raly's tour, night mode and
+// its music switch.
 // It steps out of the way while you read downward and returns when you scroll
 // back up.
 const Listen = ({ compact = false }) => {
@@ -44,6 +46,23 @@ const Listen = ({ compact = false }) => {
   );
 };
 
+// Night: the page goes dark and still, for sitting with raly and some music.
+const Night = () => {
+  const [dark, setDark] = useState(isDark);
+  useEffect(() => onTheme(setDark), []);
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(dark ? "light" : "dark")}
+      aria-pressed={dark}
+      title={dark ? "Back to the paper journal" : "A dark, quiet page for sitting with raly"}
+      className="font-mono text-[11px] tracking-[0.16em] uppercase text-muted hover:text-coral transition-colors duration-200"
+    >
+      {dark ? "day" : "night"}
+    </button>
+  );
+};
+
 const Navbar = () => {
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
@@ -62,7 +81,7 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 inset-x-0 z-20 transition-transform duration-500 ease-out ${hidden && !open ? "-translate-y-full" : "translate-y-0"}`}
-      style={{ background: "rgba(244,235,223,0.94)" }}
+      style={{ background: "rgb(var(--paper-rgb) / 0.94)" }}
     >
       <div className={`${styles.paddingX} max-w-[1440px] mx-auto`}>
         <div className="flex items-center justify-between h-[68px] border-b border-hair">
@@ -82,9 +101,11 @@ const Navbar = () => {
                 tour
               </button>
             </li>
+            <li><Night /></li>
             <li><Listen /></li>
           </ul>
           <div className="md:hidden flex items-center gap-5">
+            <Night />
             <Listen compact />
             <button type="button" onClick={() => setOpen(v => !v)} aria-expanded={open} className="font-mono text-[11px] tracking-[0.16em] uppercase text-ink-text">
               {open ? "close" : "menu"}
