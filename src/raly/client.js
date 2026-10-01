@@ -91,7 +91,7 @@ export async function createRalyClient(host, drawing, options) {
       disposed = true; cancelAnimationFrame(frame); clearTimeout(deadline);
       removeEventListener('resize', resize); document.removeEventListener('visibilitychange', visibility);
       audio.disable(); worker?.terminate(); worker = null; canvas.remove();
-      host.classList.remove('is-forming', 'is-ready', 'is-fallback');
+      host.classList.remove('is-forming', 'is-active', 'is-ready', 'is-styles-ready', 'is-fallback');
       drawing.classList.remove('is-finished', 'is-projected'); ralyScreen.visible = false;
     },
   };
