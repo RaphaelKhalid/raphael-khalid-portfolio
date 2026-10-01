@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ralyScreen } from "../raly/store";
+import { createHeadlineLoading } from "../utils/headlineLoading";
 
 // "running experiments", set as a row of printed letters with real thickness.
 // Every letter is its own small 3D body on a spring: it leans away from a
@@ -261,12 +262,14 @@ const ReactiveHeadline = ({ className = "" }) => {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
   const textRef = useRef(null);
+  const loadingRef = useRef(null);
 
   useEffect(() => {
     const wrap = wrapRef.current, canvas = canvasRef.current, text = textRef.current;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const loading = createHeadlineLoading(text, loadingRef.current);
     const gl = canvas.getContext("webgl2", { premultipliedAlpha: true, antialias: true });
-    if (!gl || reduced) { canvas.style.display = "none"; return undefined; }
+    if (!gl || reduced) { canvas.style.display = "none"; loading.finish(); return () => loading.dispose(); }
 
     let program;
     try {
@@ -277,7 +280,8 @@ const ReactiveHeadline = ({ className = "" }) => {
     } catch (error) {
       console.error(error);
       canvas.style.display = "none";
-      return undefined;
+      loading.finish();
+      return () => loading.dispose();
     }
 
     // Link in the background where the browser can (the shader is large, and
@@ -291,12 +295,13 @@ const ReactiveHeadline = ({ className = "" }) => {
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
         console.error(gl.getProgramInfoLog(program));
         canvas.style.display = "none";
+        loading.finish();
         return;
       }
       teardown = setup();
     };
     whenLinked();
-    return () => { cancelled = true; clearTimeout(pollTimer); teardown(); };
+    return () => { cancelled = true; clearTimeout(pollTimer); loading.dispose(); teardown(); };
 
     function setup() {
     gl.useProgram(program);
@@ -514,8 +519,10 @@ const ReactiveHeadline = ({ className = "" }) => {
     const observer = new ResizeObserver(() => { if (ready) rebuild(); });
     const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
     document.fonts.ready.then(() => {
+      if (cancelled) return;
       rebuild();
       text.style.color = "transparent";
+      loading.finish();
       observer.observe(wrap);
       io.observe(wrap);
       frame = requestAnimationFrame(tick);
@@ -538,7 +545,8 @@ const ReactiveHeadline = ({ className = "" }) => {
           <span key={line} data-line className="block w-fit">{line}</span>
         ))}
       </h1>
-      <canvas ref={canvasRef} aria-hidden="true" className="absolute pointer-events-none z-[2]" />
+      <div ref={loadingRef} aria-hidden="true" className="headline-loading headline-type absolute inset-0 pointer-events-none z-[3]" />
+      <canvas ref={canvasRef} aria-hidden="true" className="headline-canvas absolute pointer-events-none z-[2]" />
     </div>
   );
 };

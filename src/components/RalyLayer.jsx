@@ -99,7 +99,16 @@ const RalyLayer = () => {
     import("../raly/engine").then(({ createRaly }) => {
       if (disposed) return;
       try {
-        engine = createRaly(canvasRef.current, { reducedMotion: reduced, quality });
+        engine = createRaly(canvasRef.current, { reducedMotion: reduced, quality, onReady: () => {
+          if (disposed || interrupted) return;
+          // Give the visitor time with the completed organism before its tour.
+          let toured = false;
+          try { toured = localStorage.getItem("raly-toured") === "1"; } catch { /* no storage */ }
+          const asked = new URLSearchParams(location.search).has("tour");
+          if (!reduced && (asked || !toured)) {
+            autoTimer = setTimeout(() => { if (asked || scrollY < 60) startTour(); }, asked ? 2200 : 8000);
+          }
+        } });
       } catch (error) {
         console.warn("raly could not start here", error);
         return;
@@ -108,19 +117,14 @@ const RalyLayer = () => {
       engine.start();
       window.raly = engine;
       frame = requestAnimationFrame(follow);
-      // A first visit that lets the hero sit gets the tour; ?tour asks for it.
-      let toured = false;
-      try { toured = localStorage.getItem("raly-toured") === "1"; } catch { /* no storage */ }
-      const asked = new URLSearchParams(location.search).has("tour");
-      if (!reduced && (asked || !toured)) {
-        autoTimer = setTimeout(() => { if (asked || scrollY < 60) startTour(); }, asked ? 2200 : 8000);
-      }
-    });
+    }).catch(error => { if (!disposed) console.warn("raly could not load", error); });
 
     const isInteractive = target => target instanceof Element && target.closest(INTERACTIVE);
+    let interrupted = false;
     // Real input hands the page back: it ends the tour, or cancels one waiting to start.
     const interrupt = event => {
       if (!event.isTrusted) return;
+      interrupted = true;
       const tourLink = event.target instanceof Element && event.target.closest('.raly-says-tour.on a');
       // Keep native link activation and Tab navigation available during the tour.
       if (tour.active && (
@@ -225,6 +229,7 @@ const RalyLayer = () => {
   return (
     <>
       <canvas ref={canvasRef} className="raly-canvas" aria-hidden="true" />
+      <span className="raly-formation-note" aria-hidden="true">a little life, taking shape</span>
       {/* What raly says when it is clicked. */}
       <div ref={saysRef} className="raly-says" aria-live="polite" />
       {/* The guide's mark: a hairline drawn around what raly is showing, with a caption. */}

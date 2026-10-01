@@ -485,7 +485,7 @@ float cutNoise(vec2 p) {
 const cutout = '';
 
 /** The lit skin. `shared` holds uniform objects; see createShared(). */
-export function createSkinMaterial(shared, surface) {
+export function createSkinMaterial(shared, surface, { formation } = {}) {
   const uniforms = surfaceUniforms(shared, surface);
   const material = new THREE.MeshPhysicalMaterial({
     name: `Living skin: ${surface.name}`,
@@ -518,6 +518,19 @@ export function createSkinMaterial(shared, surface) {
     // Art styles repaint the finished pixel, after tone mapping.
     shader.fragmentShader = shader.fragmentShader.replace('#include <colorspace_fragment>', lookFragment);
     shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', pigmentFragment);
+    if (formation) {
+      shader.uniforms.uFormation = formation;
+      shader.fragmentShader = 'uniform vec3 uFormation;\n' + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace('#include <opaque_fragment>', `
+        // The live skin develops over the contour drawing only once ready.
+        if (uFormation.y < 1.0) {
+          float reveal = smoothstep(skinArc / max(uLength, 0.001) - 0.08,
+            skinArc / max(uLength, 0.001) + 0.08, uFormation.y * 1.2 - 0.1);
+          if (fract(gl_FragCoord.x * 0.754877666 + gl_FragCoord.y * 0.569840296) > reveal) discard;
+        }
+        #include <opaque_fragment>
+      `);
+    }
     shader.fragmentShader = shader.fragmentShader.replace('#include <roughnessmap_fragment>', `
       #include <roughnessmap_fragment>
       roughnessFactor = clamp(roughnessFactor + skinSpot * 0.1 - skinGlint * 0.2
@@ -563,7 +576,37 @@ export function createSkinMaterial(shared, surface) {
       #include <opaque_fragment>
     `);
   };
-  material.customProgramCacheKey = () => `organism-skin-9-${surface.kind === 2 ? 'ribbon' : 'body'}`;
+  material.customProgramCacheKey = () => `organism-skin-10-${surface.kind === 2 ? 'ribbon' : 'body'}-${formation ? 'forming' : 'complete'}`;
+  return material;
+}
+
+/** A light contour study of the actual body, shown while its skin compiles. */
+export function createFormationMaterial(shared, surface, formation) {
+  const uniforms = surfaceUniforms(shared, surface);
+  const material = new THREE.MeshBasicMaterial({
+    color: '#34528a', side: THREE.DoubleSide, transparent: true,
+    depthWrite: false, toneMapped: false,
+  });
+  material.onBeforeCompile = shader => {
+    installMotion(shader, uniforms, '');
+    Object.assign(shader.uniforms, { uFormation: formation, uLength: uniforms.uLength });
+    shader.fragmentShader = `uniform vec3 uFormation; uniform float uLength; varying vec4 vSurf;\n` + shader.fragmentShader;
+    shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', `
+      float arc = vSurf.x / max(uLength, 0.001), across = abs(vSurf.y);
+      float reach = 0.08 + 1.05 * smoothstep(0.0, 1.0, uFormation.x);
+      float growing = 1.0 - smoothstep(reach - 0.12, reach, across);
+      vec2 grid = vec2(arc * 44.0, vSurf.y * 24.0);
+      vec2 edge = abs(fract(grid - 0.5) - 0.5) / max(fwidth(grid), vec2(0.001));
+      float lines = 1.0 - smoothstep(0.45, 1.2, min(edge.x, edge.y));
+      float points = 1.0 - smoothstep(0.7, 1.9, length(edge));
+      float scan = exp(-pow((arc - fract(uFormation.z * 0.16)) * 14.0, 2.0));
+      diffuseColor.rgb = mix(vec3(0.055, 0.085, 0.23), vec3(0.52, 0.16, 0.08), across);
+      diffuseColor.a = growing * (points * 0.68 + lines * (0.1 + 0.25 * uFormation.x)
+        + scan * lines * 0.18 + 0.025 * uFormation.x) * (1.0 - uFormation.y);
+      if (diffuseColor.a < 0.008) discard;
+    `);
+  };
+  material.customProgramCacheKey = () => 'organism-formation-1';
   return material;
 }
 
