@@ -195,8 +195,12 @@
   color: var(--ink);
 }
 
-/* Night: the still frames are ink on paper; turn them into pale lines on
-   the dark until the living canvas takes over. */
-:root[data-theme="dark"] .wall-tile__art { filter: grayscale(0.85) invert(0.9) hue-rotate(180deg) opacity(0.8); }
+/* Keep the illustrations on their original warm paper at night. The same
+   backing remains beneath the transparent live canvas and fallback stills. */
+:root[data-theme="dark"] .wall-tile__art {
+  background-color: #f4ebdf;
+  filter: grayscale(0.35);
+}
 :root[data-theme="dark"] .wall-tile:hover .wall-tile__art,
-:root[data-theme="dark"] .wall-tile:focus-visible .wall-tile__art { filter: invert(0.9) hue-rotate(180deg); }
+:root[data-theme="dark"] .wall-tile:focus-visible .wall-tile__art,
+:root[data-theme="dark"] .plate-wall.is-live .wall-tile__art { filter: none; }

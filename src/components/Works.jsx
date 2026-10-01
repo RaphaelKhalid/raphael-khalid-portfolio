@@ -6,7 +6,6 @@ import { styles } from "../styles";
 import SectionHead from "./SectionHead";
 import wallClip from "../assets/plates/wall.mp4";
 import wallPoster from "../assets/plates/wall-poster.webp";
-import { isDark } from "../utils/theme";
 import { linkProgram, whenIdle } from "../utils/webgl";
 import "./works-wall.css";
 
@@ -49,7 +48,6 @@ const FRAGMENT = `#version 300 es
 precision highp float;
 uniform sampler2D uCalm;
 uniform sampler2D uAwake;
-uniform float uDark;
 in vec2 vUv;
 flat in int vTile;
 in float vWake;
@@ -66,8 +64,6 @@ void main() {
   float value = dot(calm, vec3(0.299, 0.587, 0.114));
   vec3 ink = mix(vec3(0.2, 0.18, 0.17), PAPER, smoothstep(0.12, 0.93, value));
   vec3 asleep = mix(PAPER, mix(ink, calm, 0.12), 0.82);
-  // Night: the same drawing with its lightness flipped, pale lines on the dark.
-  asleep += uDark * (1.0 - 2.0 * dot(asleep, vec3(0.299, 0.587, 0.114)));
   // The clips are drawn on the page's own paper: key it out, so raly can be
   // seen swimming between the machines rather than behind paper squares.
   float away = max(distance(calm, PAPER), distance(awake, PAPER));
@@ -125,7 +121,7 @@ function useLivingWall(wallRef, tileRefs, hovered, focused) {
       const corner = gl.getAttribLocation(program, "aCorner");
       gl.enableVertexAttribArray(corner);
       gl.vertexAttribPointer(corner, 2, gl.FLOAT, false, 0, 0);
-      const U = Object.fromEntries(["uRect", "uWake", "uRes", "uCalm", "uAwake", "uDark"].map(n => [n, gl.getUniformLocation(program, n)]));
+      const U = Object.fromEntries(["uRect", "uWake", "uRes", "uCalm", "uAwake"].map(n => [n, gl.getUniformLocation(program, n)]));
       const textures = [0, 1].map(unit => {
         const t = gl.createTexture();
         gl.activeTexture(gl.TEXTURE0 + unit);
@@ -243,7 +239,6 @@ function useLivingWall(wallRef, tileRefs, hovered, focused) {
         gl.uniform4fv(U.uRect, rects);
         gl.uniform1fv(U.uWake, wakeArray);
         gl.uniform2f(U.uRes, size[0], size[1]);
-        gl.uniform1f(U.uDark, isDark() ? 1 : 0);
         gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, count);
       }
       return () => {
