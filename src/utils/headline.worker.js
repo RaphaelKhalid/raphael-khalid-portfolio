@@ -6,6 +6,7 @@ precision highp float;
 in vec2 aCorner;
 uniform vec4 uBox[${MAX_LETTERS}];
 uniform vec4 uPose[${MAX_LETTERS}];   // tilt x, tilt y, lift (px), spin z
+uniform vec4 uDance[${MAX_LETTERS}];  // hop (px), squash, step aside (px), unused
 uniform vec2 uRes;
 uniform float uPad;
 uniform float uDepth;
@@ -22,6 +23,11 @@ void main() {
   vec4 pose = uPose[letter];
   float depth = float(layer) / float(${LAYERS - 1}) * uDepth;
   vec3 v = vec3(glyph - center, -depth);
+  // Dancing: squash and stretch from the letter's foot, so it lands and pushes off.
+  vec4 dance = uDance[letter];
+  float foot = (uBox[letter].w - uBox[letter].y) * 0.5;
+  v.y = (v.y - foot) * (1.0 - dance.y) + foot;
+  v.x *= 1.0 + dance.y * 0.6;
   float cz = cos(pose.w), sz = sin(pose.w);
   v.xy = mat2(cz, -sz, sz, cz) * v.xy;
   float cx = cos(pose.x), sx = sin(pose.x);
@@ -30,7 +36,7 @@ void main() {
   v = vec3(cy * v.x + sy * v.z, v.y, -sy * v.x + cy * v.z);
   v.z += pose.z;
   float focal = uRes.y * 2.2;
-  vec2 screen = center + v.xy * focal / (focal - v.z);
+  vec2 screen = center + v.xy * focal / (focal - v.z) + vec2(dance.z, -dance.x);
   vGlyph = glyph;
   vLayer = float(layer) / float(${LAYERS - 1});
   vLetter = letter;
@@ -51,6 +57,10 @@ uniform float uTime;
 uniform float uCell;
 uniform vec2 uPhase;
 uniform vec2 uRaly;
+uniform float uDark;
+// The field is an atlas, one padded cell per letter: layout point + offset.
+uniform vec4 uAtlas[${MAX_LETTERS}];
+uniform vec2 uAtlasRes;
 in vec2 vGlyph;
 in float vLayer;
 flat in int vLetter;
@@ -63,7 +73,7 @@ float noise(vec2 p) {
   return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + 1.0), f.x), f.y);
 }
 float fbm(vec2 p) { return 0.55 * noise(p) + 0.3 * noise(p * 2.1 + 5.2) + 0.15 * noise(p * 4.3 + 1.7); }
-float sdfAt(vec2 px) { return (texture(uSdf, px / uRes).r - 0.5) * 2.0 * uRange; }
+float sdfAt(vec2 px) { return (texture(uSdf, (px + uAtlas[vLetter].xy) / uAtlasRes).r - 0.5) * 2.0 * uRange; }
 
 void main() {
   vec2 p = vGlyph;
@@ -76,6 +86,7 @@ void main() {
   // visible where the letter is turned.
   if (vLayer > 0.01) {
     vec3 side = mix(vec3(0.44, 0.38, 0.34), vec3(0.86, 0.4, 0.28), smoothstep(0.35, 1.0, vLayer));
+    side += uDark * (1.0 - 2.0 * dot(side, vec3(0.299, 0.587, 0.114)));
     outColor = vec4(side * inside, inside);
     return;
   }
@@ -165,6 +176,9 @@ void main() {
   vec3 color = (wBase * inside * INK + w.x * engraved * engraveColor + w.y * stripes * interfereColor
     + w.z * swell * inkColor + w.w * geometric * geoColor
     + wc.x * marble * marbleColor + wc.y * riso * risoColor + wc.z * water * waterColor) / max(cover, 1e-4);
+  // Night: flip each colour's lightness and keep its hue, so ink becomes pale
+  // paper-coloured type and the coloured styles stay recognisable.
+  color = clamp(color + uDark * (1.0 - 2.0 * dot(color, vec3(0.299, 0.587, 0.114))), 0.0, 1.0);
   cover = clamp(cover, 0.0, 1.0);
   outColor = vec4(color * cover, cover);
 }`;
@@ -226,7 +240,7 @@ function compile(gl, type, source) {
 }
 
 
-let canvas, gl, program, U, texture, linked = false, pendingBuild = null, pendingFrame = null, built = false;
+let canvas, gl, program, U, texture, linked = false, pendingBuild = null, pendingFrame = null, built = false, dark = false, atlas = null;
 function initialize(target) {
   canvas = target;
   gl = canvas.getContext('webgl2', { premultipliedAlpha: true, antialias: true });
@@ -248,7 +262,7 @@ function initialize(target) {
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     const uniform = name => gl.getUniformLocation(program, name);
-    U = Object.fromEntries(["uSdf", "uBox", "uPose", "uA", "uB", "uC", "uRes", "uRange", "uPx", "uTime", "uCell", "uPhase", "uRaly", "uPad", "uDepth"].map(n => [n, uniform(n)]));
+    U = Object.fromEntries(["uSdf", "uBox", "uPose", "uA", "uB", "uC", "uRes", "uRange", "uPx", "uTime", "uCell", "uPhase", "uRaly", "uPad", "uDepth", "uDance", "uDark", "uAtlas", "uAtlasRes"].map(n => [n, uniform(n)]));
     texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -267,21 +281,26 @@ function initialize(target) {
 function flush() {
   if (!linked) return;
   if (pendingBuild) {
-    const { alpha, width, height, range } = pendingBuild; pendingBuild = null;
-    canvas.width = width; canvas.height = height;
+    const { alpha, width, height, canvasWidth, canvasHeight, offsets, range } = pendingBuild; pendingBuild = null;
+    canvas.width = canvasWidth; canvas.height = canvasHeight;
     const field = signedField(alpha, width, height, range);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, width, height, 0, gl.RED, gl.UNSIGNED_BYTE, field);
-    gl.viewport(0, 0, width, height); built = true;
+    gl.viewport(0, 0, canvasWidth, canvasHeight); built = true;
+    atlas = { offsets, width, height };
   }
   if (!built || !pendingFrame) return;
-  const { boxes, poses, stateA, stateB, stateC, layout, time, phase, raly, count } = pendingFrame;
+  const { boxes, poses, dance, stateA, stateB, stateC, layout, time, phase, raly, count } = pendingFrame;
   pendingFrame = null;
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform1i(U.uSdf, 0);
       gl.uniform4fv(U.uBox, boxes);
       gl.uniform4fv(U.uPose, poses);
+      gl.uniform4fv(U.uDance, dance);
+      gl.uniform1f(U.uDark, dark ? 1 : 0);
+      gl.uniform4fv(U.uAtlas, atlas.offsets);
+      gl.uniform2f(U.uAtlasRes, atlas.width, atlas.height);
       gl.uniform4fv(U.uA, stateA);
       gl.uniform4fv(U.uB, stateB);
       gl.uniform4fv(U.uC, stateC);
@@ -303,6 +322,7 @@ self.onmessage = ({ data }) => {
     if (data.type === 'init') initialize(data.canvas);
     if (data.type === 'build') pendingBuild = data;
     if (data.type === 'frame') pendingFrame = data;
+    if (data.type === 'theme') dark = data.dark;
     flush();
   } catch (error) { postMessage({ type: 'error', message: error.message }); }
 };

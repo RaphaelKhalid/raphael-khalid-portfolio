@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { isDark } from "../utils/theme";
 import { linkProgram, whenIdle } from "../utils/webgl";
 
 // The sunlit floor at the bottom of the page: slow caustic light on paper, as
@@ -11,7 +12,7 @@ void main() { vUv = aPos * 0.5 + 0.5; gl_Position = vec4(aPos, 0.0, 1.0); }`;
 
 const fragment = `#version 300 es
 precision highp float;
-uniform vec2 uRes; uniform float uTime;
+uniform vec2 uRes; uniform float uTime; uniform float uDark;
 in vec2 vUv; out vec4 outColor;
 vec2 hash2(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * vec3(0.1031, 0.1030, 0.0973)); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.xx + p3.yz) * p3.zy); }
 float layer(vec2 p, float t) {
@@ -34,9 +35,10 @@ void main() {
   float a = layer(p, t), b = layer(p * 1.8 + 3.7, t * 1.3);
   float light = (a * 0.5 + b * 0.35 + a * b * 2.0);
   float fade = smoothstep(0.0, 0.45, 1.0 - vUv.y) * smoothstep(0.0, 0.35, vUv.y + 0.1);
-  vec3 sun = vec3(1.0, 0.97, 0.9);
+  // By night the same caustics, as cool moonlight on dark water.
+  vec3 sun = mix(vec3(1.0, 0.97, 0.9), vec3(0.62, 0.8, 1.0), uDark);
   // Light only: laid over the paper, never darker than it.
-  float cover = clamp(light * fade * 0.55, 0.0, 0.85);
+  float cover = clamp(light * fade * mix(0.55, 0.4, uDark), 0.0, 0.85);
   outColor = vec4(sun * cover, cover);
 }`;
 
@@ -65,7 +67,7 @@ const SunlitFloor = ({ className = "" }) => {
       const loc = gl.getAttribLocation(program, "aPos");
       gl.enableVertexAttribArray(loc);
       gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      const uRes = gl.getUniformLocation(program, "uRes"), uTime = gl.getUniformLocation(program, "uTime");
+      const uRes = gl.getUniformLocation(program, "uRes"), uTime = gl.getUniformLocation(program, "uTime"), uDark = gl.getUniformLocation(program, "uDark");
       gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
       const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -80,6 +82,7 @@ const SunlitFloor = ({ className = "" }) => {
         gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
         gl.uniform2f(uRes, canvas.width, canvas.height);
         gl.uniform1f(uTime, (now - start) / 1000);
+        gl.uniform1f(uDark, isDark() ? 1 : 0);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       };
       const tick = now => { frame = requestAnimationFrame(tick); if (visible && !document.hidden) draw(now); };
