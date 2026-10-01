@@ -109,7 +109,7 @@ const ReactiveHeadline = ({ className = "" }) => {
             seed: old?.seed ?? Math.random(),
             engrave: 0, interfere: 0, ink: 0, geo: 0, marble: 0, riso: 0, water: 0, pressure: 0, geoTimer: 0, flow: [0, 0],
             pose: old?.pose ?? [0, 0, 0, 0], velocity: old?.velocity ?? [0, 0, 0, 0],
-            hop: 0, flick: 0, flickDir: 1,
+            hop: 0, level: 0, flick: 0, flickHit: 0, flickDir: 1,
           });
         }
       });
@@ -163,7 +163,9 @@ const ReactiveHeadline = ({ className = "" }) => {
     let lastRaly = null, frame = 0, last = 0, time = 0, visible = true;
     // Music raly hears (the nav's "listen") makes the words dance; night mode
     // flips their ink.
-    let audio = null, groove = 0, seen = null, kickHit = 0, snareHit = 0, snareSide = 1;
+    // Each hit sets a target that decays; what is drawn eases toward it over a
+    // few frames, so a hit lands like a move rather than a jump cut.
+    let audio = null, groove = 0, seen = null, kickHit = 0, kick = 0, snareHit = 0, snare = 0, snareSide = 1;
     const offRaly = onRaly(engine => { audio = engine?.audio?.state ?? null; });
     const offTheme = onTheme(dark => worker.postMessage({ type: 'theme', dark }));
     const approach = (value, target, rise, fall, dt) => value + (target - value) * (1 - Math.exp(-dt * (target > value ? rise : fall)));
@@ -210,12 +212,16 @@ const ReactiveHeadline = ({ className = "" }) => {
       if (music && music.snares !== seen.snares) { seen.snares = music.snares; snareHit = 1; snareSide = -snareSide; }
       if (music && music.hats !== seen.hats && letters.length) {
         seen.hats = music.hats;
-        for (let n = 0; n < 2; n++) {
-          const l = letters[Math.floor(Math.random() * letters.length)];
-          l.flick = 1; l.flickDir = Math.random() < 0.5 ? -1 : 1;
-        }
+        const l = letters[Math.floor(Math.random() * letters.length)];
+        l.flickHit = 1; l.flickDir = Math.random() < 0.5 ? -1 : 1;
       }
-      kickHit *= Math.exp(-dt * 10); snareHit *= Math.exp(-dt * 8);
+      kickHit *= Math.exp(-dt * 6); snareHit *= Math.exp(-dt * 5);
+      kick = approach(kick, kickHit, 25, 25, dt); snare = approach(snare, snareHit, 22, 22, dt);
+      // The equalizer is read as a contour: each letter averages its band with
+      // its neighbours', so the word rolls with the music instead of each
+      // letter twitching on its own band's noise.
+      const spectrumAt = k => music.spectrum[Math.max(0, Math.min(SPECTRUM_BANDS - 1, k))];
+      const contour = k => music ? 0.25 * spectrumAt(k - 1) + 0.5 * spectrumAt(k) + 0.25 * spectrumAt(k + 1) : 0;
       const f = layout.fontPx, tone = (music?.tone ?? 0) * groove, bright = music?.brightness ?? 0.5;
 
       letters.forEach((l, i) => {
@@ -229,7 +235,7 @@ const ReactiveHeadline = ({ className = "" }) => {
         targets[attentionStyle] = Math.max(targets[attentionStyle], prox * slow);
         targets[quickStyle] = Math.max(targets[quickStyle], prox * fast);
         targets[style] = Math.max(targets[style], 0.7 * wave);
-        const band = music ? music.spectrum[letters.length > 1 ? Math.round(i * (SPECTRUM_BANDS - 1) / (letters.length - 1)) : 0] : 0;
+        const band = contour(letters.length > 1 ? Math.round(i * (SPECTRUM_BANDS - 1) / (letters.length - 1)) : 0);
         const colour = Math.min(1, tone * (0.35 + 0.65 * band) * 1.3);
         targets[6] = Math.max(targets[6], colour * (1 - bright));
         targets[4] = Math.max(targets[4], colour * bright);
@@ -270,13 +276,15 @@ const ReactiveHeadline = ({ className = "" }) => {
 
         // The dance is applied straight to the drawn letter, not through the
         // pose springs, so it lands on the sound rather than after it.
-        l.hop = approach(l.hop, band * 0.2 * f * groove, 30, 12, dt);
-        l.flick *= Math.exp(-dt * 14);
+        l.level = approach(l.level, band, 14, 4, dt);
+        l.hop = approach(l.hop, l.level * 0.16 * f * groove, 16, 6, dt);
+        l.flickHit *= Math.exp(-dt * 7);
+        l.flick = approach(l.flick, l.flickHit, 20, 20, dt);
         const parity = i % 2 ? 1 : -1;
-        const hop = l.hop - kickHit * 0.035 * f * groove;
-        const squash = (kickHit * 0.14 - band * 0.05) * groove;
-        const step = snareHit * snareSide * parity * 0.06 * f * groove;
-        const spin = (snareHit * snareSide * parity * 0.07 + l.flick * l.flickDir * 0.12) * groove;
+        const hop = l.hop - kick * 0.03 * f * groove;
+        const squash = (kick * 0.1 - l.level * 0.03) * groove;
+        const step = snare * snareSide * parity * 0.035 * f * groove;
+        const spin = (snare * snareSide * parity * 0.04 + l.flick * l.flickDir * 0.05) * groove;
         dance.set([hop * layout.scale, squash, step * layout.scale, spin], i * 4);
       });
       letters.forEach((l, i) => {
