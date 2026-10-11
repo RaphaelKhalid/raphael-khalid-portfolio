@@ -25,7 +25,7 @@ const services = [
 
 const experiences = [
   {
-    title: "Course Instructor",
+    title: "Program Manager",
     company_name: "Center for Future Global Leaders",
     icon: cfgl,
     iconBg: "#FFFFFF",
