@@ -67,7 +67,13 @@ const RalyLayer = () => {
       sayUntil = performance.now() + 2600 + text.length * 55;
       smooth.ready = false;
     }
-    const startTour = () => { clearTimeout(autoTimer); if (engine && !reduced) tour.start(); };
+    // A tour asked for before raly has loaded starts the moment it arrives.
+    let tourWanted = false;
+    const startTour = () => {
+      clearTimeout(autoTimer);
+      if (reduced) return;
+      if (engine) tour.start(); else tourWanted = true;
+    };
 
     function follow() {
       frame = requestAnimationFrame(follow);
@@ -119,6 +125,7 @@ const RalyLayer = () => {
       engine.start();
       window.raly = engine;
       frame = requestAnimationFrame(follow);
+      if (tourWanted) tour.start();
     }).catch(error => { if (!disposed) console.warn("raly could not load", error); });
 
     const isInteractive = target => target instanceof Element && target.closest(INTERACTIVE);
@@ -137,6 +144,7 @@ const RalyLayer = () => {
         ))
       )) return;
       clearTimeout(autoTimer);
+      tourWanted = false;
       if (tour.active) tour.stop();
     };
     const onRaly = (x, y, target) => Boolean(engine) && !isInteractive(target) && engine.hover(x, y);
