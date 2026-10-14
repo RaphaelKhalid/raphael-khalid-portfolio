@@ -105,18 +105,43 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   const swimmer = createSwimmer(specimen, { scale: SCALE, random, faithful: true });
   const organism = new THREE.Group(); organism.scale.setScalar(SCALE); scene.add(organism);
   const skinGroup = new THREE.Group();
-  let meshes = [];
-  // One skin program carries every art style. It is large and compiles once,
-  // while the line drawing stands in; after that a click changes style with
-  // no compiling at all. (Compiling a style per click froze the page.)
+  let meshes = [], styleMaterials = [], styleTimer = 0, stylesWanted = false;
+  // One skin program carries every art style, so a click changes style with
+  // no compiling at all. (Compiling a style per click froze the page.) That
+  // program takes seconds to compile, so raly first wears a natural-only skin
+  // (about a quarter of the compile) and the styles compile behind it; the
+  // first style is not due for 30 s. ?look=ink asks for a style from the start.
+  const quickSkin = !askedLook || lookIndex(askedLook) === 0;
+  let styled = !quickSkin;
   function prepareSkin() {
     meshes = specimen.surfaces.map(surface => {
-      const mesh = new THREE.Mesh(surface.geometry, createSkinMaterial(shared, surface, { formation, membraneOnly: true }));
+      const mesh = new THREE.Mesh(surface.geometry, createSkinMaterial(shared, surface, { formation, membraneOnly: true, looks: quickSkin ? [0] : undefined }));
       mesh.customDepthMaterial = createDepthMaterial(shared, surface, { membraneOnly: true });
       mesh.castShadow = true; mesh.frustumCulled = false;
       skinGroup.add(mesh);
       return mesh;
     });
+  }
+  // The styles compile on the driver's threads while raly keeps swimming in
+  // its natural skin. A new program's first draw still costs the GPU a beat,
+  // so they take its place well after compiling, or once a style is wanted.
+  async function prepareStyles() {
+    const group = new THREE.Group();
+    styleMaterials = specimen.surfaces.map(surface => createSkinMaterial(shared, surface, { formation, membraneOnly: true }));
+    meshes.forEach((mesh, i) => {
+      const stand = new THREE.Mesh(mesh.geometry, styleMaterials[i]);
+      stand.castShadow = true; stand.frustumCulled = false;
+      group.add(stand);
+    });
+    const issued = performance.now();
+    await compileScene(group, scene);
+    // Without parallel compiling a wanted style would freeze raly until the
+    // compile ends, so there the click's change waits its turn instead.
+    await settle(issued, 15000, () => parallel && stylesWanted);
+    if (disposed) return;
+    meshes.forEach((mesh, i) => { mesh.material.dispose(); mesh.material = styleMaterials[i]; });
+    styleMaterials = [];
+    styled = true;
   }
   const drawings = specimen.surfaces.map(surface => {
     const mesh = new THREE.Mesh(surface.geometry, createFormationMaterial(shared, surface, formation));
@@ -340,10 +365,29 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     render();
     runtime.status('is-ready');
     schedule();
+    // Let the first seconds of the page settle before the styles compile.
+    if (!styled) styleTimer = setTimeout(() => prepareStyles().catch(error => {
+      if (!disposed) console.warn('raly styles could not compile; keeping its natural skin', error);
+    }), 2500);
   }
-  // Style changes wait for the skin; a click while it loads plays once it is ready.
-  function activateSkinLooks() {
-    return detailed ? compiled : previewReady;
+  // Style changes wait for the skin, and art styles for their program; a
+  // click while either loads plays once it is ready.
+  function activateSkinLooks(looks = []) {
+    if (!detailed) return previewReady;
+    const natural = looks.every(look => look === 0);
+    if (!natural) stylesWanted = true;
+    return compiled && (styled || natural);
+  }
+  // Without KHR_parallel_shader_compile (Firefox), compileAsync resolves at
+  // once and the first draw blocks until the driver is done, freezing raly.
+  // The driver compiles in the background all the same, so a new program gets
+  // time before it is drawn.
+  const parallel = renderer.extensions.has('KHR_parallel_shader_compile');
+  function settle(since, ms, early = () => false) {
+    return new Promise(resolve => {
+      const check = () => (disposed || early() || performance.now() - since >= ms ? resolve() : setTimeout(check, 100));
+      check();
+    });
   }
   function compileScene(group, targetScene = null) {
     try { compilation = renderer.compileAsync(group, camera, targetScene); }
@@ -377,7 +421,9 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
           }
           if (disposed) return;
           prepareSkin();
+          const issued = performance.now();
           await compileScene(skinGroup, scene);
+          if (!parallel) await settle(issued, 2500);
           whenCompiled();
         } catch (error) {
           if (!disposed) { console.warn('raly skin could not finish; keeping the drawing', error); runtime.status('is-fallback'); }
@@ -455,7 +501,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       if (disposed) return;
       disposed = true;
       state.running = false; cancelAnimationFrame(frameId);
-      cancelAnimationFrame(compileFrame);
+      cancelAnimationFrame(compileFrame); clearTimeout(styleTimer);
       unsubscribe();
       audio.disable();
       // Three's async compiler polls its material programs. Keep those alive
@@ -463,6 +509,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
       const release = () => {
         meshes.forEach(mesh => mesh.customDepthMaterial.dispose());
         meshes.forEach(mesh => mesh.material.dispose());
+        styleMaterials.forEach(material => material.dispose());
         drawings.forEach(mesh => mesh.material.dispose());
         specimen.surfaces.forEach(surface => surface.geometry.dispose());
         shadowPlane.geometry.dispose(); shadowPlane.material.dispose();
