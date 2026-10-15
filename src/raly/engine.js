@@ -100,17 +100,18 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
   shared.palette.value.set(specimen.palette.hue, specimen.palette.warmth);
   // It moves through its palettes and art styles; ?look=ink shows and holds one.
   const askedLook = new URLSearchParams(runtime.search).get('look');
-  const palettes = createAppearanceCycle(shared, { look: askedLook, canTransition: activateSkinLooks });
+  const palettes = createAppearanceCycle(shared, { look: askedLook, canShow: look => !detailed || look === 0 || styled, canTransition: activateSkinLooks });
   shared.morph.value.set(0, 0, 0, 1);
   const swimmer = createSwimmer(specimen, { scale: SCALE, random, faithful: true });
   const organism = new THREE.Group(); organism.scale.setScalar(SCALE); scene.add(organism);
   const skinGroup = new THREE.Group();
-  let meshes = [], styleMaterials = [], styleTimer = 0, stylesWanted = false;
+  let meshes = [], styleMaterials = [], styleTimer = 0;
   // One skin program carries every art style, so a click changes style with
   // no compiling at all. (Compiling a style per click froze the page.) That
   // program takes seconds to compile, so raly first wears a natural-only skin
-  // (about a quarter of the compile) and the styles compile behind it; the
-  // first style is not due for 30 s. ?look=ink asks for a style from the start.
+  // (about a quarter of the compile) and the styles compile behind it, where
+  // the browser can compile in the background; until then the cycle keeps to
+  // the natural palettes. ?look=ink asks for a style from the start.
   const quickSkin = !askedLook || lookIndex(askedLook) === 0;
   let styled = !quickSkin;
   function prepareSkin() {
@@ -123,7 +124,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     });
   }
   // The styles compile on the driver's threads while raly keeps swimming in
-  // its natural skin, then take its place.
+  // its natural skin, then take its place once the page has settled: a new
+  // program's first draw still costs the GPU a beat.
   async function prepareStyles() {
     const group = new THREE.Group();
     styleMaterials = specimen.surfaces.map(surface => createSkinMaterial(shared, surface, { formation, membraneOnly: true }));
@@ -134,8 +136,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     });
     const issued = performance.now();
     await compileScene(group, scene);
-    await linked();
-    await settle(issued, 15000, () => stylesWanted);
+    await new Promise(resolve => setTimeout(resolve, Math.max(0, issued + 15000 - performance.now())));
     if (disposed) return;
     meshes.forEach((mesh, i) => { mesh.material.dispose(); mesh.material = styleMaterials[i]; });
     styleMaterials = [];
@@ -364,23 +365,23 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     runtime.status('is-ready');
     schedule();
     // Let the first seconds of the page settle before the styles compile.
-    if (!styled) styleTimer = setTimeout(() => prepareStyles().catch(error => {
+    // Without parallel compiling the driver's compile stalls the browser's
+    // whole GPU process, every tab's painting with it, for seconds; there raly
+    // keeps to its natural palettes.
+    if (!styled && parallel) styleTimer = setTimeout(() => prepareStyles().catch(error => {
       if (!disposed) console.warn('raly styles could not compile; keeping its natural skin', error);
     }), 2500);
   }
   // Style changes wait for the skin, and art styles for their program; a
-  // click while either loads plays once it is ready.
+  // click while the skin loads plays once it is ready.
   function activateSkinLooks(looks = []) {
-    if (!detailed) return previewReady;
-    const natural = looks.every(look => look === 0);
-    if (!natural) stylesWanted = true;
-    return compiled && (styled || natural);
+    return detailed ? compiled && (styled || looks.every(look => look === 0)) : previewReady;
   }
   // Without KHR_parallel_shader_compile (Firefox, Safari), compileAsync
   // resolves at once and the first draw blocks until the driver is done,
-  // freezing raly for as long as the compile takes, seconds on a phone. The
-  // driver compiles in the background all the same, and a fence queued behind
-  // the link signals as it nears the end, which paces the wait to the device.
+  // freezing raly for as long as the compile takes, seconds on a phone. A
+  // fence queued behind the link signals as it nears the end, which paces the
+  // first draw to the device.
   const parallel = renderer.extensions.has('KHR_parallel_shader_compile');
   function linked() {
     const gl = renderer.getContext();
@@ -396,14 +397,6 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
         // under as long again.
         setTimeout(resolve, waited);
       };
-      check();
-    });
-  }
-  // A new program's first draw still costs the GPU a beat, so the styles wait
-  // for a quiet moment unless one is wanted sooner.
-  function settle(since, ms, early = () => false) {
-    return new Promise(resolve => {
-      const check = () => (disposed || early() || performance.now() - since >= ms ? resolve() : setTimeout(check, 100));
       check();
     });
   }
