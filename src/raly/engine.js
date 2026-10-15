@@ -123,8 +123,7 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     });
   }
   // The styles compile on the driver's threads while raly keeps swimming in
-  // its natural skin. A new program's first draw still costs the GPU a beat,
-  // so they take its place well after compiling, or once a style is wanted.
+  // its natural skin, then take its place.
   async function prepareStyles() {
     const group = new THREE.Group();
     styleMaterials = specimen.surfaces.map(surface => createSkinMaterial(shared, surface, { formation, membraneOnly: true }));
@@ -135,9 +134,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     });
     const issued = performance.now();
     await compileScene(group, scene);
-    // Without parallel compiling a wanted style would freeze raly until the
-    // compile ends, so there the click's change waits its turn instead.
-    await settle(issued, 15000, () => parallel && stylesWanted);
+    await linked();
+    await settle(issued, 15000, () => stylesWanted);
     if (disposed) return;
     meshes.forEach((mesh, i) => { mesh.material.dispose(); mesh.material = styleMaterials[i]; });
     styleMaterials = [];
@@ -378,11 +376,31 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
     if (!natural) stylesWanted = true;
     return compiled && (styled || natural);
   }
-  // Without KHR_parallel_shader_compile (Firefox), compileAsync resolves at
-  // once and the first draw blocks until the driver is done, freezing raly.
-  // The driver compiles in the background all the same, so a new program gets
-  // time before it is drawn.
+  // Without KHR_parallel_shader_compile (Firefox, Safari), compileAsync
+  // resolves at once and the first draw blocks until the driver is done,
+  // freezing raly for as long as the compile takes, seconds on a phone. The
+  // driver compiles in the background all the same, and a fence queued behind
+  // the link signals as it nears the end, which paces the wait to the device.
   const parallel = renderer.extensions.has('KHR_parallel_shader_compile');
+  function linked() {
+    const gl = renderer.getContext();
+    if (parallel || !gl.fenceSync) return Promise.resolve();
+    const fence = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0), issued = performance.now();
+    gl.flush();
+    return new Promise(resolve => {
+      const check = () => {
+        const waited = performance.now() - issued;
+        if (!disposed && waited < 20000 && gl.getSyncParameter(fence, gl.SYNC_STATUS) !== gl.SIGNALED) { setTimeout(check, 50); return; }
+        gl.deleteSync(fence);
+        // It signals before the driver is quite done; the rest takes well
+        // under as long again.
+        setTimeout(resolve, waited);
+      };
+      check();
+    });
+  }
+  // A new program's first draw still costs the GPU a beat, so the styles wait
+  // for a quiet moment unless one is wanted sooner.
   function settle(since, ms, early = () => false) {
     return new Promise(resolve => {
       const check = () => (disposed || early() || performance.now() - since >= ms ? resolve() : setTimeout(check, 100));
@@ -421,9 +439,8 @@ export function createRaly(canvas, { reducedMotion = false, quality = 'high', se
           }
           if (disposed) return;
           prepareSkin();
-          const issued = performance.now();
           await compileScene(skinGroup, scene);
-          if (!parallel) await settle(issued, 2500);
+          await linked();
           whenCompiled();
         } catch (error) {
           if (!disposed) { console.warn('raly skin could not finish; keeping the drawing', error); runtime.status('is-fallback'); }
