@@ -33,8 +33,9 @@ export const APPEARANCES = [
 const HOLD = 30, BLEND = 5;
 const smooth = t => t * t * (3 - 2 * t);
 
-/** Cycles raly's appearance. `look` names one to show and hold (for previews). */
-export function createAppearanceCycle(shared, { look, canTransition = () => true } = {}) {
+/** Cycles raly's appearance. `look` names one to show and hold (for previews).
+ *  Appearances whose look `canShow` refuses are passed over for now. */
+export function createAppearanceCycle(shared, { look, canShow = () => true, canTransition = () => true } = {}) {
   const colors = Object.fromEntries(Object.entries(PALETTES).map(([name, p]) => [name, p.ramp.map(hex => new THREE.Color(hex))]));
   const asked = look ? APPEARANCES.findIndex(a => a.look === look) : -1;
   let from = Math.max(0, asked), to = from, t = 1, held = 0, blend = BLEND;
@@ -80,7 +81,9 @@ export function createAppearanceCycle(shared, { look, canTransition = () => true
       if (t < 1) { t = Math.min(1, t + dt / blend); apply(); return; }
       held += dt;
       if (!requested && (paused || held <= HOLD)) return;
-      const next = (to + 1) % APPEARANCES.length;
+      let next = (to + 1) % APPEARANCES.length;
+      while (next !== to && !canShow(lookIndex(APPEARANCES[next].look))) next = (next + 1) % APPEARANCES.length;
+      if (next === to) return;
       const looks = [lookIndex(APPEARANCES[to].look), lookIndex(APPEARANCES[next].look)];
       // Keep every visible uniform unchanged until the whole transition is ready.
       if (!canTransition(looks)) return;
