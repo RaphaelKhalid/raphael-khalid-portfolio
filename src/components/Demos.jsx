@@ -39,9 +39,9 @@ const SOURCE_GROUPS = [
         name: "AutoLabs",
         tag: "Flagship",
         href: "https://autolabs-ebon.vercel.app/",
-        note: "A public lab where autonomous agents run AI-safety experiments end to end — this is the live run.",
+        note: "A public lab where agents ran an AI-safety experiment end to end; this is the finished write-up.",
         blurb:
-          "The current run trains a Matryoshka sparse autoencoder on Qwen2.5-7B to surface persona-relevant directions that prompting can't reach. What you see below is the live page: a spend ledger, frozen protocol hashes, and a training curve the pod reports as it checkpoints — no screenshots, the real thing.",
+          "The completed run trained a Matryoshka sparse autoencoder on Qwen2.5-7B to look for persona-relevant directions that prompting can't reach. The page below is the finished write-up, with its spend ledger, frozen protocol hashes, training curve and screen results.",
       },
       {
         key: "afterlight",
@@ -59,9 +59,9 @@ const SOURCE_GROUPS = [
         name: "RALYtable",
         tag: "Interpretability",
         href: "https://ralytable.vercel.app/",
-        note: "Interpretability for reasoning models: read the internal state, not just the words.",
+        note: "Can a model show a readable internal state without losing capability? Here, no.",
         blurb:
-          "Probing tooling aimed at reasoning models — reading the internal state behind a chain of thought rather than trusting the text it emits. Live, interactive.",
+          "A small model forced through a 512-symbol readable bottleneck. The capability test came out negative (a matched dense model won 152 of 179 blind comparisons), so the project became an audit of whether exposed structure is actually load-bearing.",
       },
     ],
   },
@@ -118,7 +118,7 @@ const SOURCE_GROUPS = [
         id: "pid",
         name: "PID control",
         tag: "Control",
-        href: "https://robotics-navy.vercel.app/units/pid-control",
+        href: "https://robotics-navy.vercel.app/units/pid",
         note: "Overdamped, underdamped, and the snap of critical damping.",
         blurb:
           "Tune the gains and watch the step response. Actuator saturation and integral windup are both modelled, which is where most real controllers actually go wrong.",

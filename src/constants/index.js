@@ -100,7 +100,7 @@ const projects = [
     artwork: "grid-wave",
     pixelArtwork: "ralytable",
     description:
-      "Interpretability tooling aimed at reasoning models: probing and reading the internal state behind a model's chain of thought rather than trusting the words it emits. Live, interactive web app.",
+      "An attempt at an interpretable-by-design model: a small language model forced through a 512-symbol readable bottleneck. The capability result was negative (a matched dense model won 152 of 179 blind comparisons), so the work turned to audits of whether the exposed structure is load-bearing.",
     tags: [
       { name: "interpretability", color: "blue-text-gradient" },
       { name: "reasoning", color: "green-text-gradient" },
@@ -109,11 +109,11 @@ const projects = [
     source_code_link: "https://ralytable.vercel.app/",
   },
   {
-    name: "Watcher — Monitor-Evasion Benchmark",
+    name: "Watcher — Bash Policy Benchmark",
     artwork: "particle-storm",
     pixelArtwork: "watcher",
     description:
-      "A benchmark measuring whether a model under oversight learns to evade its monitor — quantifying how monitorability degrades once a model is optimized against a watcher, and what that means for scalable oversight.",
+      "An offline test of Apollo Research's Watcher: does its deterministic Bash policy tier let dangerous commands through when a harmless-looking prefix or wrapper changes their surface form? On the installed 63-rule policy, 6 of 110 dangerous strings were routed to allow. It tests the policy router, not the full LLM monitor.",
     tags: [
       { name: "aisafety", color: "blue-text-gradient" },
       { name: "evals", color: "green-text-gradient" },

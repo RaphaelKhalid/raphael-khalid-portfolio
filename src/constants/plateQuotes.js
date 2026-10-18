@@ -4,7 +4,7 @@
 export const plateQuotes = {
   "autolabs": "I trained a sparse autoencoder on language-model activations and evaluated whether its decoder directions produced interpretable changes in response style.",
   "afterlight": "In the VPN example, the model chose A without a cue and B after a direct request based on sports-league sponsorship; its explanation cited price, coverage, and audit status.",
-  "ralytable": "A readable symbolic bottleneck made a small model worse: the ordinary control won 85.4% of 179 blind comparisons.",
+  "ralytable": "A readable symbolic bottleneck made a small model worse: the ordinary control won 152 of 179 blind comparisons (one tie).",
   "watcher": "In this installed 63-rule deterministic policy and this 22-case synthetic corpus, some dangerous strings were routed to allow, and allowlist-style wrappers increased the descriptive allow count from 1/22 to 3/22.",
   "roolytooly": "On a real hard benchmark the harness changes the honesty number, not the skill number.",
   "refusal-erosion": "This is the deployment layer nobody re-tests: frontier labs red-team their models, but the wrapper a 13-year-old actually talks to ships untested.",
