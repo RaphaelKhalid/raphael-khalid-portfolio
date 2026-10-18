@@ -3,3 +3,6 @@ dist
 .vercel
 *.zip
 *.pdf
+
+# local agent notes (kept out of the repo)
+/CLAUDE.md
