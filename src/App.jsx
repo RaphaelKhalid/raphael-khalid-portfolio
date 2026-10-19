@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useState } from "react";
+import { Fragment, startTransition, useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { BrowserRouter } from "react-router-dom";
 import { Contact, Demos, Experience, Hero, Navbar, Photographs, RalyLayer, Works } from "./components";
@@ -8,8 +8,8 @@ import { Contact, Demos, Experience, Hero, Navbar, Photographs, RalyLayer, Works
 // (#contact) mounts everything at once so the browser can jump to it.
 const LATER = [Demos, Works, Experience, Photographs, Contact];
 
-const BelowHero = () => {
-  const [count, setCount] = useState(() => (location.hash ? LATER.length : 0));
+const BelowHero = ({ all = false }) => {
+  const [count, setCount] = useState(() => (all || location.hash ? LATER.length : 0));
   useEffect(() => {
     if (count >= LATER.length) return undefined;
     const frame = requestAnimationFrame(() => startTransition(() => setCount(n => n + 1)));
@@ -20,19 +20,24 @@ const BelowHero = () => {
 
 // A field journal with a living specimen: raly lives in a fixed layer behind
 // the page, and the page reads over it.
-const App = () => {
+//
+// `prerender` is the build-time render (src/entry-server.jsx): every section
+// at once and no router, so the shipped HTML already holds the whole page for
+// crawlers and AI search engines that don't run JavaScript.
+const App = ({ prerender = false }) => {
+  const Shell = prerender ? Fragment : BrowserRouter;
   return (
-    <BrowserRouter>
+    <Shell>
       <RalyLayer />
       <div className="relative" style={{ zIndex: 1 }}>
         <Navbar />
         <main>
           <Hero />
-          <BelowHero />
+          <BelowHero all={prerender} />
         </main>
       </div>
-      <Analytics />
-    </BrowserRouter>
+      {!prerender && <Analytics />}
+    </Shell>
   );
 };
 

@@ -352,7 +352,7 @@ export default function Works() {
               onFocus={e => { focused.current = i; showCard(i, e.currentTarget); }}
               onBlur={() => { if (focused.current === i) focused.current = -1; hideCard(i); }}
               aria-label={`${project.name}: open details`}
-              aria-describedby={card?.i === i ? "wall-card" : undefined}
+              aria-describedby={`wall-about-${i}`}
             >
               <span
                 className="wall-tile__art"
@@ -366,6 +366,11 @@ export default function Works() {
               <span className="wall-tile__name">
                 {i === 0 && <span className="wall-tile__flag">flagship · </span>}
                 {shortName(project.name)}
+              </span>
+              {/* What the project is, for screen readers and for search engines
+                  that read the page as text; the art carries it visually. */}
+              <span id={`wall-about-${i}`} className="sr-only">
+                {project.description}{plateQuotes[project.pixelArtwork] ? ` “${plateQuotes[project.pixelArtwork]}”` : ""}
               </span>
               {card?.i === i && (
                 <span id="wall-card" role="tooltip" className={`wall-card wall-card--${card.align}`}>
