@@ -100,9 +100,9 @@ const Contact = () => {
       <div id="sunlit-floor" className="sunlit-floor mt-16 h-[46vh] min-h-[300px]">
         <SunlitFloor />
         <div className={`${styles.paddingX} max-w-[1440px] mx-auto h-full flex items-end`}>
-          <p className="relative w-full flex justify-between py-5 font-mono text-[10.5px] tracking-[0.16em] uppercase text-muted">
-            <span>raphaelkhalid.com</span>
-            <span>© {new Date().getFullYear()} raphael khalid</span>
+          <p className="relative w-full flex flex-wrap justify-between gap-x-6 gap-y-2 py-5 font-mono text-[10.5px] tracking-[0.16em] uppercase text-muted">
+            <span>Raphael Khalid · AI safety researcher &amp; machine learning engineer · San Francisco Bay Area</span>
+            <span>© {new Date().getFullYear()} raphaelkhalid.com</span>
           </p>
         </div>
       </div>

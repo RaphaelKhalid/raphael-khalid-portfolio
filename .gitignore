@@ -6,3 +6,4 @@ dist
 
 # local agent notes (kept out of the repo)
 /CLAUDE.md
+dist-ssr

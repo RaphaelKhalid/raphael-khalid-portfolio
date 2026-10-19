@@ -6,7 +6,7 @@
 const KEY = "theme";
 const BAR = { light: "#F4EBDF", dark: "#0E131B" };
 
-export const isDark = () => document.documentElement.dataset.theme === "dark";
+export const isDark = () => typeof document !== "undefined" && document.documentElement.dataset.theme === "dark";
 
 export function setTheme(theme) {
   document.documentElement.dataset.theme = theme;

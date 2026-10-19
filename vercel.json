@@ -1,22 +1,36 @@
 {
+  "buildCommand": "npm run build",
   "headers": [
     {
       "source": "/assets/:path*",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ],
   "redirects": [
     {
       "source": "/",
-      "has": [{ "type": "host", "value": "raphael-khalid.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "raphael-khalid.vercel.app"
+        }
+      ],
       "destination": "https://raphaelkhalid.com/",
       "permanent": true
     },
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "raphael-khalid.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "raphael-khalid.vercel.app"
+        }
+      ],
       "destination": "https://raphaelkhalid.com/:path*",
       "permanent": true
     }
