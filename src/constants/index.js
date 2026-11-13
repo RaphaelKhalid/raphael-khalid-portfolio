@@ -72,8 +72,7 @@ const projects = [
   {
     name: "Andar Control",
     artwork: "network-pulse",
-    // The plate art in this slot is keyed "autolabs". It stays until Andar has its own plate.
-    pixelArtwork: "autolabs",
+    pixelArtwork: "andar",
     description:
       "White-box methods for AI control and alignment. The latest result: a linear probe trained on a sandbagging model's activations scored its held-back failures 1.03 standard deviations above its honest failures on the same 127 tasks (95% CI 0.81 to 1.27). The strongest text monitor tried reached 0.42. One model, with the behavior trained in.",
     tags: [

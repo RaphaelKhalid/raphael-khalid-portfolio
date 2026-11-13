@@ -2,7 +2,7 @@
 // or site (checked against the source text), shown when a plate is hovered
 // or focused and in its detail panel (see Works.jsx).
 export const plateQuotes = {
-  "autolabs": "We compared a sandbagging model's held-back failures with its own honest failures on the same 127 tasks.",
+  "andar": "We compared a sandbagging model's held-back failures with its own honest failures on the same 127 tasks.",
   "afterlight": "In the VPN example, the model chose A without a cue and B after a direct request based on sports-league sponsorship; its explanation cited price, coverage, and audit status.",
   "ralytable": "A readable symbolic bottleneck made a small model worse: the ordinary control won 152 of 179 blind comparisons (one tie).",
   "watcher": "In this installed 63-rule deterministic policy and this 22-case synthetic corpus, some dangerous strings were routed to allow, and allowlist-style wrappers increased the descriptive allow count from 1/22 to 3/22.",
