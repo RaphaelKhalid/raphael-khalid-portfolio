@@ -37,7 +37,7 @@ const SOURCE_GROUPS = [
         key: "autolabs",
         src: "https://autolabs-ebon.vercel.app/",
         name: "AutoLabs",
-        tag: "Flagship",
+        tag: "AI safety",
         href: "https://autolabs-ebon.vercel.app/",
         note: "A public lab where agents ran an AI-safety experiment end to end; this is the finished write-up.",
         blurb:

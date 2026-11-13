@@ -38,9 +38,9 @@ const STEPS = [
   {
     scroll: ["#plate-wall", 170],
     mark: () => $('#plate-wall [data-tile="0"] .wall-tile__art'),
-    // raly waits beside AutoLabs, and the plates wake as it arrives.
+    // raly waits beside Andar Control, and the plates wake as it arrives.
     near: r => [r.right + 70, r.top + r.height * 0.55],
-    say: "autolabs is where most of my current research lives",
+    say: "andar control is where most of my current research lives",
     ms: 6500,
   },
   {

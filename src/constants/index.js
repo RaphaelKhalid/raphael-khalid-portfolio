@@ -70,17 +70,18 @@ const experiences = [
 
 const projects = [
   {
-    name: "AutoLabs",
+    name: "Andar Control",
     artwork: "network-pulse",
+    // The plate art in this slot is keyed "autolabs". It stays until Andar has its own plate.
     pixelArtwork: "autolabs",
     description:
-      "A public laboratory where autonomous agents design, run, and report AI-safety experiments end to end — a spend ledger, frozen protocol hashes, and every public claim checked against the record. The flagship run trained a Matryoshka sparse autoencoder on Qwen2.5-7B to look for persona-relevant directions. Whether prompting can reach the same effects was not tested.",
+      "White-box methods for AI control and alignment. The latest result: a linear probe trained on a sandbagging model's activations scored its held-back failures 1.03 standard deviations above its honest failures on the same 127 tasks (95% CI 0.81 to 1.27). The strongest text monitor tried reached 0.42. One model, with the behavior trained in.",
     tags: [
       { name: "aisafety", color: "blue-text-gradient" },
       { name: "interpretability", color: "green-text-gradient" },
-      { name: "agents", color: "pink-text-gradient" },
+      { name: "control", color: "pink-text-gradient" },
     ],
-    source_code_link: "https://autolabs-ebon.vercel.app/",
+    source_code_link: "https://andarcontrol.org/",
   },
   {
     name: "Afterlight",
