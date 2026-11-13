@@ -41,7 +41,7 @@ const SOURCE_GROUPS = [
         href: "https://autolabs-ebon.vercel.app/",
         note: "A public lab where agents ran an AI-safety experiment end to end; this is the finished write-up.",
         blurb:
-          "The completed run trained a Matryoshka sparse autoencoder on Qwen2.5-7B to look for persona-relevant directions that prompting can't reach. The page below is the finished write-up, with its spend ledger, frozen protocol hashes, training curve and screen results.",
+          "The completed run trained a Matryoshka sparse autoencoder on Qwen2.5-7B to look for persona-relevant directions. Whether prompting can reach the same effects was not tested. The page below is the finished write-up, with its spend ledger, frozen protocol hashes, training curve and screen results.",
       },
       {
         key: "afterlight",

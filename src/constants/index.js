@@ -74,7 +74,7 @@ const projects = [
     artwork: "network-pulse",
     pixelArtwork: "autolabs",
     description:
-      "A public laboratory where autonomous agents design, run, and report AI-safety experiments end to end — a spend ledger, frozen protocol hashes, and every public claim checked against the record. The live flagship run trains a Matryoshka sparse autoencoder on Qwen2.5-7B to surface persona-relevant directions that prompting can't reach.",
+      "A public laboratory where autonomous agents design, run, and report AI-safety experiments end to end — a spend ledger, frozen protocol hashes, and every public claim checked against the record. The flagship run trained a Matryoshka sparse autoencoder on Qwen2.5-7B to look for persona-relevant directions. Whether prompting can reach the same effects was not tested.",
     tags: [
       { name: "aisafety", color: "blue-text-gradient" },
       { name: "interpretability", color: "green-text-gradient" },
@@ -126,7 +126,7 @@ const projects = [
     artwork: "network-pulse",
     pixelArtwork: "roolytooly",
     description:
-      "A self-improving inference harness that lifts a model's LiveCodeBench-hard pass rate from 90% to 93% by letting it iterate on its own tool use and test feedback. Live write-up.",
+      "A self-improving inference harness that lets a model iterate on its own tool use and test feedback. On 30 LiveCodeBench-hard problems the model passed 28 with the harness and 27 without it (93% against 90%). Live write-up.",
     tags: [
       { name: "agents", color: "blue-text-gradient" },
       { name: "codegen", color: "green-text-gradient" },
@@ -138,7 +138,7 @@ const projects = [
     name: "Deployment-Layer Refusal Erosion",
     artwork: "refusal-erosion",
     pixelArtwork: "refusal-erosion",
-    description: "An evaluation harness showing that an aligned model's refusals collapse when the same request is routed through an ordinary product system prompt, with no jailbreak. Replicated across three developers' models (Google Gemini, DeepSeek V4 Flash, and an OpenRouter-routed model) at p<0.0001 via an exact McNemar test, and validated against a blind human labeling pass. Ships with a live, interactive demo.",
+    description: "An evaluation harness showing that an aligned model's refusals collapse when the same request is routed through an ordinary product system prompt, with no jailbreak. Measured on three models (Gemini Flash-Lite, DeepSeek V4 Flash, and an unnamed OpenRouter free-tier model): the refusal-to-compliance flip is p<0.0001 on each under a keyword grader, via an exact McNemar test. A blind human labeling pass agreed with that grader on 55% of cells (Cohen's kappa 0.35). The live demo is paused, and the findings are on the site.",
     tags: [
       { name: "aisafety", color: "blue-text-gradient" },
       { name: "evals", color: "green-text-gradient" },
